@@ -6,59 +6,36 @@ const app_express = express();
 const server = app_express.listen(3000);
 const io = require('socket.io').listen(server);
 const fs = require('fs');
-
-var osc = require('node-osc');
-var oscServer = new osc.Server(12345, '127.0.0.1');
-
+const osc = require('node-osc');
 const createCSVWriter = require('csv-writer').createObjectCsvWriter;
-var csvTimeWriter;
+const path = require('path');
 
-const sendRate = .2; // seconds
-const expectedSampleRate = 250; // samples per second
-var samplesToSend = expectedSampleRate * sendRate;
-var toSend = [];
+var oscServer = new osc.Server(12345, '127.0.0.1');
+// var spawn = require("child_process").spawn; // to run
 var mode = "training";
 
-//Will determine if collecting and sending to file currently.
+
+/*
+Training Parameters
+*/
+var csvTimeWriter;
 //Other values will only be updated if collecting is true!
-var collecting = false;
+var collecting = false; //Will determine if collecting and sending to file currently.
 var duration = 0;
 var direction = "none";
 var active = [];
 var collectionTimer=null;
 var loop = false;
+var trialName = null;
+var timeTesting = getTimeValue();
+var numSamples = 0;
+var counterSpect1 = 0;
+var counterSpect2 = 0;
 
-var path = require('path');
+/*
+Setting up CSV writers
+*/
 
-var spawn = require("child_process").spawn; // to run
-
-/*EXPRESS*/
-// Sets static directory as public
-app_express.use(express.static(__dirname + '/public'));
-
-app_express.get('/', (req, res) => {
-  res.sendFile(path.join(__dirname + '/public/index.html'));
-});
-
-app_express.get('/production', (req, res) => {
-  res.sendFile(path.join(__dirname + '/public/production.html'));
-});
-
-console.log('Listening on Port 3000!')
-
-
-/* Gets the current time */
-function getTimeValue() {
-  var dateBuffer = new Date();
-  var Time = dateBuffer.getTime();
-  //Milliseconds since 1 January 1970
-  return Time;
-}
-
-
-/*SETTING UP CSV WRITERS*/
-
-/*Time csv writer*/
 /* Formatting header of time CSV */
 const timeHeader = [{id: 'time', title: 'TIME'},
                     {id: 'channel1', title: 'CHANNEL 1'},
@@ -87,7 +64,43 @@ const timeHeaderToWrite = {
                 };
 
 var timeSamples = [timeHeaderToWrite];
-//Global variable will be used to store time data
+// Global variable will be used to store time data
+
+/*
+Production Parameters
+*/
+const sendRate = .2; // seconds
+const expectedSampleRate = 250; // samples per second
+var samplesToSend = expectedSampleRate * sendRate;
+var toSend = [];
+var state = "stop" // forward, turning, stop
+const turnTime = 1000; // milliseconds
+
+
+/*
+Express
+*/
+// Sets static directory as public
+app_express.use(express.static(__dirname + '/public'));
+
+app_express.get('/', (req, res) => {
+  res.sendFile(path.join(__dirname + '/public/index.html'));
+});
+
+app_express.get('/production', (req, res) => {
+  res.sendFile(path.join(__dirname + '/public/production.html'));
+});
+
+console.log('Listening on Port 3000!')
+
+
+/* Gets the current time */
+function getTimeValue() {
+  var dateBuffer = new Date();
+  var Time = dateBuffer.getTime();
+  //Milliseconds since 1 January 1970
+  return Time;
+}
 
 
 /* Sets the csvwriters to the correct paths! */
@@ -105,15 +118,8 @@ function setupCsvWriters(){
           header: timeHeader,
           append: true
     });
-
 }
 
-
-var trialName=null;
-var timeTesting = getTimeValue();
-var numSamples = 0;
-var counterSpect1 = 0;
-var counterSpect2 = 0;
 oscServer.on("message", function (data) {
   let time = getTimeValue(); // milliseconds since January 1 1970. Adjust?
   let dataWithoutFirst = []; // TODO
@@ -149,10 +155,10 @@ oscServer.on("message", function (data) {
       io.sockets.emit('sample rate', {'sample rate': numSamples});
       if (numSamples < expectedSampleRate*0.9 || // check for ± 10%
           numSamples > expectedSampleRate*1.1) {
-            console.log("\n-------- IRREGULAR SAMPLE RATE --------")
+            // console.log("\n-------- IRREGULAR SAMPLE RATE --------")
           }
       timeTesting = time;
-      console.log("Sample rate: " + numSamples);
+      // console.log("Sample rate: " + numSamples);
       numSamples = 0;
     }
 
@@ -225,16 +231,9 @@ function endTest(saved){
 /*USER CONTROL OF COLLECTING BOOLEAN WITH SOCKET IO*/
 
 
-//Socket IO:
+// Socket IO:
 io.on('connection', function(socket){
   console.log('A user connected socket');
-
-  if(mode == "production"){
-    socket.on("data from ML", function(data){
-      io.sockets.emit('to robotics', {'response': data['response']});
-      console.log(data['response']);
-    });
-  }
 
   socket.on('stop', function(){
       clearInterval(collectionTimer);
@@ -242,6 +241,7 @@ io.on('connection', function(socket){
       endTest(false);
   });
 
+  // Training Mode
   socket.on('collectQueue', function(clientRequest){
     mode = "training";
     timeSamples = [timeHeaderToWrite];
@@ -261,7 +261,7 @@ io.on('connection', function(socket){
       times.push(totalTime);
     });
 
-    console.log(totalTime);
+    // console.log(totalTime);
 
     direction = collectQueue[0][0];
     setupCsvWriters();
@@ -296,16 +296,72 @@ io.on('connection', function(socket){
         time++;
     }, 1000);
 
-
-
   });
-  //Production
+
+  // Production
+
+  // collectionTimer = setInterval(function(){
+  //   io.sockets.emit('to robotics', {response: 'D'}) // request data
+  // }, 200); // 5 times/sec
+  //
+  // socket.on("from sensors", function(data){
+  //   // data: {front, left, right, front-tilt}
+  //   io.sockets.emit('to safety', data);
+  // });
+  //
+  // socket.on("from safety", function(data){
+  //
+  //
+  // });
+
+
+
+
+
+  socket.on("data from ML", function(data){
+    if (state == "stop") {
+      if (data['response'] == "BLINK") {
+        // go forward
+        io.sockets.emit('to robotics', {'response': "F"});
+        state = "forward"
+      }
+    } else if (state == "forward") {
+      if (data['response'] == "BLINK") {
+        // stop
+        io.sockets.emit('to robotics', {'response': "S"});
+        state = "intermediate"
+      }
+    } else if (state == "intermediate") {
+      if (data['response'] == "BLINK") {
+        state = "stop"
+      } else if (data['response'] == "L" || data['response'] =="R") {
+        io.sockets.emit('to robotics', {'response': data['response']});
+        state="turning"
+        setTimeout(function(){
+          state="forward";
+          io.sockets.emit('to ML (state)', {'state': state});
+          io.sockets.emit('to robotics', {'response': "F"});
+        }, turnTime)
+      }
+    }
+
+    io.sockets.emit('to ML (state)', {'state': state});
+
+    io.sockets.emit('ML graphs', data);
+    console.log(data['response']);
+  });
+
+  // socket.on("from safety", function(data) {
+  //   io.sockets.emit('to robotics', {'response': data['response']});
+  // })
+
   socket.on('production', function(data){
     toSend = [];
     if (data['on'] == true) {
       mode = "production";
       console.log(mode);
     }
+
     else {
       mode = "training";
       console.log(mode);
