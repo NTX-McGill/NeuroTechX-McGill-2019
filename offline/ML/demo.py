@@ -51,7 +51,7 @@ def get_features(data_epochs, sampling_freq):
                                      meanBeta]).T
     feature_vector = np.log10(feature_vector)
     return feature_vector
-def draw_specgram(ch, fs_Hz):
+def draw_specgram(ch, fs_Hz, fig, i):
     NFFT = fs_Hz*2
     overlap = NFFT - int(0.25 * fs_Hz)
     spec_PSDperHz, spec_freqs, spec_t = mlab.specgram(np.squeeze(ch),
@@ -64,8 +64,8 @@ def draw_specgram(ch, fs_Hz):
     
     spec_PSDperBin = spec_PSDperHz * fs_Hz / float(NFFT)
     f_lim_Hz = [0, 60]   # frequency limits for plotting
-    plt.figure(figsize=(10,5))
-    ax = plt.subplot(1,1,1)
+    #plt.figure(figsize=(10,5))
+    ax = fig.add_subplot(2,1,i)
     plt.pcolor(spec_t, spec_freqs, 10*np.log10(spec_PSDperBin))  # dB re: 1 uV
     plt.clim([-25,26])
     plt.xlim(spec_t[0], spec_t[-1]+1)
@@ -74,8 +74,8 @@ def draw_specgram(ch, fs_Hz):
     plt.ylabel('Frequency (Hz)')
     plt.show()
 if __name__ == '__main__':
-    fname_ec = 'EyesClosedNTXDemo.txt' 
-    fname_eo = 'EyesOpenedNTXDemo.txt' 
+    fname_ec = '../data/EyesClosedNTXDemo.txt' 
+    fname_eo = '../data/EyesOpenedNTXDemo.txt' 
     data_ec = np.loadtxt(fname_ec,
                       delimiter=',',
                       skiprows=7,
@@ -87,7 +87,9 @@ if __name__ == '__main__':
     sampling_freq = 250
     window_size = int(3 * sampling_freq)
     window_overlap = int(0.5 * sampling_freq)
-    draw_specgram(data_eo, sampling_freq)
+    fig = plt.figure()
+    draw_specgram(data_eo, sampling_freq, fig, 1)
+    draw_specgram(data_ec, sampling_freq, fig, 2)
     
     data_epochs_ec = epoch_data(data_ec, window_size, window_overlap)
     data_epochs_eo = epoch_data(data_eo, window_size, window_overlap)
