@@ -119,11 +119,11 @@ def streamData(sample):
             print("  current sample: ", sample.channel_data)
         # send to clients interpolated sample
         # leftover_duplications = 0
-        server.broadcast_values(interpol_values)
+        # server.broadcast_values(interpol_values)
         nb_samples_out = nb_samples_out + 1
 
     # send to clients current sample
-    server.broadcast_values(sample.channel_data)
+    # server.broadcast_values(sample.channel_data)
     nb_samples_out = nb_samples_out + 1
 
     # save current values for possible interpolation
@@ -134,7 +134,7 @@ if __name__ == '__main__':
     # init server
     server = StreamerTCPServer(ip=SERVER_IP, port=SERVER_PORT)
     # init board
-    port = '/dev/tty.usbserial-DB00JAM0'
+    port = '/dev/tty.usbserial-DM00QA1Z'
     baud = 115200
     monit = Monitor()
     # daemonize theard to terminate it altogether with the main when time will come
