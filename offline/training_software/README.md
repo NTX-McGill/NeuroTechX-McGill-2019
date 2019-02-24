@@ -20,3 +20,10 @@ pip3 install python-osc
 pip3 install requests
 pip3 install xmltodict
 ```
+
+Note there is also a requirements.txt file. 
+You can install all requirements including the above packages with:
+
+```
+pip install -r requirements.txt
+```
