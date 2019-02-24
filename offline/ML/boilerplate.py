@@ -73,4 +73,3 @@ length = 1 # length of data to plot in seconds
 ax.plot(data_ec[start:start + length*sampling_freq] - np.mean(data_ec[start:start + length*sampling_freq]))
 ax.plot(data_ec_filtered[start: start+length*sampling_freq])
 plt.show()
-
