@@ -1,12 +1,13 @@
 ## TODOS
 
+```
 [x] cp `stream_data.py`
 [x] document what python packages `stream_data.py` requires
 [] figure out how data is streamed in (probably will be like [1,2,...,8] for channels)
 [] create a server to attach to `stream_data.py` (either inside or outside)
 [] `server.[x]` should have an open socket to listen to `stream_data.py` input and output to the html file
 [] create html file that has two buttons "left" and "right"
-
+```
 
 For installation:
 ```
