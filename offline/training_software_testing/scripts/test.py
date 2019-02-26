@@ -5,6 +5,7 @@ sys.path.append('..')  # help python find cyton.py relative to scripts folder
 from openbci import cyton as bci
 import logging
 import time
+import csv
 
 def write_data(sample):
     # os.system('clear')
@@ -16,11 +17,10 @@ def write_data(sample):
         print("{}\t".format(sample.aux_data))
         print("\n")
     else:
-        with open('sample.txt', 'a') as f:
-            f.write("%f\t" % (sample.id))
-            f.write("{}\t".format(sample.channel_data))
-            f.write("{}\t".format(sample.aux_data))
-            f.write("\n")
+        with open('data.csv', 'a') as f:
+            writer = csv.writer(f, delimiter='\t')
+            row = [int(sample.id)] + sample.channel_data + sample.aux_data
+            writer.writerow(row)
 
 if __name__ == '__main__':
     # port = '/dev/tty.OpenBCI-DN008VTF'
