@@ -6,14 +6,21 @@ from openbci import cyton as bci
 import logging
 import time
 
-
 def write_data(sample):
     # os.system('clear')
-    with open('sample.txt', 'a') as f:
-        f.write("%f\t" % (sample.id))
-        f.write("{}\t".format(sample.channel_data))
-        f.write("{}\t".format(sample.aux_data))
-        f.write("\n")
+    to_print = True
+
+    if to_print:
+        print("%f\t" % (sample.id))
+        print("{}\t".format(sample.channel_data))
+        print("{}\t".format(sample.aux_data))
+        print("\n")
+    else:
+        with open('sample.txt', 'a') as f:
+            f.write("%f\t" % (sample.id))
+            f.write("{}\t".format(sample.channel_data))
+            f.write("{}\t".format(sample.aux_data))
+            f.write("\n")
 
 if __name__ == '__main__':
     # port = '/dev/tty.OpenBCI-DN008VTF'
