@@ -20,6 +20,8 @@ from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
 from sklearn.naive_bayes import GaussianNB
 from sklearn.svm import SVC
 
+import pandas as pd
+
 
 def epoch_data(data, window_length, overlap):
     arr = []
@@ -121,6 +123,7 @@ if __name__ == '__main__':
     # evaluate each model in turn
     results = []
     names = []
+    
     for name, model in models:
     	kfold = model_selection.KFold(n_splits=10, random_state=seed)
     	cv_results = model_selection.cross_val_score(model, X_train, Y_train, cv=kfold, scoring=scoring)
@@ -129,7 +132,40 @@ if __name__ == '__main__':
     	msg = "%s: %f (%f)" % (name, cv_results.mean(), cv_results.std())
     	print(msg)
     
+    fname_eo_test = '../data/OpenBCI-RAW-2018-04-17_17-21-25.txt'
+    fname_ec_test = '../data/Ganglion1minEyesOpen-1minEyesClosed.txt'
+        
+    eo_test = np.loadtxt(fname_eo_test,
+                      delimiter=',',
+                      skiprows=7,
+                      usecols=(1))
+    ec_test = np.loadtxt(fname_ec_test,
+                      delimiter=',',
+                      skiprows=sampling_freq*10,    # skip first 10 seconds (noisy)
+                      usecols=(3))                  # channel 3 is at O1
     
+    ec_test = ec_test[70*sampling_freq : 100*sampling_freq]             # grab seconds 70 to 100 
+    
+    fig = plt.figure()
+    draw_specgram(eo_test, sampling_freq, fig, 1)
+    draw_specgram(ec_test, sampling_freq, fig, 2)
+    
+    data_epochs_ec_test = epoch_data(ec_test, window_size, window_overlap)
+    data_epochs_eo_test = epoch_data(eo_test, window_size, window_overlap)
+    
+    ec_test_features = get_features(data_epochs_ec_test, sampling_freq)
+    eo_test_features = get_features(data_epochs_eo_test, sampling_freq)
+    
+    Y_eo_test = [0]*len(eo_test_features)
+    Y_ec_test = [1]*len(ec_test_features)
+    
+    for name, model in models:
+        model.fit(X_train, Y_train)
+        ec_test_score = model.score(ec_test_features, Y_ec_test)
+        eo_test_score = model.score(eo_test_features, Y_eo_test)
+        validation_score = model.score(X_validation, Y_validation)
+        msg = "%s: validation %f, test (closed) %f, test (open) %f" % (name, validation_score, ec_test_score, eo_test_score)
+        print(msg)
 
 
 
