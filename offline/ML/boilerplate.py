@@ -19,6 +19,7 @@ def notch_mains_interference(data):
         data = signal.lfilter(b, a, data, axis=0)
         print("Notch filter removing: " + str(bp_stop_Hz[0]) + "-" + str(bp_stop_Hz[1]) + " Hz")
     return data
+
 def filter_(arr, lowcut, highcut, order):
    arr = notch_mains_interference(arr)
    nyq = 0.5 * 250
@@ -26,6 +27,7 @@ def filter_(arr, lowcut, highcut, order):
    for i in range(0, order):
        arr = signal.lfilter(b, a, arr, axis=0)
    return arr
+
 def draw_specgram(ch, fs_Hz, fig, i):
     NFFT = fs_Hz*2
     overlap = NFFT - int(0.25 * fs_Hz)
@@ -47,7 +49,8 @@ def draw_specgram(ch, fs_Hz, fig, i):
     plt.ylim(f_lim_Hz)
     plt.xlabel('Time (sec)')
     plt.ylabel('Frequency (Hz)')
-    
+
+''' load the data '''
 fname_ec = '../data/EyesClosedNTXDemo.txt' 
 fname_eo = '../data/EyesOpenedNTXDemo.txt' 
 data_ec = np.loadtxt(fname_ec,
@@ -58,18 +61,36 @@ data_eo = np.loadtxt(fname_eo,
                   delimiter=',',
                   skiprows=7,
                   usecols=(1))
-
-fig = plt.figure()
+''' apply some filters '''
 sampling_freq = 250
-data_ec_filtered = filter_(data_ec.T, lowcut=1, highcut=20,order=1) #filter data
+data_ec_filtered =  filter_(data_ec.T, lowcut=1, highcut=20,order=1) #filter data
 data_eo_filtered = filter_(data_eo.T, lowcut=1, highcut=20,order=1) #filter data
+
+''' plot the spectrogram (frequency domain) '''
+fig = plt.figure()
 draw_specgram(data_eo_filtered, sampling_freq, fig, 1)
 draw_specgram(data_ec_filtered, sampling_freq, fig, 2)
 
+''' plot a segment of the EEG (time domain) '''
 fig = plt.figure()
 ax = fig.add_subplot(111)
-start = 250 # start index (don't start at 0 becaues of filtering artifacts)
+start = 250 # start index (don't start at 0 because of filtering artifacts)
 length = 1 # length of data to plot in seconds
 ax.plot(data_ec[start:start + length*sampling_freq] - np.mean(data_ec[start:start + length*sampling_freq]))
 ax.plot(data_ec_filtered[start: start+length*sampling_freq])
 plt.show()
+
+''' load test data (these are from separate sessions) '''
+fname_eo_test = '../data/OpenBCI-RAW-2018-04-17_17-21-25.txt'
+fname_ec_test = '../data/Ganglion1minEyesOpen-1minEyesClosed.txt'
+    
+eo_test = np.loadtxt(fname_eo_test,
+                  delimiter=',',
+                  skiprows=7,
+                  usecols=(1))
+ec_test = np.loadtxt(fname_ec_test,
+                  delimiter=',',
+                  skiprows=sampling_freq*10,    # skip first 10 seconds (noisy)
+                  usecols=(3))                  # channel 3 is at O1
+
+ec_test = ec_test[70*sampling_freq : 100*sampling_freq]             # grab seconds 70 to 100 (this is when the subject's eyes were closed)
