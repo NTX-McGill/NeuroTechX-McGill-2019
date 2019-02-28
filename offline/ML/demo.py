@@ -118,7 +118,7 @@ if __name__ == '__main__':
     models.append(('LDA', LinearDiscriminantAnalysis()))
     models.append(('KNN', KNeighborsClassifier()))
     models.append(('CART', DecisionTreeClassifier()))
-    models.append(('NB', GaussianNB()))
+    models.append(('NB', GaussianNB(var_smoothing=0.001)))
     models.append(('SVM', SVC()))
     # evaluate each model in turn
     results = []
