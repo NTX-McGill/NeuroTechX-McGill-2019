@@ -1,0 +1,192 @@
+/* Add styling here! Feel free to add comments! */
+
+/* Navigation */
+.navbar .navbar-brand {
+  text-align: center;
+  display: block;
+  width: 100%;
+}
+
+.navbar .navbar-brand > .navbar-item,
+.navbar .navbar-brand .navbar-link {
+  display: inline-block;
+}
+
+a.navbar-item{
+  font-size: 30;
+}
+
+
+/* Switch Navigation */
+#tab-content > div {
+  display: none;
+}
+
+#tab-content > div.is-active {
+  display: block;
+}
+.tabs.is-toggle li.is-active a {
+  background-color: black;
+  border: none;
+}
+
+/* Graph View */
+.graphview {
+  border: 2px solid black;
+  width: 100%;
+  overflow: auto;
+  height: 480px;
+}
+.graph-controls{
+  margin-top: -2px;
+  border: 2px solid black;
+  display: inline-block;
+  width: 100%;
+  text-align: center;
+}
+
+.graph-controls > input{
+  margin-left: 2%;
+  margin-right: 2%;
+}
+.media {
+  padding-left: 5px;
+  padding-top: 1rem;
+}
+.hide {
+  display: none;
+}
+.media+.media {
+  margin-top: 0rem;
+}
+
+/* Controls */
+#controls-text {
+  padding-top: 20px;
+  float: left;
+  width: 50%;
+}
+
+#time-right {
+    padding-top: 20px;
+}
+.left {
+  width: 50%;
+  float: left;
+
+}
+
+.right {
+  width: 50%;
+  display:inline-block;
+
+}
+.range-slider {
+  width: 50%;
+  float: left;
+}
+.input-range {
+           width:75%;
+           height:10px;
+           background:#efefef;
+           outline:none;
+           -webkit-appearance: none;
+       }
+
+  .input-range::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 20px;
+      height: 20px;
+      background: black;
+
+  }
+  .input-range::-webkit-slider-thumb:hover,
+  .input-range:active::-webkit-slider-thumb{
+      background: #032B5A;
+  }
+
+  .range-value {
+      display: inline-block;
+      position: relative;
+      width: 50px;
+      color: #fff;
+      font-size: 16px;
+      line-height: 20px;
+      text-align: center;
+      background: black;
+      padding: 5px 0px;
+      margin-left: 7px;
+      border: none;
+      border-color: transparent;
+  }
+
+  .range-value:focus{
+      outline: none;
+  }
+
+  .range-value:after{
+      content:"";
+      position: absolute;
+      left: -7px;
+      top: 7px;
+      width: 0;
+      height: 0;
+      border-top: 7px solid transparent;
+      border-right: 7px solid #419EDA;
+      border-bottom: 7px solid transparent;
+  }
+
+  @media (max-width: 1000px) {
+      .input-range {
+          width:65%;
+      }
+  }
+
+.with-unit {
+  display: inline-block;
+}
+
+/* Control buttons */
+.control-buttons {
+  width: 25%;
+  float:left;
+  display: inline-block;
+  overflow: hidden;
+}
+
+.control-buttons {
+  display: inline-block;
+  font-size: 16px;
+  line-height: 1rem;
+}
+.control-buttons:after {
+content: " ";
+display: block;
+clear: both;
+}
+.radio-button-label {
+  cursor: pointer;
+  float: left;
+}
+.radio-button-label > input {
+	display: none;
+}
+.radio-button-label span {
+	cursor: pointer;
+  border: 1px solid white;
+  margin: 0;
+  background-color: #eee;
+  padding: 6px 20px;
+  display: inline-block;
+}
+.radio-button-label span:hover {
+	background-color: black;
+	color: white;
+}
+.radio-button-label > input:checked + span {
+	background-color: black;
+  color: white
+}
+.radio-button-label > input:checked + span:hover {
+	color: white;
+}
