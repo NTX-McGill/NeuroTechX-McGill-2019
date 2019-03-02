@@ -1,43 +1,51 @@
+"""
+Grabs OpenBCI GUI data and saves it to CSV
+Listens on localhost, port 12345
+Listens at addresses openbci-fft, openbci-time
+"""
+
 from pythonosc import dispatcher
 from pythonosc import osc_server
 
 import csv
+import datetime
+import time
 
-def time_series(*args):
-    print(args)
+import matplotlib.pyplot as plt
 
-def fft(*args):
-    channel = int(args[1])
-    frequency_data = args[2:]
-    alpha_mu = frequency_data[7:12] # mu waves at 8-12 Hz
-    average = sum(alpha_mu)/len(alpha_mu)
-    # averages[channel].append()
-    # print(averages)
-    batch = (channel-1) % 4 # split channels into 2
-    memory_array.append(average)
+def write_time_data(*args):
+    test_number = args[1][0]
+    time_data = list(args[2:])
+    plt.plot([1,2,3],[1,2,3])
+    plt.show()
+    time = datetime.datetime.now()
+    with open('../data/sample-tests/time_test{}.csv'.format(test_number), 'a') as f:
+        writer = csv.writer(f, delimiter=',')
+        writer.writerow([time] + time_data)
 
-    if i == 100: # save every 100
-        # write to csv
-        i = 0
-        memory_average = sum(memory_array)/len(memory_array)
-        memory_array = []
-        with open('batch-{}.csv'.format(batch), 'a') as f:
-            writer = csv.writer(f, delimiter=',')
-            writer.writerow([str(memory_average)])
-    i += 1
+def write_fft_data(*args):
+    test_number = args[1][0]
+    channel = int(args[2])
+    frequency_data = list(args[3:])
+    time = datetime.datetime.now()
+    with open('../data/sample-tests/fft_test{}_channel{}.csv'.format(test_number, channel), 'a') as f:
+        writer = csv.writer(f, delimiter=',')
+        writer.writerow([time] + frequency_data)
 
-if __name__ == "__main__":
-    averages = {i: [] for i in range(1,9)} # 8 channels
-    i = 1
-    memory_array = []
+dispatcher = dispatcher.Dispatcher()
+
+def get_data(test_number=0):
+    """
+    Main function in program
+    """
+    global dispatcher
+    dispatcher.map("/openbci-fft", write_fft_data, test_number)
+    dispatcher.map("/openbci-time", write_time_data, test_number)
 
     ip = "127.0.0.1"
     port = 12345
 
-    dispatcher = dispatcher.Dispatcher()
-    # dispatcher.map("/openbci", default_handler)
-    dispatcher.map("/openbcifft", fft)
-
     server = osc_server.ThreadingOSCUDPServer((ip, port), dispatcher)
     print("Serving on {}".format(server.server_address))
     server.serve_forever()
+get_data()
