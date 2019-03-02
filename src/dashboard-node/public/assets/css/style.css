@@ -1,6 +1,35 @@
 /* Add styling here! Feel free to add comments! */
 
+.section{
+  padding-top: 10px;
+  height: 600px;
+}
+
+.container{
+  height:600px;
+}
+
+/* Logo */
+.logo-image{
+  width: 150px;
+  height: 150px;
+  position: absolute;
+  top: 5px;
+  left: 5px;
+  z-index: -1;
+}
+
+
 /* Navigation */
+.navbar{
+  z-index: -3;
+}
+
+.navbar-brand{
+  z-index: -2;
+}
+
+
 .navbar .navbar-brand {
   text-align: center;
   display: block;
@@ -11,6 +40,8 @@
 .navbar .navbar-brand .navbar-link {
   display: inline-block;
 }
+
+
 
 a.navbar-item{
   font-size: 30;
@@ -30,12 +61,14 @@ a.navbar-item{
   border: none;
 }
 
+
+
 /* Graph View */
 .graphview {
   border: 2px solid black;
   width: 100%;
   overflow: auto;
-  height: 480px;
+  height: 250px;
 }
 .graph-controls{
   margin-top: -2px;
@@ -61,7 +94,7 @@ a.navbar-item{
 }
 
 /* Controls */
-#controls-text {
+/* #controls-text {
   padding-top: 20px;
   float: left;
   width: 50%;
@@ -80,10 +113,11 @@ a.navbar-item{
   width: 50%;
   display:inline-block;
 
-}
+} */
 .range-slider {
   width: 50%;
-  float: left;
+  margin-left: 29%;
+  margin-top: 20%;
 }
 .input-range {
            width:75%;
@@ -147,7 +181,86 @@ a.navbar-item{
 }
 
 /* Control buttons */
-.control-buttons {
+
+
+
+.selection{
+    float: left;
+}
+
+.commands{
+    display: flex;
+    flex-direction: row;
+    flex-warp: nowrap;
+    justify-content: center;
+    position: absolute;
+    /* text-align: center; */
+    bottom: 5%;
+    /* left: 25%; */
+    width: 100%;
+}
+
+.imagery{
+    background-color: rgb(90,200,250);
+    opacity: 0.4;
+    border:none;
+    border-radius: 10%;
+    width: 200px;
+    height: 150px;
+    text-align: center;
+    margin-left: 15px;
+    margin-right: 15px;
+    font-size: 30px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.imagery:hover{
+    background-color: rgb(90,200,250);
+    opacity:1;
+    -webkit-transition-duration: 0.4s; /* Safari */
+    transition-duration: 0.4s;
+}
+
+.timer{
+    background-color: rgb(250,250,250);
+    border-style: solid;
+    border-size: 2px;
+    border-color: black;
+    border-radius: 10%;
+    height: 100px;
+    width: 150px;
+
+    font-size: 24px;
+    font-weight: bold;
+    text-align: center;
+    vertical-align: middle;
+    line-height: 100px;
+}
+
+.loop{
+    background-color: rgb(250,250,250);
+    border-style: solid;
+    border-size: 2px;
+    border-color: black;
+    border-radius: 10%;
+    height: 100px;
+    width: 150px;
+    text-align: center;
+    cursor: pointer;
+
+}
+
+
+
+.loop:hover{
+    background-color: rgb(110,230,150);
+    opacity:.8;
+    -webkit-transition-duration: 0.4s; /* Safari */
+    transition-duration: 0.4s;
+}
+
+/* .control-buttons {
   width: 25%;
   float:left;
   display: inline-block;
@@ -169,10 +282,10 @@ clear: both;
   float: left;
 }
 .radio-button-label > input {
-	display: none;
+  display: none;
 }
 .radio-button-label span {
-	cursor: pointer;
+  cursor: pointer;
   border: 1px solid white;
   margin: 0;
   background-color: #eee;
@@ -180,13 +293,14 @@ clear: both;
   display: inline-block;
 }
 .radio-button-label span:hover {
-	background-color: black;
-	color: white;
+  background-color: black;
+  color: white;
 }
 .radio-button-label > input:checked + span {
-	background-color: black;
+  background-color: black;
   color: white
 }
 .radio-button-label > input:checked + span:hover {
-	color: white;
+  color: white;
 }
+ */

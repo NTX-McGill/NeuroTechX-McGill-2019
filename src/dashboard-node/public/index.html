@@ -39,6 +39,9 @@
       </div>
     </nav>
 
+    <img class="logo-image" src="assets/img/mcgill-neurotech.png" alt="McGill Neurotech">
+
+
   <section class="section">
     <div id="tab-content">
       <div class="is-active" data-content="1">
@@ -171,47 +174,29 @@
                 <input type="checkbox" id="sensor8" name="sensor8" checked>
 
               </div>
-              <div class="container" id="controls">
-                <h2 class="title" id="controls-text">
-                  Controls
-                </h2>
 
-                <h2 class="title right" id="time-right">
-                  Currently Idle
-                </h2>
 
-                <p class="left"> Duration (seconds): </p>
-
-                <p class="right"> Start Collection: </p>
-
-                <div class="range-slider">
-                        <input class="input-range" type="range" value="0" min="0" max="100" step="1" >
-                        <div class="with-unit">
-                          <input type="text" class="range-value" value="0"></input>
-                          <label class="black-bg">s</label>
-                        </div>
-                </div>
-
-                <div class="control-buttons">
-                  <div class="image_radio_button_control">
-                    <label class="radio-button-label">
-                      <input type="radio" name="radio-control2" value="left"/>
-                      <span>Left</span>
-                    </label>
-
-                    <label class="radio-button-label">
-                      <input type="radio" name="radio-control2" value="rest"/>
-                      <span>Rest</span>
-                    </label>
-
-                    <label class="radio-button-label">
-                      <input type="radio" name="radio-control2" value="right"/>
-                      <span>Right</span>
-                    </label>
-                  </div>
-
+              <div class="range-slider">
+                <input class="input-range" type="range" value="0" min="0" max="100" step="1" >
+                <div class="with-unit">
+                  <input type="text" class="range-value" value="0"></input>
+                  <label class="black-bg">s</label>
                 </div>
               </div>
+
+              <div class="commands">
+                <div class="timer">
+
+                </div>
+                <button class="selection imagery direction-left">Left</button>
+                <button class="selection imagery direction-rest">Rest</button>
+                <button class="selection imagery direction-right">Right</button>
+                <button class="selection loop">
+                  <i class="fas fa-retweet"></i>
+                </button>
+              </div>
+
+
         </div>
 
       </div>
