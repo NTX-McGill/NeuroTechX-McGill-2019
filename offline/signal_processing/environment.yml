@@ -1,0 +1,47 @@
+name: mne
+channels:
+- defaults
+dependencies:
+- python<3.7
+- pip
+- mkl
+- numpy
+- scipy
+- matplotlib
+- cython
+- pyqt>=5.9
+- pandas
+- xlrd
+- scikit-learn
+- h5py
+- pillow
+- statsmodels
+- jupyter
+- pytest
+- pytest-cov
+- pytest-mock
+- pytest-timeout
+- joblib
+- psutil
+- numpydoc
+- flake8
+- spyder
+- numexpr
+- traits>=4.6.0
+- pyface>=6
+- traitsui>=6
+- testpath<0.4
+- pip:
+  - mne
+  - vtk
+  - https://api.github.com/repos/enthought/mayavi/zipball/226189a6ad3dc3c01d031ef21d0d0cde554ac851
+  - PySurfer[save_movie]
+  - dipy --only-binary dipy
+  - nibabel
+  - nilearn
+  - neo
+  - pytest-faulthandler
+  - pytest-sugar
+  - pydocstyle
+  - codespell
+  - python-picard
