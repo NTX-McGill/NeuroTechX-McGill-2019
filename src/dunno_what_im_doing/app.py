@@ -1,26 +1,21 @@
-from flask import Flask, render_template
-from apscheduler.schedulers.background import BackgroundScheduler
-from apscheduler.triggers.interval import IntervalTrigger
-from pusher import Pusher
-import requests, json, atexit, time, plotly, plotly.graph_objs as go
+from flask import Flask, render_template, request
 
 # create flask app
 app = Flask(__name__)
 
-# configure pusher object
-pusher = Pusher(
-    app_id='726413',
-    key='f26ddd693c9477bad4c9',
-    secret='e2c955adb821315bfff2',
-    cluster='us2',
-    ssl=True
-)
-
-# define variables for data retrieval
-times = []
-currencies = ["BTC"]
-prices = {"BTC": []}
-
-@app.route("/")
+@app.route("/", methods=['POST', 'GET'])
 def index():
+    if request.method == 'POST':
+        if request.form['submit_button'] == 'left':
+            with open("../../offline/training_software/settings.txt", 'w') as f:
+                f.write('left')
+                f.close()
+        elif request.form['submit_button'] == 'right':
+            with open("../../offline/training_software/settings.txt", 'w') as f:
+                f.write('right')
+                f.close()
+        elif request.form['submit_button'] == 'wait':
+            with open("../../offline/training_software/settings.txt", 'w') as f:
+                f.write('wait')
+                f.close()
     return render_template("index.html")
