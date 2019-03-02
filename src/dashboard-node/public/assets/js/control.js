@@ -79,11 +79,11 @@ $(document).ready(function() {
 
   $(".input-range").on('input', function(){
       range = $(".input-range").val();
-      $(".range-value").val(range);
+      $(".timer").val(range);
   });
 
-  $(".range-value").on('input', function(){
-      range = $(".range-value").val();
+  $(".timer").on('input', function(){
+      range = $(".timer").val();
       $(".input-range").val(range);
   });
 

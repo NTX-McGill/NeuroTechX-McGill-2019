@@ -2,46 +2,31 @@
 
 .section{
   padding-top: 10px;
-  height: 600px;
+  height: 85%;
 }
-
-.container{
-  height:600px;
-}
-
-/* Logo */
-.logo-image{
-  width: 8%;
-  height: auto;
-  position: absolute;
-  top: 5px;
-  right: 5px;
-  z-index: -1;
-}
-
 
 /* Navigation */
-.navbar{
-  z-index: -3;
-}
-
-.navbar-brand{
-  z-index: -2;
-}
-
-
 .navbar .navbar-brand {
   text-align: center;
   display: block;
   width: 100%;
 }
 
+/* Logo */
+.logo-image{
+  width: 80px;
+  height: auto;
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  z-index: 3;
+}
+
+
 .navbar .navbar-brand > .navbar-item,
 .navbar .navbar-brand .navbar-link {
   display: inline-block;
 }
-
-
 
 a.navbar-item{
   font-size: 30;
@@ -61,14 +46,12 @@ a.navbar-item{
   border: none;
 }
 
-
-
 /* Graph View */
 .graphview {
   border: 2px solid black;
   width: 100%;
   overflow: auto;
-  height: 250px;
+  height: 240px;
 }
 .graph-controls{
   margin-top: -2px;
@@ -94,7 +77,7 @@ a.navbar-item{
 }
 
 /* Controls */
-/* #controls-text {
+#controls-text {
   padding-top: 20px;
   float: left;
   width: 50%;
@@ -113,11 +96,11 @@ a.navbar-item{
   width: 50%;
   display:inline-block;
 
-} */
+}
 .range-slider {
-  width: 50%;
-  margin-left: 29%;
-  margin-top: 20%;
+  margin-top: 15px;
+  width: 100%;
+  float: left;
 }
 .input-range {
            width:75%;
@@ -139,37 +122,6 @@ a.navbar-item{
       background: #032B5A;
   }
 
-  .range-value {
-      display: inline-block;
-      position: relative;
-      width: 50px;
-      color: #fff;
-      font-size: 16px;
-      line-height: 20px;
-      text-align: center;
-      background: black;
-      padding: 5px 0px;
-      margin-left: 7px;
-      border: none;
-      border-color: transparent;
-  }
-
-  .range-value:focus{
-      outline: none;
-  }
-
-  .range-value:after{
-      content:"";
-      position: absolute;
-      left: -7px;
-      top: 7px;
-      width: 0;
-      height: 0;
-      border-top: 7px solid transparent;
-      border-right: 7px solid #419EDA;
-      border-bottom: 7px solid transparent;
-  }
-
   @media (max-width: 1000px) {
       .input-range {
           width:65%;
@@ -182,31 +134,35 @@ a.navbar-item{
 
 /* Control buttons */
 
-
+#controls{
+  width:100%;
+  height: 200px;
+}
 
 .selection{
-    float: left;
+    display: inline-block;
+    margin: 0 auto;
+    text-align:center;
 }
 
 .commands{
-    display: flex;
-    flex-direction: row;
-    flex-warp: nowrap;
-    justify-content: center;
+    margin-top: 15px;
+    display: block;
     position: absolute;
     /* text-align: center; */
-    bottom: 8%;
+    text-align:center;
     /* left: 25%; */
     width: 100%;
 }
 
 .imagery{
+    display: inline-block;
     background-color: rgb(90,200,250);
     opacity: 0.4;
     border:none;
     border-radius: 10%;
     width: 200px;
-    height: 150px;
+    height: 125px;
     text-align: center;
     margin-left: 15px;
     margin-right: 15px;
@@ -223,6 +179,7 @@ a.navbar-item{
 }
 
 .timer{
+    display: inline-block;
     background-color: rgb(250,250,250);
     border-style: solid;
     border-size: 2px;
@@ -239,6 +196,7 @@ a.navbar-item{
 }
 
 .loop{
+    display: inline-block;
     background-color: rgb(250,250,250);
     border-style: solid;
     border-size: 2px;
@@ -259,7 +217,6 @@ a.navbar-item{
     -webkit-transition-duration: 0.4s; /* Safari */
     transition-duration: 0.4s;
 }
-
 /* .control-buttons {
   width: 25%;
   float:left;
@@ -282,10 +239,10 @@ clear: both;
   float: left;
 }
 .radio-button-label > input {
-  display: none;
+	display: none;
 }
 .radio-button-label span {
-  cursor: pointer;
+	cursor: pointer;
   border: 1px solid white;
   margin: 0;
   background-color: #eee;
@@ -293,14 +250,13 @@ clear: both;
   display: inline-block;
 }
 .radio-button-label span:hover {
-  background-color: black;
-  color: white;
+	background-color: black;
+	color: white;
 }
 .radio-button-label > input:checked + span {
-  background-color: black;
+	background-color: black;
   color: white
 }
 .radio-button-label > input:checked + span:hover {
-  color: white;
-}
- */
+	color: white;
+} */
