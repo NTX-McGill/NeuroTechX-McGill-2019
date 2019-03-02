@@ -11,11 +11,11 @@
 
 /* Logo */
 .logo-image{
-  width: 150px;
-  height: 150px;
+  width: 8%;
+  height: auto;
   position: absolute;
   top: 5px;
-  left: 5px;
+  right: 5px;
   z-index: -1;
 }
 
@@ -195,7 +195,7 @@ a.navbar-item{
     justify-content: center;
     position: absolute;
     /* text-align: center; */
-    bottom: 5%;
+    bottom: 8%;
     /* left: 25%; */
     width: 100%;
 }
