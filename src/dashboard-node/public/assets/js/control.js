@@ -28,14 +28,11 @@ $(document).ready(function() {
       sinLayer.values.push({ x: x, y: Math.sin(x) + 1 });
       cosLayer.values.push({ x: x, y: Math.cos(x) + 1 });
     }
-  var data = new RealTimeData(4);
 
 
-  var sensorChart1 = $('#sensor1').epoch({
-      type: 'time.area',
-      data: data.history(),
-      axes: ['left', 'right', 'bottom']
-  });
+
+
+
   var sensorChart2 = $('#sensor2').epoch({
       type: 'area',
       data: [sinLayer, cosLayer],
@@ -71,9 +68,6 @@ $(document).ready(function() {
       data: [sinLayer, cosLayer],
       axes: ['left', 'right', 'bottom']
   });
-
-  setInterval(function() { sensorChart1.push(data.next()); }, 1000);
-  sensorChart1.push(data.next());
 
   var range = $('.input-range').val();
 
