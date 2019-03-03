@@ -1,5 +1,10 @@
 // Add javascript here, sorry for the mess and repitition!
 $(document).ready(function() {
+  //Timer:
+
+  //Active graphs
+  let active = [1,1,1,1,1,1,1,1];
+
   $('#tabs li').on('click', function() {
     var tab = $(this).data('tab');
 
@@ -13,8 +18,19 @@ $(document).ready(function() {
   $('.graph-controls input').mousedown(function() {
 
     var input = $(this).attr("name");
-    console.log(input);
+    var indexChar = input[input.length-1];
+    var index = parseInt(indexChar, 10)-1;
+
+
     $('article[id="media-' + input + '"]').toggleClass("hide");
+    if(active[index] == 1){
+      active[index] = 0;
+    }
+    else{
+      active[index] = 1;
+    }
+
+
   });
 
   var data = [
@@ -86,17 +102,26 @@ $(".selection").click(function() {
   console.log("clicked?");
   var clicked = $(this);
   var duration = $(".input-range").val();
+  if(duration != 0){
+    if(clicked.is('.direction-left')){
+      socket.emit("collect", {command: "left", duration: duration, sensors: active});
+    }
+    else if(clicked.is('.direction-right')){
+      socket.emit("collect", {command: "right", duration: duration, sensors: active});
+    }
+    else if(clicked.is('.direction-rest')){
+      socket.emit("collect", {command: "rest", duration: duration, sensors: active});
+    }
 
-  if(clicked.is('.direction-left')){
-    socket.emit("collect", {command: "left", duration: duration});
-  }
-  else if(clicked.is('.direction-right')){
-    socket.emit("collect", {command: "right", duration: duration});
-  }
-  else if(clicked.is('.direction-rest')){
-    socket.emit("collect", {command: "rest", duration: duration});
-  }
-
+  let timeLeft = duration;
+  let collectionTimer = setInterval(function(){
+    $('.timer').val(timeLeft);
+    timeLeft -= 1;
+    if(timeLeft <= 0){
+      clearInterval(collectionTimer);
+      timeLeft = duration;
+    }
+  }, 1000);
 
   if (clicked.hasClass('toggle')) {
     clicked.removeClass('toggle');
@@ -105,6 +130,8 @@ $(".selection").click(function() {
     $('.selection').removeClass('toggle');
     clicked.addClass('toggle');
   }
+  }
+
 
 })
 

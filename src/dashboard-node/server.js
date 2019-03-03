@@ -7,6 +7,11 @@ const io = require('socket.io').listen(server);
 
 const Cyton = require("@openbci/cyton");
 const k = require("@openbci/utilities").constants;
+const fs = require('fs');
+
+var settings = JSON.parse(fs.readFileSync('data_settings.json', 'utf8'));
+console.log("Currently running on these settings: \n" + settings);
+let testNumber = settings['testNumber'];
 
 function getTimeValue() {
   var dateBuffer = new Date();
@@ -51,6 +56,7 @@ client.events.on('sample', function(data) {
 io.on('connection', function(socket){
   console.log('a user connected');
   socket.on('collect', function(collectsocket){
+    //Request sent for collection
     console.log(collectsocket);
   });
 });
