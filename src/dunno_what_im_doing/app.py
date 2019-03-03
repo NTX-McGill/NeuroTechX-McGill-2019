@@ -14,8 +14,8 @@ def index():
             with open("../../offline/training_software/settings.txt", 'w') as f:
                 f.write('right')
                 f.close()
-        elif request.form['submit_button'] == 'wait':
+        elif request.form['submit_button'] == 'rest':
             with open("../../offline/training_software/settings.txt", 'w') as f:
-                f.write('wait')
+                f.write('rest')
                 f.close()
     return render_template("index.html")
