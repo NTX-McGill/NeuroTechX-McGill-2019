@@ -17,6 +17,7 @@ def write_time_data(*args):
     time = datetime.datetime.now()
     with open('settings.txt', 'r') as f:
         settings = f.read()
+    print(settings)
     if settings!= 'wait':
         with open('../data/sample-tests/time_test{}.csv'.format(test_number), 'a') as f:
             writer = csv.writer(f, delimiter=',')
@@ -29,6 +30,7 @@ def write_fft_data(*args):
     time = datetime.datetime.now()
     with open('settings.txt', 'r') as f:
         settings = f.read()
+    print(settings)
     if settings!= 'wait':
         with open('../data/sample-tests/fft_test{}_channel{}.csv'.format(test_number, channel), 'a') as f:
             writer = csv.writer(f, delimiter=',')
