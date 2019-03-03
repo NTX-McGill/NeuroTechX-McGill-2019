@@ -15,13 +15,10 @@ def index():
                 f.write('right')
                 f.close()
         elif request.form['submit_button'] == 'rest':
-<<<<<<< HEAD
             with open("../../offline/training_software/settings.txt", 'w') as f:
                 f.write('rest')
                 f.close()
         elif request.form['submit_button'] == 'wait':
-=======
->>>>>>> 49ef48035381c48124343e94981ace4560a274a6
             with open("../../offline/training_software/settings.txt", 'w') as f:
                 f.write('rest')
                 f.close()
