@@ -1,3 +1,5 @@
+const dgram = require('dgram');
+const events = require('events');
 const express = require('express');
 const app = express();
 const server = app.listen(3000);
@@ -12,38 +14,38 @@ function getTimeValue() {
   return Time;
 }
 
-let previousTime = 0;
-let counter = 0;
+function UDPClient(port, host) {
+  this.port = port;
+  this.host = host;
+  this.data = [];
+  this.events = new events.EventEmitter();
+  this.connection = dgram.createSocket('udp4');
+  this.connection.on('listening', this.onListening.bind(this));
+  this.connection.on('message', this.onMessage.bind(this));
+  this.connection.bind(this.port, this.host);
+};
 
-const ourBoard = new Cyton();
-ourBoard
-  .connect(k.OBCISimulatorPortName) // This will set `simulate` to true
-  .then(boardSerial => {
+UDPClient.prototype.onListening = function() {
+  console.log('Listening for data...');
+};
 
-    return ourBoard.streamStart();
-  })
-  .catch(err => {
-    /** Handle connection errors */
-    console.log(ourBoard.getInfo());
-  });
-ourBoard.on('sample',(sample) => {
-    let timern = getTimeValue();
-    if (timern - previousTime > 1000) {
-        // console.log(counter);
-        previousTime = getTimeValue();
-        counter = 0;
-    } else {
-        // ends with 0
-        counter++;
+UDPClient.prototype.onMessage = function(msg) {
+  this.events.emit('sample', JSON.parse(msg.toString()));
+};
 
-    }
-    let channelName = "Channel1";
-    io.sockets.emit(channelName, {data: sample.channelData[0].toFixed(8)*1000000});
+var client = new UDPClient(12345, "127.0.0.1");
+
+client.events.on('sample', function(data) {
+  if(data['type'] == 'fft'){
+    io.sockets.emit('fft', data);
+  }
+  else{
+    let time = getTimeValue();
+    console.log(data);
+    io.sockets.emit('timeseries', {'time': time, 'eeg': data});
+  }
 });
 
-ourBoard.on('error', (callback) => {
-  console.log(callback);
-});
 
 //Socket IO:
 io.on('connection', function(socket){

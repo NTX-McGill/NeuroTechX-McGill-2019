@@ -231,7 +231,7 @@
       });
       let counter = 0;
       let previousTime = 0;
-      socket.on('Channel1',function(channelOne) {
+      socket.on('timeseries',function(timeseries) {
           // console.log(channelOne.data);
           let timern = getTimeValue();
           if (timern - previousTime > 1000) {
@@ -244,8 +244,8 @@
 
           }
 
-
-          let newData = [{time: timern, y: channelOne.data}];
+          // console.log(timeseries['eeg']['data'][0]);
+          let newData = [{time: timeseries['time'], y: timeseries['eeg']['data'][0]}];
 
           // console.log(channelOne.data + " and time: " + getTimeValue());
           sensorChart1.push(newData);
