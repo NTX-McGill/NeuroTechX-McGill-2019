@@ -41,7 +41,7 @@ client.events.on('sample', function(data) {
   }
   else{
     let time = getTimeValue();
-    console.log(data);
+    // console.log(data);
     io.sockets.emit('timeseries', {'time': time, 'eeg': data});
   }
 });
@@ -50,7 +50,12 @@ client.events.on('sample', function(data) {
 //Socket IO:
 io.on('connection', function(socket){
   console.log('a user connected');
+  socket.on('collect', function(collectsocket){
+    console.log(collectsocket);
+  });
 });
+
+
 
 //Sets static directory as public
 app.use(express.static(__dirname + '/public'));

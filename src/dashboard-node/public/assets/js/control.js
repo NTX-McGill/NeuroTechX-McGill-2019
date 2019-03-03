@@ -81,9 +81,32 @@ $(document).ready(function() {
       $(".input-range").val(range);
   });
 
+  // Timer and states and emitting collection to node server!
+$(".selection").click(function() {
+  console.log("clicked?");
+  var clicked = $(this);
+  var duration = $(".input-range").val();
 
-  // Timer and states!
+  if(clicked.is('.direction-left')){
+    socket.emit("collect", {command: "left", duration: duration});
+  }
+  else if(clicked.is('.direction-right')){
+    socket.emit("collect", {command: "right", duration: duration});
+  }
+  else if(clicked.is('.direction-rest')){
+    socket.emit("collect", {command: "rest", duration: duration});
+  }
 
+
+  if (clicked.hasClass('toggle')) {
+    clicked.removeClass('toggle');
+  }
+  else {
+    $('.selection').removeClass('toggle');
+    clicked.addClass('toggle');
+  }
+
+})
 
 
 });

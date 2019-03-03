@@ -169,13 +169,18 @@ a.navbar-item{
     font-size: 2.5vmax;
     font-weight: bold;
     cursor: pointer;
+    outline: none;
 }
 
 .imagery:hover{
-    background-color: rgb(90,200,250);
+    background-color: green;
     opacity:1;
     -webkit-transition-duration: 0.4s; /* Safari */
     transition-duration: 0.4s;
+}
+
+.toggle {
+  background-color: green;
 }
 
 .timer{
