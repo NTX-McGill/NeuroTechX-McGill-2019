@@ -16,6 +16,8 @@ var collecting = false;
 var duration = 0;
 var direction = "none";
 var active = [];
+var samples = [];
+
 
 /* These are manual settings that we can use to keep track of testNumber as an example */
 var settings = JSON.parse(fs.readFileSync('data_settings.json', 'utf8'));
@@ -31,12 +33,21 @@ function getTimeValue() {
 
 /* Sets the csvwriters to the correct paths! */
 function setupCSVWriters(){
+    for(i = 0; i < 8; i++){
+      samples.push([]);
+    }
     csvWriter = createCsvWriter({
           path: __dirname + '/data/test-' + testNumber + '-' + direction + '.csv',
           header: [
               {id: 'time', title: 'TIME'},
-              {id: 'y', title: 'DATA'},
-              {id: 'tNumber', title: 'TEST NUMBER'}
+              {id: 'channel1', title: 'CHANNEL 1'},
+              {id: 'channel2', title: 'CHANNEL 2'},
+              {id: 'channel3', title: 'CHANNEL 3'},
+              {id: 'channel4', title: 'CHANNEL 4'},
+              {id: 'channel5', title: 'CHANNEL 5'},
+              {id: 'channel6', title: 'CHANNEL 6'},
+              {id: 'channel7', title: 'CHANNEL 7'},
+              {id: 'channel8', title: 'CHANNEL 8'}
           ],
           append: true
     });
@@ -45,28 +56,46 @@ function setupCSVWriters(){
 
 /* When data is collecting, samples will also write to file! */
 function appendSample(data){
-  for(i = 0; i < 8; i++){
-    if(active[i] == 1){
-      //Only add if active!
-      console.log(data['data']['data'][i]);
-      let sample = [{time: data['time'],  y: data['data']['data'][i]}];
-      csvWriter[i].writeRecords(sample).then(() => {
-        console.log('Added some sample');
-      });
-
+  channelData = []
+  for (i = 0; i < 8; i++) {
+    if (active[i]) {
+        channelData[i] = data['data']['data'][i];
+    }
+    else {
+      channelData[i] = null;
     }
   }
+  sampleToPush = {time: data['time'],
+                  channel1: channelData[0],
+                  channel2: channelData[1],
+                  channel3: channelData[2],
+                  channel4: channelData[3],
+                  channel5: channelData[4],
+                  channel6: channelData[5],
+                  channel7: channelData[6],
+                  channel8: channelData[7]
+                }
+  samples.push(sampleToPush);
 }
 
 /* Updates test number on data_settings file */
-function updateTestNumber(){
+function endTest(){
   settings['testNumber'] += 1;
   let settingsString = JSON.stringify(settings);
+
   fs.writeFile('data_settings.json', settingsString, 'utf8', function(err){
     if (err) throw err;
     console.log('Updated Test Number!');
     testNumber = settings['testNumber'];
   });
+  // [ {ENTRY 1}, {ENTRY 2}]
+  csvWriter.writeRecords(samples).then(() => {
+    console.log('Added some samples');
+  });
+
+// time | channel1 | chanel2 | ... | channel8
+
+
 }
 
 /* Creates a UDP client to listen to the OpenBCI GUI */
@@ -138,12 +167,13 @@ io.on('connection', function(socket){
     setupCSVWriters();
     let timeLeft = duration;
     collecting = true;
+
     let collectionTimer = setInterval(function(){
         timeLeft--;
         if(timeLeft <= 0){
           collecting = false;
           clearInterval(collectionTimer);
-          updateTestNumber();
+          endTest();
         }
     }, 1000);
 
