@@ -8,8 +8,7 @@ const fs = require('fs');
 
 
 const createCsvWriter = require('csv-writer').createObjectCsvWriter;
-var csvWriter1, csvWriter2, csvWriter3, csvWriter4, csvWriter5, csvWriter6, csvWriter7, csvWriter8;
-var csvWriter = [csvWriter1, csvWriter2, csvWriter3, csvWriter4, csvWriter5, csvWriter6, csvWriter7, csvWriter8];
+var csvWriter;
 
 //Will determine if collecting and sending to file currently.
 //Other values will only be updated if collecting is true!
@@ -32,16 +31,15 @@ function getTimeValue() {
 
 /* Sets the csvwriters to the correct paths! */
 function setupCSVWriters(){
-  for(i = 0; i < 8; i++){
-    csvWriter[i] = createCsvWriter({
-          path: __dirname + '/data/test-' + testNumber + '-' + direction + '-channel' + i + '.csv',
+    csvWriter = createCsvWriter({
+          path: __dirname + '/data/test-' + testNumber + '-' + direction + '.csv',
           header: [
               {id: 'time', title: 'TIME'},
-              {id: 'y', title: 'DATA'}
+              {id: 'y', title: 'DATA'},
+              {id: 'tNumber', title: 'TEST NUMBER'}
           ],
           append: true
-      });
-  }
+    });
 }
 
 
