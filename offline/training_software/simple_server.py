@@ -11,6 +11,14 @@ import csv
 import datetime
 import time
 
+from flask import Flask, render_template
+from flask_socketio import SocketIO, emit
+
+app = Flask(__name__)
+socketio = SocketIO(app)
+
+emit('Channel1', {'time': 42, 'y': 42390})
+
 def write_time_data(*args):
     test_number = args[1][0]
     time_data = list(args[2:])
@@ -38,11 +46,14 @@ def write_fft_data(*args):
 
 dispatcher = dispatcher.Dispatcher()
 
-def get_data(test_number=0):
-    """
-    Main function in program
-    """
-    global dispatcher
+# def get_data(test_number=0):
+"""
+Main function in program
+"""
+
+if __name__ == '__main__':
+    test_number=0
+    # global dispatcher
     dispatcher.map("/openbci-fft", write_fft_data, test_number)
     dispatcher.map("/openbci-time", write_time_data, test_number)
 
@@ -51,5 +62,9 @@ def get_data(test_number=0):
 
     server = osc_server.ThreadingOSCUDPServer((ip, port), dispatcher)
     print("Serving on {}".format(server.server_address))
+    socketio.run(app)
     server.serve_forever()
-get_data()
+
+
+
+# get_data()
