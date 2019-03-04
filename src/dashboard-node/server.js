@@ -4,21 +4,21 @@ const express = require('express');
 const app = express();
 const server = app.listen(3000);
 const io = require('socket.io').listen(server);
-
-const Cyton = require("@openbci/cyton");
-const k = require("@openbci/utilities").constants;
 const fs = require('fs');
 
+/* These are manual settings that we can use to keep track of testNumber as an example */
 var settings = JSON.parse(fs.readFileSync('data_settings.json', 'utf8'));
 console.log("Currently running on these settings: \n" + settings);
 let testNumber = settings['testNumber'];
 
+/* Gets the current time */
 function getTimeValue() {
   var dateBuffer = new Date();
   var Time = dateBuffer.getTime();
   return Time;
 }
 
+/* Creates a UDP client to listen to the OpenBCI GUI */
 function UDPClient(port, host) {
   this.port = port;
   this.host = host;
@@ -30,23 +30,41 @@ function UDPClient(port, host) {
   this.connection.bind(this.port, this.host);
 };
 
+/* Prints listening */
 UDPClient.prototype.onListening = function() {
   console.log('Listening for data...');
 };
 
+/* On message from OpenBCI UDP, emits an event called sample for further classification */
 UDPClient.prototype.onMessage = function(msg) {
   this.events.emit('sample', JSON.parse(msg.toString()));
 };
 
+/* Creates UDP Client */
 var client = new UDPClient(12345, "127.0.0.1");
 
+/* On sample received runs the following code: */
 client.events.on('sample', function(data) {
+
+  /* If it is a fast fourier transform or timeseries value does the following */
+
   if(data['type'] == 'fft'){
+
+    /* Sends a socket to the client called fft that has all the data */
     io.sockets.emit('fft', data);
   }
   else{
     let time = getTimeValue();
-    // console.log(data);
+
+    /* Sends a socket to the client called timeseries that has the data as well as time */
+    /* Data Format:
+                  {
+                    'time': time,
+                    'eeg': {
+                              'data': [0.5,3,-5,40,5,32,8,1] data[index] is the eeg value at sensor-index
+                           }
+                  }
+    */
     io.sockets.emit('timeseries', {'time': time, 'eeg': data});
   }
 });
@@ -56,7 +74,8 @@ client.events.on('sample', function(data) {
 io.on('connection', function(socket){
   console.log('a user connected');
   socket.on('collect', function(collectsocket){
-    //Request sent for collection
+    /* From the client when a button is clicked a collect message will be sent! */
+    /* Will include, duration, direction and visible channels as an array */
     console.log(collectsocket);
   });
 });

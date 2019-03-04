@@ -1,10 +1,10 @@
 // Add javascript here, sorry for the mess and repitition!
 $(document).ready(function() {
-  //Timer:
 
-  //Active graphs
+  //Active graphs (Used for sending information to server)
   let active = [1,1,1,1,1,1,1,1];
 
+  //Used for showcasing other dashboard or training dashboard
   $('#tabs li').on('click', function() {
     var tab = $(this).data('tab');
 
@@ -15,12 +15,12 @@ $(document).ready(function() {
     $('div[data-content="' + tab + '"]').addClass('is-active');
   });
 
-  $('.graph-controls input').mousedown(function() {
 
+  //Used for changing which graphs are shown and updates active array accordingly
+  $('.graph-controls input').mousedown(function() {
     var input = $(this).attr("name");
     var indexChar = input[input.length-1];
     var index = parseInt(indexChar, 10)-1;
-
 
     $('article[id="media-' + input + '"]').toggleClass("hide");
     if(active[index] == 1){
@@ -29,10 +29,10 @@ $(document).ready(function() {
     else{
       active[index] = 1;
     }
-
-
   });
 
+
+  //Sample Data and Graphs Please Ignore this block:
   var data = [
     { label: 'Layer 1', values: [ {x: 0, y: 0}, {x: 1, y: 1}, {x: 2, y: 2} ] },
     { label: 'Layer 2', values: [ {x: 0, y: 0}, {x: 1, y: 1}, {x: 2, y: 4} ] }
@@ -44,11 +44,6 @@ $(document).ready(function() {
       sinLayer.values.push({ x: x, y: Math.sin(x) + 1 });
       cosLayer.values.push({ x: x, y: Math.cos(x) + 1 });
     }
-
-
-
-
-
   var sensorChart2 = $('#sensor2').epoch({
       type: 'area',
       data: [sinLayer, cosLayer],
@@ -85,55 +80,65 @@ $(document).ready(function() {
       axes: ['left', 'right', 'bottom']
   });
 
-  var range = $('.input-range').val();
 
+  //Depending on range, changes the countdown text and vice versa
+  var range = $('.input-range').val();
   $(".input-range").on('input', function(){
       range = $(".input-range").val();
       $(".timer").val(range);
   });
-
   $(".timer").on('input', function(){
       range = $(".timer").val();
       $(".input-range").val(range);
   });
 
-  // Timer and states and emitting collection to node server!
-$(".selection").click(function() {
-  console.log("clicked?");
-  var clicked = $(this);
-  var duration = $(".input-range").val();
-  if(duration != 0){
-    if(clicked.is('.direction-left')){
-      socket.emit("collect", {command: "left", duration: duration, sensors: active});
+  /* IMPORTANT BLOCK FOR DATA COLLECTION! */
+  // If one of the collection buttons are clicked does the following:
+  $(".selection").click(function() {
+
+    //Gets the button that was clicked
+    var clicked = $(this);
+
+    //Sets the duration from the value that was present
+    var duration = $(".input-range").val();
+
+    //If the duration is not 0 then does the following:
+    if(duration != 0){
+
+      //Gets the proper direction and sends left/right/rest, the duration and active sensors to server
+      if(clicked.is('.direction-left')){
+        socket.emit("collect", {command: "left", duration: duration, sensors: active});
+      }
+      else if(clicked.is('.direction-right')){
+        socket.emit("collect", {command: "right", duration: duration, sensors: active});
+      }
+      else if(clicked.is('.direction-rest')){
+        socket.emit("collect", {command: "rest", duration: duration, sensors: active});
+      }
+
+    //Allows the countdown to work ***VERY crude currently, need to fix! ***
+    let timeLeft = duration;
+    let collectionTimer = setInterval(function(){
+      $('.timer').val(timeLeft);
+      timeLeft -= 1;
+      if(timeLeft <= 0){
+        clearInterval(collectionTimer);
+        timeLeft = duration;
+      }
+    }, 1000);
+
+    //Adds a toggle class for the button that was clicked
+    if (clicked.hasClass('toggle')) {
+      clicked.removeClass('toggle');
     }
-    else if(clicked.is('.direction-right')){
-      socket.emit("collect", {command: "right", duration: duration, sensors: active});
+    else {
+      $('.selection').removeClass('toggle');
+      clicked.addClass('toggle');
     }
-    else if(clicked.is('.direction-rest')){
-      socket.emit("collect", {command: "rest", duration: duration, sensors: active});
     }
 
-  let timeLeft = duration;
-  let collectionTimer = setInterval(function(){
-    $('.timer').val(timeLeft);
-    timeLeft -= 1;
-    if(timeLeft <= 0){
-      clearInterval(collectionTimer);
-      timeLeft = duration;
-    }
-  }, 1000);
 
-  if (clicked.hasClass('toggle')) {
-    clicked.removeClass('toggle');
-  }
-  else {
-    $('.selection').removeClass('toggle');
-    clicked.addClass('toggle');
-  }
-  }
-
-
-})
+  })
 
 
 });
