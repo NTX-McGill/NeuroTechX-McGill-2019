@@ -3,6 +3,7 @@ $(document).ready(function() {
 
   //Active graphs (Used for sending information to server)
   let active = [1,1,1,1,1,1,1,1];
+  var collecting = false;
 
   //Used for showcasing other dashboard or training dashboard
   $('#tabs li').on('click', function() {
@@ -84,59 +85,84 @@ $(document).ready(function() {
   //Depending on range, changes the countdown text and vice versa
   var range = $('.input-range').val();
   $(".input-range").on('input', function(){
-      range = $(".input-range").val();
-      $(".timer").val(range);
+      if(!collecting){
+        range = $(".input-range").val();
+        $(".timer").val(range);
+      } else{
+        //Maintains value from timer!
+        range = $(".timer").val();
+        $(".input-range").val(range);
+      }
   });
+
   $(".timer").on('input', function(){
+    if(!collecting){
       range = $(".timer").val();
       $(".input-range").val(range);
+    }
+    else {
+      //Maintains value from range!
+      range = $(".input-range").val();
+      $(".timer").val(range);
+    }
   });
 
   /* IMPORTANT BLOCK FOR DATA COLLECTION! */
   // If one of the collection buttons are clicked does the following:
   $(".selection").click(function() {
+    if(!collecting){
+      //Gets the button that was clicked
+      var clicked = $(this);
 
-    //Gets the button that was clicked
-    var clicked = $(this);
+      //Sets the duration from the value that was present
+      var duration = $(".input-range").val();
 
-    //Sets the duration from the value that was present
-    var duration = $(".input-range").val();
+      //If the duration is not 0 then does the following:
+      if(duration != 0){
+          collecting = true;
+          //Gets the proper direction and sends left/right/rest, the duration and active sensors to server
+          if(clicked.is('.direction-left')){
+            socket.emit("collect", {command: "left", duration: duration, sensors: active});
+          }
+          else if(clicked.is('.direction-right')){
+            socket.emit("collect", {command: "right", duration: duration, sensors: active});
+          }
+          else if(clicked.is('.direction-rest')){
+            socket.emit("collect", {command: "rest", duration: duration, sensors: active});
+          }
 
-    //If the duration is not 0 then does the following:
-    if(duration != 0){
+        //Allows the countdown to work ***VERY crude currently, need to fix! ***
+        let timeLeft = duration;
+        let collectionTimer = setInterval(function(){
+          timeLeft -= 1;
+          $('.timer').val(timeLeft);
+          $(".input-range").val(timeLeft);
+          if(timeLeft <= 0){
+            //END OF COLLECTION DUTIES:
+            clearInterval(collectionTimer);
+            timeLeft = duration;
+            if (clicked.hasClass('toggle')) {
+              clicked.removeClass('toggle');
+            }
+            else {
+              $('.selection').removeClass('toggle');
+              clicked.addClass('toggle');
 
-      //Gets the proper direction and sends left/right/rest, the duration and active sensors to server
-      if(clicked.is('.direction-left')){
-        socket.emit("collect", {command: "left", duration: duration, sensors: active});
+            }
+            collecting = false;
+          }
+        }, 1000);
+
+        //Adds a toggle class for the button that was clicked
+        if (clicked.hasClass('toggle')) {
+          clicked.removeClass('toggle');
+        }
+        else {
+          $('.selection').removeClass('toggle');
+          clicked.addClass('toggle');
+        }
       }
-      else if(clicked.is('.direction-right')){
-        socket.emit("collect", {command: "right", duration: duration, sensors: active});
-      }
-      else if(clicked.is('.direction-rest')){
-        socket.emit("collect", {command: "rest", duration: duration, sensors: active});
-      }
-
-    //Allows the countdown to work ***VERY crude currently, need to fix! ***
-    let timeLeft = duration;
-    let collectionTimer = setInterval(function(){
-      $('.timer').val(timeLeft);
-      timeLeft -= 1;
-      if(timeLeft <= 0){
-        clearInterval(collectionTimer);
-        timeLeft = duration;
-      }
-    }, 1000);
-
-    //Adds a toggle class for the button that was clicked
-    if (clicked.hasClass('toggle')) {
-      clicked.removeClass('toggle');
     }
-    else {
-      $('.selection').removeClass('toggle');
-      clicked.addClass('toggle');
-    }
-    }
-
 
   })
 
