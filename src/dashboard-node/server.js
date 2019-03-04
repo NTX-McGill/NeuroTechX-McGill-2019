@@ -16,7 +16,17 @@ var collecting = false;
 var duration = 0;
 var direction = "none";
 var active = [];
-var samples = [];
+const header = {time: 'Time',
+                  channel1: 'Channel 1',
+                  channel2: 'Channel 2',
+                  channel3: 'Channel 3',
+                  channel4: 'Channel 4',
+                  channel5: 'Channel 5',
+                  channel6: 'Channel 6',
+                  channel7: 'Channel 7',
+                  channel8: 'Channel 8'
+                };
+var samples = [header];
 
 
 /* These are manual settings that we can use to keep track of testNumber as an example */
@@ -33,9 +43,6 @@ function getTimeValue() {
 
 /* Sets the csvwriters to the correct paths! */
 function setupCSVWriters(){
-    for(i = 0; i < 8; i++){
-      samples.push([]);
-    }
     csvWriter = createCsvWriter({
           path: __dirname + '/data/test-' + testNumber + '-' + direction + '.csv',
           header: [
@@ -57,8 +64,9 @@ function setupCSVWriters(){
 /* When data is collecting, samples will also write to file! */
 function appendSample(data){
   channelData = []
+  console.log(active);
   for (i = 0; i < 8; i++) {
-    if (active[i]) {
+    if (active[i] == 1) {
         channelData[i] = data['data']['data'][i];
     }
     else {
@@ -89,13 +97,11 @@ function endTest(){
     testNumber = settings['testNumber'];
   });
   // [ {ENTRY 1}, {ENTRY 2}]
+  console.log(samples);
   csvWriter.writeRecords(samples).then(() => {
     console.log('Added some samples');
   });
-
-// time | channel1 | chanel2 | ... | channel8
-
-
+  samples = [header];
 }
 
 /* Creates a UDP client to listen to the OpenBCI GUI */
