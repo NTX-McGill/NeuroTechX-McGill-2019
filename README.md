@@ -1,4 +1,4 @@
-# McGill Neurotech Club
+# McGill Neurotech Club : Wheelchair Project (NTX 2019)
 
 ## 1. Who are we?
 
