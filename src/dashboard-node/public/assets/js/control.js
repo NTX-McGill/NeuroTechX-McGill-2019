@@ -1,6 +1,6 @@
 // Add javascript here, sorry for the mess and repitition!
 $(document).ready(function() {
-
+  var timeLeft;
   //Active graphs (Used for sending information to server)
   let active = [1,1,1,1,1,1,1,1];
   var collecting = false;
@@ -23,7 +23,7 @@ $(document).ready(function() {
     var indexChar = input[input.length-1];
     var index = parseInt(indexChar, 10)-1;
 
-    $('article[id="media-' + input + '"]').toggleClass("hide");
+    $('#media-sensor' + (index+1)).toggleClass("hide");
     if(active[index] == 1){
       active[index] = 0;
     }
@@ -132,11 +132,15 @@ $(document).ready(function() {
           }
 
         //Allows the countdown to work ***VERY crude currently, need to fix! ***
-        let timeLeft = duration;
-        let collectionTimer = setInterval(function(){
+        timeLeft = duration;
+
+        $('.selection').addClass('active');
+        $(".selection").removeClass('imagery-inactive');
+        var collectionTimer = setInterval(function(){
           timeLeft -= 1;
           $('.timer').val(timeLeft);
           $(".input-range").val(timeLeft);
+
           if(timeLeft <= 0){
             //END OF COLLECTION DUTIES:
             clearInterval(collectionTimer);
@@ -149,7 +153,11 @@ $(document).ready(function() {
               clicked.addClass('toggle');
 
             }
+            $('.selection').removeClass('active');
+            $('.selection').addClass('imagery-inactive');
             collecting = false;
+            $(".timer").val(10);
+            $(".input-range").val(10);
           }
         }, 1000);
 
@@ -161,10 +169,84 @@ $(document).ready(function() {
           $('.selection').removeClass('toggle');
           clicked.addClass('toggle');
         }
+
+
       }
     }
 
   })
 
+  //GRAPHING!
+  function getTimeValue() {
+    var dateBuffer = new Date();
+    var Time = dateBuffer.getTime();
+    return Time;
+  }
+  var charts = [], lines = [];
+  var colors = ["#6dbe3d","#c3a323","#EB9486","#787F9A","#97A7B3","#9F7E69","#d97127", "#259188"]
+
+  for(i = 0; i < 8; i++) {
+    charts.push(new SmoothieChart({grid:{fillStyle:'transparent'},
+                                   labels:{fillStyle:'transparent'},
+                                   maxValue: 400,
+                                   minValue: -400}));
+    charts[i].streamTo(document.getElementById('smoothie-chart-' + (i+1)), 500);
+    lines.push(new TimeSeries());
+  }
+
+  let timeElapsed = new Date().getTime()
+  socket.on('timeseries', function(timeseries) {
+      // console.log(channelOne.data);
+      for(i = 0; i < 8; i++){
+        lines[i].append(new Date().getTime(), timeseries['eeg']['data'][i]);
+      }
+
+      // if (counter == 10) {
+        // let newData = (new Date().getTime(), timeseries['eeg']['data'][0]);
+        // console.log(timeseries['eeg']['data'][0])
+        // console.log(counter)
+        if (new Date().getTime() -  timeElapsed > 1000){
+          for(i = 0; i < 8; i++){
+            charts[i].addTimeSeries(lines[i], {lineWidth:2,
+                                               strokeStyle:colors[i]});
+            timeElapsed = new Date().getTime();
+            lines[i] = new TimeSeries();
+          }
+        }
+
+          // counter = 0;
+      // } else {
+          // ends with 0
+          // counter++;
+      // }
+      // console.log(timeseries['eeg']['data'][0]);
+
+      // console.log(channelOne.data + " and time: " + getTimeValue());
+      // sensorChart1.push(newData);
+  });
+
+  // setInterval(function() {
+  //   line.append(new Date().getTime(), Math.random())
+  // }, 100);
+  //
+  // chart.addTimeSeries(line, {lineWidth:2, strokeStyle:'#6834c8'});
+
+
+
+//
+//
+// var sensorChart1 = $('#sensor1').epoch({
+//     type: 'time.area',
+//     data: lineChartData,
+//     axes: ['left', 'right', 'bottom']
+// });
+// let counter = 0;
+// let previousTime = 0;
+
+  $('#stop').click(function(){
+    socket.emit("stop", {});
+    timeLeft = 0;
+
+  });
 
 });

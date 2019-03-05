@@ -55,7 +55,7 @@
                 Training Dashboard
               </h1>
               <div class="graphview">
-                <article class="media" id="media-sensor1">
+                <div class="media" id="media-sensor1">
                   <figure class="media-left">
                     <strong>
                     Sensor 1:
@@ -64,137 +64,173 @@
                   </figure>
                   <div class="media-content">
                     <div class="content">
-                    <canvas id="smoothie-chart" width="800" height="100">
+                    <canvas id="smoothie-chart-1" width="800" height="100">
                       <div id="sensor1" class="epoch category10" style="height: 100px;"></div>
                     </div>
                   </div>
-                </article>
-                <!--
-                <article class="media" id="media-sensor2">
-                  <figure class="media-left">
-                    <strong>
-                    <a> Sensor 2:
-                      </a>
-                    </strong>
-                  </figure>
-                  <div class="media-content">
-                    <div class="content">
-                      <div id="sensor2" class="epoch category10" style="height: 100px;"></div>
-                    </div>
-                  </div>
-                </article>
-                <article class="media" id="media-sensor3">
-                  <figure class="media-left">
-                    <strong>
-                    <a> Sensor 3:
-                      </a>
-                    </strong>
-                  </figure>
-                  <div class="media-content">
-                    <div class="content">
-                      <div id="sensor3" class="epoch category10" style="height: 100px;"></div>
-                    </div>
-                  </div>
-                </article>
-                <article class="media" id="media-sensor4">
-                  <figure class="media-left">
-                    <strong>
-                    <a> Sensor 4:
-                      </a>
-                    </strong>
-                  </figure>
-                  <div class="media-content">
-                    <div class="content">
-                      <div id="sensor4" class="epoch category10" style="height: 100px;"></div>
-                    </div>
-                  </div>
-                </article>
-                <article class="media" id="media-sensor5">
-                  <figure class="media-left">
-                    <strong>
-                    <a> Sensor 5:
-                      </a>
-                    </strong>
-                  </figure>
-                  <div class="media-content">
-                    <div class="content">
-                      <div id="sensor5" class="epoch category10" style="height: 100px;"></div>
-                    </div>
-                  </div>
-                </article>
-                <article class="media" id="media-sensor6">
-                  <figure class="media-left">
-                    <strong>
-                    <a> Sensor 6:
-                      </a>
-                    </strong>
-                  </figure>
-                  <div class="media-content">
-                    <div class="content">
-                      <div id="sensor6" class="epoch category10" style="height: 100px;"></div>
-                    </div>
-                  </div>
-                </article>
-                <article class="media" id="media-sensor7">
-                  <figure class="media-left">
-                    <strong>
-                    <a> Sensor 7:
-                      </a>
-                    </strong>
-                  </figure>
-                  <div class="media-content">
-                    <div class="content">
-                      <div id="sensor7" class="epoch category10" style="height: 100px;"></div>
-                    </div>
-                  </div>
-                </article>
-                <article class="media" id="media-sensor8">
-                  <figure class="media-left">
-                    <strong>
-                    <a> Sensor 8:
-                      </a>
-                    </strong>
-                  </figure>
-                  <div class="media-content">
-                    <div class="content">
-                      <div id="sensor8" class="epoch category10" style="height: 100px;"></div>
-                    </div>
-                  </div>
-                </article> -->
-              </div>
-              <div class="graph-controls">
-                <label for="scales">Sensor 1:</label>
-                <input type="checkbox" id="sensor1" name="sensor1" checked>
-                <label for="scales">Sensor 2:</label>
-                <input type="checkbox" id="sensor2" name="sensor2" checked>
-                <label for="scales">Sensor 3:</label>
-                <input type="checkbox" id="sensor3" name="sensor3" checked>
-                <label for="scales">Sensor 4:</label>
-                <input type="checkbox" id="sensor4" name="sensor4" checked>
-                <label for="scales">Sensor 5:</label>
-                <input type="checkbox" id="sensor5" name="sensor5" checked>
-                <label for="scales">Sensor 6:</label>
-                <input type="checkbox" id="sensor6" name="sensor6" checked>
-                <label for="scales">Sensor 7:</label>
-                <input type="checkbox" id="sensor7" name="sensor7" checked>
-                <label for="scales">Sensor 8:</label>
-                <input type="checkbox" id="sensor8" name="sensor8" checked>
+                </div>
 
+                  <div class="media" id="media-sensor2">
+                    <figure class="media-left">
+                      <strong>
+                      Sensor 2:
+
+                      </strong>
+                    </figure>
+                    <div class="media-content">
+                      <div class="content">
+                      <canvas id="smoothie-chart-2" width="800" height="100">
+                        <div id="sensor2" class="epoch category10" style="height: 100px;"></div>
+                      </div>
+                    </div>
+                  </div>
+
+                    <div class="media" id="media-sensor3">
+                      <figure class="media-left">
+                        <strong>
+                        Sensor 3:
+
+                        </strong>
+                      </figure>
+                      <div class="media-content">
+                        <div class="content">
+                        <canvas id="smoothie-chart-3" width="800" height="100">
+                          <div id="sensor3" class="epoch category10" style="height: 100px;"></div>
+                        </div>
+                      </div>
+                    </div>
+
+                      <div class="media" id="media-sensor4">
+                        <figure class="media-left">
+                          <strong>
+                          Sensor 4:
+
+                          </strong>
+                        </figure>
+                        <div class="media-content">
+                          <div class="content">
+                          <canvas id="smoothie-chart-4" width="800" height="100">
+                            <div id="sensor4" class="epoch category10" style="height: 100px;"></div>
+                          </div>
+                        </div>
+                      </div>
+
+                        <div class="media" id="media-sensor5">
+                          <figure class="media-left">
+                            <strong>
+                            Sensor 5:
+
+                            </strong>
+                          </figure>
+                          <div class="media-content">
+                            <div class="content">
+                            <canvas id="smoothie-chart-5" width="800" height="100">
+                              <div id="sensor5" class="epoch category10" style="height: 100px;"></div>
+                            </div>
+                          </div>
+                        </div>
+
+                          <div class="media" id="media-sensor6">
+                            <figure class="media-left">
+                              <strong>
+                              Sensor 6:
+
+                              </strong>
+                            </figure>
+                            <div class="media-content">
+                              <div class="content">
+                              <canvas id="smoothie-chart-6" width="800" height="100">
+                                <div id="sensor6" class="epoch category10" style="height: 100px;"></div>
+                              </div>
+                            </div>
+                          </div>
+
+                            <div class="media" id="media-sensor7">
+                              <figure class="media-left">
+                                <strong>
+                                Sensor 7:
+
+                                </strong>
+                              </figure>
+                              <div class="media-content">
+                                <div class="content">
+                                <canvas id="smoothie-chart-7" width="800" height="100">
+                                  <div id="sensor7" class="epoch category10" style="height: 100px;"></div>
+                                </div>
+                              </div>
+                            </div>
+
+                              <div class="media" id="media-sensor8">
+                                <figure class="media-left">
+                                  <strong>
+                                  Sensor 8:
+
+                                  </strong>
+                                </figure>
+                                <div class="media-content">
+                                  <div class="content">
+                                  <canvas id="smoothie-chart-8" width="800" height="100">
+                                    <div id="sensor8" class="epoch category10" style="height: 100px;"></div>
+                                  </div>
+                                </div>
+                              </div>
+
+
+
+              </div>
+              <div class="graph-controls" style="padding-top: 20px; padding-bottom: 10px">
+                <div class = "columns is-mobile" style="padding-bottom: 0px; margin-bottom: 0px;">
+                <div class="column" style="padding-bottom: 0px; margin-bottom: 0px;">
+                  <label for="scales">Sensor 1:</label>
+                  <input type="checkbox" id="sensor1" name="sensor1" checked>
+                </div>
+                <div class="column" style="padding-bottom: 0px; margin-bottom: 0px;">
+                  <label for="scales">Sensor 2:</label>
+                  <input type="checkbox" id="sensor2" name="sensor2" checked>
+                </div>
+                <div class="column" style="padding-bottom: 0px; margin-bottom: 0px;">
+                  <label for="scales">Sensor 3:</label>
+                  <input type="checkbox" id="sensor3" name="sensor3" checked>
+                </div>
+                <div class="column" style="padding-bottom: 0px; margin-bottom: 0px;">
+                  <label for="scales">Sensor 4:</label>
+                  <input type="checkbox" id="sensor4" name="sensor4" checked>
+                </div>
+              </div>
+                <div class = "columns is-mobile" style="padding-top: 0px;">
+                <div class="column">
+                  <label for="scales">Sensor 5:</label>
+                  <input type="checkbox" id="sensor5" name="sensor5" checked>
+                </div>
+                <div class="column">
+                  <label for="scales">Sensor 6:</label>
+                  <input type="checkbox" id="sensor6" name="sensor6" checked>
+                </div>
+                <div class="column">
+                  <label for="scales">Sensor 7:</label>
+                  <input type="checkbox" id="sensor7" name="sensor7" checked>
+                </div>
+                <div class="column">
+                  <label for="scales">Sensor 8:</label>
+                  <input type="checkbox" id="sensor8" name="sensor8" checked>
+                </div>
+
+                </div>
               </div>
               <div class="container" id="controls">
 
                 <div class="commands">
                     <div class="with-unit">
-                      <input type="text" class="timer" value="0"></input>
+                      <input type="text" class="timer" value="10"></input>
                   </div>
-                  <button class="selection imagery direction-left">Left</button>
-                  <button class="selection imagery direction-rest">Rest</button>
-                  <button class="selection imagery direction-right">Right</button>
-                  <button class="selection loop">
-                    <i class="fas fa-retweet"></i>
+                  <button class="selection imagery imagery-inactive direction-left">Left</button>
+                  <button class="selection imagery imagery-inactive direction-rest">Rest</button>
+                  <button class="selection imagery imagery-inactive direction-right">Right</button>
+                  <button class="loop" id="stop">
+                    <i class="fas fa-ban" style="font-size: 40px;"></i>
                   </button>
                   <div class="range-slider">
-                    <input class="input-range" type="range" value="0" min="0" max="100" step="1" >
+                    <input class="input-range" type="range" value="10" min="0" max="100" step="1" >
                   </div>
                 </div>
 
@@ -213,61 +249,6 @@
     </div>
 
   </section>
-  <script>
-    function getTimeValue() {
-      var dateBuffer = new Date();
-      var Time = dateBuffer.getTime();
-      return Time;
-    }
-
-    var chart = new SmoothieChart({grid:{fillStyle:'transparent'},
-                                  labels:{fillStyle:'transparent'}});
-    chart.streamTo(document.getElementById('smoothie-chart'), 500);
-
-    var line = new TimeSeries();
-    let timeElapsed = new Date().getTime()
-    socket.on('timeseries', function(timeseries) {
-        // console.log(channelOne.data);
-        line.append(new Date().getTime(), timeseries['eeg']['data'][0]);
-        // if (counter == 10) {
-          // let newData = (new Date().getTime(), timeseries['eeg']['data'][0]);
-          // console.log(timeseries['eeg']['data'][0])
-          // console.log(counter)
-          if (new Date().getTime() -  timeElapsed > 550){
-              chart.addTimeSeries(line, {lineWidth:2, strokeStyle:'#6834c8'});
-              timeElapsed = new Date().getTime();
-              line = new TimeSeries();
-          }
-
-            // counter = 0;
-        // } else {
-            // ends with 0
-            // counter++;
-        // }
-        // console.log(timeseries['eeg']['data'][0]);
-
-        // console.log(channelOne.data + " and time: " + getTimeValue());
-        // sensorChart1.push(newData);
-    });
-
-    // setInterval(function() {
-    //   line.append(new Date().getTime(), Math.random())
-    // }, 100);
-    //
-    // chart.addTimeSeries(line, {lineWidth:2, strokeStyle:'#6834c8'});
-
-
-
-  //
-  //
-  // var sensorChart1 = $('#sensor1').epoch({
-  //     type: 'time.area',
-  //     data: lineChartData,
-  //     axes: ['left', 'right', 'bottom']
-  // });
-  // let counter = 0;
-  // let previousTime = 0;
-  </script>
   </body>
 
 </html>

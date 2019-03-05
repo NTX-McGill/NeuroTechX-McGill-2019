@@ -94,20 +94,22 @@ function appendSample(data){
 }
 
 /* Updates test number on data_settings file */
-function endTest(){
-  settings['testNumber'] += 1;
-  let settingsString = JSON.stringify(settings);
+function endTest(saved){
+  if(saved){
+    settings['testNumber'] += 1;
+    let settingsString = JSON.stringify(settings);
 
-  fs.writeFile('data_settings.json', settingsString, 'utf8', function(err){
-    if (err) throw err;
-    console.log('Updated Test Number!');
-    testNumber = settings['testNumber'];
-  });
-  // [ {ENTRY 1}, {ENTRY 2}]
-  console.log(samples);
-  csvWriter.writeRecords(samples).then(() => {
-    console.log('Added some samples');
-  });
+    fs.writeFile('data_settings.json', settingsString, 'utf8', function(err){
+      if (err) throw err;
+      console.log('Updated Test Number!');
+      testNumber = settings['testNumber'];
+    });
+    // [ {ENTRY 1}, {ENTRY 2}]
+    console.log(samples);
+    csvWriter.writeRecords(samples).then(() => {
+      console.log('Added some samples');
+    });
+  }
   samples = [header];
 }
 
@@ -186,9 +188,15 @@ io.on('connection', function(socket){
         if(timeLeft <= 0){
           collecting = false;
           clearInterval(collectionTimer);
-          endTest();
+          endTest(true);
         }
     }, 1000);
+
+    socket.on('stop', function(){
+      collecting = false;
+      clearInterval(collectionTimer);
+      endTest(false);
+    });
 
     console.log(collectsocket);
   });
