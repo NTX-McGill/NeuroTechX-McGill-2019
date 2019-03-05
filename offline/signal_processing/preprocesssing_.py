@@ -19,6 +19,7 @@ from scipy.signal import butter, lfilter
 class Preprocessing():
     def __init__(self, path):
         self.path = path
+        self.sample_rate = 250
         
     
     def load_data_BCI(self, list_channels):
@@ -57,11 +58,7 @@ class Preprocessing():
                                        usecols=[12],
                                        header = None)
         
-        #TODO: time_length
-        
-        with open(self.path) as f:
-            sample_rate_txt = f.readlines()[2:3]int(float(re.findall(r'[+-]?\d+\.\d+',
-                                                    str(sample_rate_txt))[0]))
+
         
     
     def initial_filtering(self, hp_cutoff_Hz = 1.0, notch_freq_Hz  = [60.0, 120.0],
@@ -97,7 +94,7 @@ class Preprocessing():
                                                               self.filtered_eeg_data_notch)
                    
     
-    def convert_to_freq_domain(self, NFFT = 256, FFTstep = 100):
+    def convert_to_freq_domain(self, NFFT = 500, FFTstep = 125):
         
         """
         
@@ -239,22 +236,22 @@ class Preprocessing():
   
       
     
-fname_ec = '/Users/jenisha/Desktop/NeuroTech-Workshop-Demo/EyesClosedNTXDemo.txt' 
-fname_eo = '/Users/jenisha/Desktop/NeuroTech-Workshop-Demo/EyesOpenedNTXDemo.txt' 
-test = Preprocessing(fname_ec)
-test.load_data_BCI([1])
-test.initial_filtering()
-test.convert_to_freq_domain()
-test.plots()
+#fname_ec = '/Users/jenisha/Desktop/NeuroTech-Workshop-Demo/EyesClosedNTXDemo.txt' 
+#fname_eo = '/Users/jenisha/Desktop/NeuroTech-Workshop-Demo/EyesOpenedNTXDemo.txt' 
+#test = Preprocessing(fname_ec)
+#test.load_data_BCI([1])
+#test.initial_filtering()
+#test.convert_to_freq_domain()
+#test.plots()
+#
+#test2 = Preprocessing(fname_eo)
+#test2.load_data_BCI([1])
+#test2.initial_filtering()
+#test2.convert_to_freq_domain()
+#test2.plots()
 
-test2 = Preprocessing(fname_eo)
-test2.load_data_BCI([1])
-test2.initial_filtering()
-test2.convert_to_freq_domain()
-test2.plots()
 
-
-fname_20 = '/Users/jenisha/Desktop/NeuroTechX-McGill-2019/offline/data/20s_rest_20s_clench_20sMI.txt'  
+fname_20 = '/Users/jenisha/Desktop/NeuroTechX-McGill-2019/offline/data/March_4/6_SUCCESS_Rest_RightClench_JawClench_ImagineClench_10secs.txt'  
 test3 = Preprocessing(fname_20)
 test3.load_data_BCI([1])
 test3.initial_filtering()
