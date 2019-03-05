@@ -15,24 +15,8 @@
     <script src="./assets/js/control.js"></script>
     <script src="/assets/js/socket.io.js"></script>
       <script>
-        function getTimeValue() {
-          var dateBuffer = new Date();
-          var Time = dateBuffer.getTime();
-          return Time;
-        }
-
-        var lineChartData = [
-          {
-            label: "Channel 1",
-            values: [ {time: getTimeValue(), y: 0}],
-            height: 240,
-            fps: 60
-          }
-        ];
         var socket = io();
-
-
-    </script>
+      </script>
   </head>
   <body>
     <nav class="navbar" role="navigation" aria-label="main navigation">
@@ -224,32 +208,53 @@
 
   </section>
   <script>
-      var sensorChart1 = $('#sensor1').epoch({
-          type: 'time.area',
-          data: lineChartData,
-          axes: ['left', 'right', 'bottom']
-      });
-      let counter = 0;
-      let previousTime = 0;
-      socket.on('timeseries',function(timeseries) {
-          // console.log(channelOne.data);
-          let timern = getTimeValue();
-          if (timern - previousTime > 1000) {
-              console.log(counter);
-              previousTime = timern;
-              counter = 0;
-          } else {
-              // ends with 0
-              counter++;
+    function getTimeValue() {
+      var dateBuffer = new Date();
+      var Time = dateBuffer.getTime();
+      return Time;
+    }
 
-          }
+    var lineChartData = [
+      {
+        label: "Channel 1",
+        values: [ {time: getTimeValue(), y: 0}],
+        height: 100,
+        fps: 250,
+        queueSize: 1,
+      }
+    ];
 
-          // console.log(timeseries['eeg']['data'][0]);
-          let newData = [{time: timeseries['time'], y: timeseries['eeg']['data'][0]}];
+    var sensorChart1 = $('#sensor1').epoch({
+        type: 'time.line',
+        data: lineChartData,
+        axes: ['left', 'right', 'bottom']
+    });
 
-          // console.log(channelOne.data + " and time: " + getTimeValue());
-          sensorChart1.push(newData);
-      });
+    let counter = 0;
+    let previousTime = 0;
+    socket.on('timeseries',function(timeseries) {
+        // let newData = [{time: previousTime, y: timeseries['eeg']['data'][0]}];
+
+        let newData = [{time: previousTime, y: previousTime%3}];
+        console.log(newData);
+        previousTime++;
+        // console.log(channelOne.data + " and time: " + getTimeValue());
+        sensorChart1.push(newData);
+
+        // console.log(channelOne.data);
+        // let timern = getTimeValue();
+        // if (timern - previousTime > 1000) {
+        //     console.log(counter);
+        //     previousTime = timern;
+        //     counter = 0;
+        // } else {
+        //     // ends with 0
+        //     counter++;
+        //
+        // }
+
+        // console.log(timeseries['eeg']['data'][0]);
+    });
   </script>
   </body>
 

@@ -43,8 +43,14 @@ function getTimeValue() {
 
 /* Sets the csvwriters to the correct paths! */
 function setupCSVWriters(){
+    let date = new Date();
+    var day = date.getFullYear() + '-' + date.getMonth() + '-' +
+                   date.getDate() + '-' + date.getHours() + '-' +
+                   date.getMinutes() + '-' + date.getSeconds()
+
     csvWriter = createCsvWriter({
-          path: __dirname + '/data/test-' + testNumber + '-' + direction + '.csv',
+          path: __dirname + '/data/test-' + testNumber + '-' + direction + '-'
+                          + day + '.csv',
           header: [
               {id: 'time', title: 'TIME'},
               {id: 'channel1', title: 'CHANNEL 1'},
@@ -60,7 +66,6 @@ function setupCSVWriters(){
     });
 }
 
-
 /* When data is collecting, samples will also write to file! */
 function appendSample(data){
   channelData = []
@@ -73,6 +78,8 @@ function appendSample(data){
       channelData[i] = null;
     }
   }
+
+
   sampleToPush = {time: data['time'],
                   channel1: channelData[0],
                   channel2: channelData[1],
