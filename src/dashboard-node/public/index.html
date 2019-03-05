@@ -8,30 +8,18 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
 
     <script src='https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.0/d3.min.js' charset='utf-8'></script>
-    <script src="./assets/js/epoch.js"></script>
+    <!-- <script src="./assets/js/epoch.js"></script> -->
     <script src="./assets/js/data.js"></script>
-    <link rel="stylesheet" type="text/css" href="./assets/css/epoch.min.css">
+    <!-- <link rel="stylesheet" type="text/css" href="./assets/css/epoch.min.css"> -->
     <link rel="stylesheet" href="./assets/css/style.css">
     <script src="./assets/js/control.js"></script>
     <script src="/assets/js/socket.io.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/smoothie/1.34.0/smoothie.min.js"></script>
+
+
+
       <script>
-        function getTimeValue() {
-          var dateBuffer = new Date();
-          var Time = dateBuffer.getTime();
-          return Time;
-        }
-
-        var lineChartData = [
-          {
-            label: "Channel 1",
-            values: [ {time: getTimeValue(), y: 0}],
-            height: 240,
-            fps: 60
-          }
-        ];
         var socket = io();
-
-
     </script>
   </head>
   <body>
@@ -70,16 +58,18 @@
                 <article class="media" id="media-sensor1">
                   <figure class="media-left">
                     <strong>
-                    <a> Sensor 1:
-                      </a>
+                    Sensor 1:
+
                     </strong>
                   </figure>
                   <div class="media-content">
                     <div class="content">
+                    <canvas id="smoothie-chart" width="800" height="100">
                       <div id="sensor1" class="epoch category10" style="height: 100px;"></div>
                     </div>
                   </div>
                 </article>
+                <!--
                 <article class="media" id="media-sensor2">
                   <figure class="media-left">
                     <strong>
@@ -170,7 +160,7 @@
                       <div id="sensor8" class="epoch category10" style="height: 100px;"></div>
                     </div>
                   </div>
-                </article>
+                </article> -->
               </div>
               <div class="graph-controls">
                 <label for="scales">Sensor 1:</label>
@@ -224,32 +214,58 @@
 
   </section>
   <script>
-      var sensorChart1 = $('#sensor1').epoch({
-          type: 'time.area',
-          data: lineChartData,
-          axes: ['left', 'right', 'bottom']
-      });
-      let counter = 0;
-      let previousTime = 0;
-      socket.on('timeseries',function(timeseries) {
-          // console.log(channelOne.data);
-          let timern = getTimeValue();
-          if (timern - previousTime > 1000) {
-              console.log(counter);
-              previousTime = timern;
-              counter = 0;
-          } else {
-              // ends with 0
-              counter++;
+    function getTimeValue() {
+      var dateBuffer = new Date();
+      var Time = dateBuffer.getTime();
+      return Time;
+    }
 
+    var chart = new SmoothieChart({grid:{fillStyle:'transparent'},
+                                  labels:{fillStyle:'transparent'}});
+    chart.streamTo(document.getElementById('smoothie-chart'), 500);
+
+    var line = new TimeSeries();
+    let timeElapsed = new Date().getTime()
+    socket.on('timeseries', function(timeseries) {
+        // console.log(channelOne.data);
+        line.append(new Date().getTime(), timeseries['eeg']['data'][0]);
+        // if (counter == 10) {
+          // let newData = (new Date().getTime(), timeseries['eeg']['data'][0]);
+          // console.log(timeseries['eeg']['data'][0])
+          // console.log(counter)
+          if (new Date().getTime() -  timeElapsed > 2000){
+              chart.addTimeSeries(line, {lineWidth:2, strokeStyle:'#6834c8'});
+              timeElapsed = new Date().getTime();
           }
 
-          // console.log(timeseries['eeg']['data'][0]);
-          let newData = [{time: timeseries['time'], y: timeseries['eeg']['data'][0]}];
+            // counter = 0;
+        // } else {
+            // ends with 0
+            // counter++;
+        // }
+        // console.log(timeseries['eeg']['data'][0]);
 
-          // console.log(channelOne.data + " and time: " + getTimeValue());
-          sensorChart1.push(newData);
-      });
+        // console.log(channelOne.data + " and time: " + getTimeValue());
+        // sensorChart1.push(newData);
+    });
+
+    // setInterval(function() {
+    //   line.append(new Date().getTime(), Math.random())
+    // }, 100);
+    //
+    // chart.addTimeSeries(line, {lineWidth:2, strokeStyle:'#6834c8'});
+
+
+
+  //
+  //
+  // var sensorChart1 = $('#sensor1').epoch({
+  //     type: 'time.area',
+  //     data: lineChartData,
+  //     axes: ['left', 'right', 'bottom']
+  // });
+  // let counter = 0;
+  // let previousTime = 0;
   </script>
   </body>
 
