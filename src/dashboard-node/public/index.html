@@ -233,7 +233,7 @@
           // let newData = (new Date().getTime(), timeseries['eeg']['data'][0]);
           // console.log(timeseries['eeg']['data'][0])
           // console.log(counter)
-          if (new Date().getTime() -  timeElapsed > 500){
+          if (new Date().getTime() -  timeElapsed > 550){
               chart.addTimeSeries(line, {lineWidth:2, strokeStyle:'#6834c8'});
               timeElapsed = new Date().getTime();
               line = new TimeSeries();
