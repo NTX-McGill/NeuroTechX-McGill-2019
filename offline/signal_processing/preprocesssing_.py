@@ -30,8 +30,7 @@ class Preprocessing():
         - list of channels
         - raw data
         - timestamp
-        
-        
+         
         
         Input:
             channel: lists of channels to use
@@ -61,8 +60,7 @@ class Preprocessing():
         #TODO: time_length
         
         with open(self.path) as f:
-            sample_rate_txt = f.readlines()[2:3]
-            self.sample_rate = int(float(re.findall(r'[+-]?\d+\.\d+',
+            sample_rate_txt = f.readlines()[2:3]int(float(re.findall(r'[+-]?\d+\.\d+',
                                                     str(sample_rate_txt))[0]))
         
     
@@ -84,7 +82,8 @@ class Preprocessing():
        # filter the data to remove DC
        self.nyq = 0.5 * self.sample_rate
        b_high, a_high = butter(order_high_pass, hp_cutoff_Hz/self.nyq, 'highpass')
-#       self.filtered_eeg_data_dc = lfilter(b_high, a_high, self.raw_eeg_data, 0) 
+
+
        self.filtered_eeg_data_dc = np.apply_along_axis(lambda l: lfilter(b_high, a_high ,l),0,
                                                       self.raw_eeg_data)
        
@@ -94,7 +93,6 @@ class Preprocessing():
        for freq_Hz in notch_freq_Hz: 
             bp_stop_Hz = freq_Hz + float(order_notch)*np.array([-1, 1])  # set the stop band
             b_notch, a_notch = butter(order_notch, bp_stop_Hz/self.nyq , 'bandstop')
-            #self.filtered_eeg_data_notch = lfilter(b_notch, a_notch, self.filtered_eeg_data_notch, 0)
             self.filtered_eeg_data_notch = np.apply_along_axis(lambda l: lfilter(b_notch, a_notch,l),0,
                                                               self.filtered_eeg_data_notch)
                    
@@ -203,7 +201,7 @@ class Preprocessing():
                    10*np.log10(self.spec_PSDperBin[channel]))
         plt.clim(25-5+np.array([-40, 0]))
         plt.xlim(t_sec[0], t_sec[-1])
-        #plt.ylim([0, self.freqs/2.0])  # show the full frequency content of the signal
+        #plt.ylim([0, 20])  # show the full frequency content of the signal
         plt.xlabel('Time (sec)')
         plt.ylabel('Frequency (Hz)')
         plt.title('Spectogram of Filtered')
