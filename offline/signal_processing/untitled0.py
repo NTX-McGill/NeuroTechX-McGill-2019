@@ -1,6 +1,14 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
+Created on Tue Mar  5 11:24:09 2019
+
+@author: jenisha
+"""
+
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
 Created on Mon Mar  4 15:26:48 2019
 
 @author: jenisha
@@ -17,35 +25,35 @@ from scipy.signal import butter, lfilter
 import numpy.fft as fft
 
 """
-Implementation of the preprocessing as outlined in 
-"TrueNorth-enabled Real-time Classification of EEG Data for Brain- TrueNorth-enabled 
-Real-time Classification of EEG Data for Brain-"
-and
-"A Robust Low-Cost EEG Motor Imagery-Based Brain-Computer Interface:"
+Implement the preprocessing as outlined in 
+"" TrueNorth-enabled Real-time Classification of EEG Data for Brain- TrueNorth-enabled 
+Real-time Classification of EEG Data for Brain-""
 
 Input:
 - path: where the data is stored
-- name_channels: name of each channel
+- list_channels: name of each channel
 
 """
 
 
 class Kiral_Korek_Preprocessing():
-    def __init__(self, path, name_channels=["C3"]):
+    def __init__(self, path, name_channel=["C3"]):
         self.path = path
         self.sample_rate = 250 #Default sampling rate for OpenBCI
-        self.name_channel = name_channels
+        self.name_channel = name_channel
         
 
     
-    def load_data_BCI(self, list_channels=[1]):
+    def load_data_BCI(self, list_channels):
         """
         
         Load the data from OpenBCI txt file
 
         Input:
-            list_channel: lists of channels to use
-
+            channel: lists of channels to use
+            
+            
+        
         
         """
         self.number_channels = len(list_channels)
@@ -57,39 +65,48 @@ class Kiral_Korek_Preprocessing():
                                        skiprows=7,
                                        usecols=list_channels)
 
-        #expand the dimmension if only one channel             
+        # extract time stamps
+        self.time_stamps = pd.read_csv(self.path, 
+                                       delimiter=',', 
+                                       skiprows=7,
+                                       usecols=[12],
+                                       header = None)
+                       
         if self.number_channels == 1:
             self.raw_eeg_data = np.expand_dims(self.raw_eeg_data, 
                                                           axis=1)
-            
         
         
-    def initial_preprocessing(self, bp_lowcut =1, bp_highcut =70, bp_order=2,
-                          notch_freq_Hz  = [60.0, 120.0], notch_order =2):
+    def initial_preprocessing(self, bp_lowcut =1, bp_highcut =70, bp_order=3,
+                          notch_freq_Hz  = [60.0, 120.0], notch_order =3):
        """
        Filters the data by applying
        - A zero-phase Butterworth bandpass was applied from 1 – 70 Hz. 
        - A 60-120 Hz notch filter to suppress line noise
       
+        In addition, Sample values exceeding ±6std, where std is the standard deviation
+           of any given voltage trace, were set to ±6std to rectify outliers in voltage.
        
        Input:
            - bp_ lowcut: lower cutoff frequency for bandpass filter
            - bp_highcut: higher cutoff frequency for bandpass filter
-           - bp_order: order of bandpass filter
            - notch_freq_Hz: cutoff frequencies for notch fitltering
            - notch_order: order of notch filter
 
+           
+
+        
         
         """
-       self.nyq = 0.5 * self.sample_rate #Nyquist frequency
+       self.nyq = 0.5 * self.sample_rate
        self.low = bp_lowcut / self.nyq
        self.high = bp_highcut / self.nyq
-       
-       #Bandpass filter
+        
        b_bandpass, a_bandpass = butter(bp_order, [self.low, self.high], btype='band')
        self.bp_filtered_eeg_data = np.apply_along_axis(lambda l: lfilter(b_bandpass, a_bandpass ,l),0,
                                                       self.raw_eeg_data)
-   
+       
+        
        self.notch_filtered_eeg_data = self.bp_filtered_eeg_data
        
        for freq_Hz in notch_freq_Hz: 
@@ -99,7 +116,7 @@ class Kiral_Korek_Preprocessing():
                                                               self.notch_filtered_eeg_data)
        
        
-#       mult_std = 6 
+        
 #       self.list_std_channel, self.list_mean_channel  = [], []
 #       self.corrected_eeg_data = self.notch_filtered_eeg_data
 #       for channel in self.corrected_eeg_data.T:
@@ -107,12 +124,10 @@ class Kiral_Korek_Preprocessing():
 #            self.list_mean_channel.append(np.mean(channel))
 #            for val in channel:
 #                if val > self.list_mean_channel[-1] + self.list_std_channel[-1] *  mult_std :
-#                    print(val)
 #                    val = val -  mult_std * self.list_mean_channel[-1]
-#                    print(val)
 #                elif val <  self.list_mean_channel[-1] - self.list_std_channel[-1] *  mult_std :
 #                    val = val +  mult_std * self.list_mean_channel[-1]
-#            
+            
           
            
             
@@ -122,14 +137,13 @@ class Kiral_Korek_Preprocessing():
         
         Input:
             - data: data to seperate into windows
-            - mode: whether the windows are of same length (mode 1) or different lengths (mode 2)
-            - window_length: length of the window in s
-            - overlap: overlap in the previous window
+            - window_length: length of the window
+            - overlap
         
         """
         array_epochs = []
         i = 0
-        self.window_size_hz = int(window_length * self.sample_rate)
+        self.window_size_hz = window_length * self.sample_rate
         
         if mode == "1":
             while(i  < len(data) ):
@@ -138,6 +152,7 @@ class Kiral_Korek_Preprocessing():
             
 
             if i is not len(data) - 1:
+                
                 array_epochs.append(data[i:len(data)])
 
             self.epoch = array_epochs
@@ -146,7 +161,7 @@ class Kiral_Korek_Preprocessing():
             while i + self.window_size_hz < len(data):
                 array_epochs.append(data[i:i + self.window_size_hz])
                 i += overlap
-            self.num_epochs = i + 1
+            self.num_epoch = i + 1
            
 
         return np.array(array_epochs)
@@ -163,21 +178,17 @@ class Kiral_Korek_Preprocessing():
         
         """
         self.corrected_epoched_eeg_data = []
-        #need to use lists because different window sizes
+        
         for filtered in self.notch_filtered_eeg_data.T:
-            epoched = self.epoch_data(filtered,mode="1",window_length = 2,overlap=0)
+            epoched = self.epoch_data(filtered,mode="1",overlap=0)
             epoched_corrected = []
-            self.a = []
             for epoch in epoched:
                 epoch_mean = np.mean(epoch)
                 epoch_std = np.std(epoch)
-                self.a.append(epoch_std)
                 epoched_corrected.append(np.array([i - epoch_std * mult_std if i > epoch_mean + epoch_std * mult_std 
                                           else i + epoch_std * mult_std if i < epoch_mean - epoch_std * mult_std 
                                           else i for i in epoch]))
             self.corrected_epoched_eeg_data.append(epoched_corrected)
-            
-
 
         
         # For graphing, "de-epoch it
@@ -187,20 +198,42 @@ class Kiral_Korek_Preprocessing():
             self.corrected_eeg_data.append(de_epoched)
   
         self.corrected_eeg_data = np.array(self.corrected_eeg_data).transpose()
+    
+    def extract_features(self):
+        """
+        Extract mu bands (8-12 Hz) for MI
         
-
+        """
+        self.fft = []
+        self.PSD = []
+        self.equal_epoched_eeg_data = []
         
+        for filtered in self.notch_filtered_eeg_data.T:
+            self.equal_epoched_eeg_data.append(self.epoch_data(filtered,mode="2"))
+   
+        for channel in self.equal_epoched_eeg_data:
+            #Todo: last window
+            fft_tmp = (fft.fft(channel)/self.window_size_hz )
+            self.fft.append(fft_tmp )
         
+        self.PSD.append(2*np.abs(fft_tmp[0:int(self.window_size_hz/2),:]))
+        
+        self.f = self.sample_rate/2*np.linspace(0, 1, int(self.window_size_hz/2))
+        self.PSD = np.array(self.PSD)
+        #8-12
+        #self.mean_mu = np.mean(self.PSD[:, np.where((f >= 8) & (f <= 12))], axis = -1)
+        
+        #self.feature_vector = np.log10(self.mean_mu)
 
     
-    def convert_to_freq_domain(self, data, NFFT = 500, FFTstep = 125):
+    def convert_to_freq_domain(self, data, NFFT = 256, FFTstep = 100):
         
         """
         
-        Computes a spectogram via an FFT
+        Computes a spectogram
         
         Input:
-            - data: data to draw the spectogram on
+            - data: data to do spectogram
             - NFFT: The number of data points used in each block
             - FFTstep: Length of the signal you want to calculate the Fourier transform of.
        
@@ -232,7 +265,7 @@ class Kiral_Korek_Preprocessing():
             list_freqs.append(freqs)
             list_t_spec.append(t_spec)
         
-        return (np.array(list_spec_PSDperBin), np.array(list_freqs), np.array(list_t_spec))
+        return (list_spec_PSDperBin, list_freqs, list_t_spec)
     
     
     def plots(self, channel=0):
@@ -245,7 +278,6 @@ class Kiral_Korek_Preprocessing():
         
         """
         self.raw_spec_PSDperBin, self.raw_freqs, self.raw_t_spec = self.convert_to_freq_domain(self.raw_eeg_data)
-        
         
         fig = plt.figure()
 
@@ -263,13 +295,14 @@ class Kiral_Korek_Preprocessing():
                    10*np.log10(self.raw_spec_PSDperBin[channel]))
         plt.clim(25-5+np.array([-40, 0]))
         plt.xlim(t_sec[0], t_sec[-1])
-        plt.ylim([0, 60]) 
+        plt.ylim([0, 60])  # show the full frequency content of the signal
         plt.xlabel('Time (sec)')
         plt.ylabel('Frequency (Hz)')
         plt.title('Spectogram of Unfiltered')
         
         
         self.corrected_spec_PSDperBin, self.corrected_freqs, self.corrected_t_spec = self.convert_to_freq_domain(self.corrected_eeg_data)
+
         ax3 = plt.subplot(223)
         plt.plot(t_sec, self.corrected_eeg_data[:,channel])
         plt.ylim(-100, 100)
@@ -283,7 +316,7 @@ class Kiral_Korek_Preprocessing():
                    10*np.log10(self.corrected_spec_PSDperBin[channel]))
         plt.clim(25-5+np.array([-40, 0]))
         plt.xlim(t_sec[0], t_sec[-1])
-        plt.ylim([0, 60])  
+        plt.ylim([0, 60])  # show the full frequency content of the signal
         plt.xlabel('Time (sec)')
         plt.ylabel('Frequency (Hz)')
         plt.title('Spectogram of Filtered')
@@ -291,33 +324,25 @@ class Kiral_Korek_Preprocessing():
 
 
         plt.tight_layout()
-        plt.show()
-        
-    def extract_features(self, mu_band_Hz=[8,12]):
-        
-        
-        # get the mean spectra and convert from PSD to uVrms
-        self.corrected_mean_spectra_PSDperBin,self.corrected_mean_uVrmsPerSqrtBin =[],[]
-        i = 0
-        while i < self.number_channels:
-            spectra = self.corrected_spec_PSDperBin[i]
-            bool_inds = (self.corrected_freqs[i] > mu_band_Hz[0]) & (self.corrected_freqs[i] < mu_band_Hz[1])
-            corrected_mean_spectra_PSDperBin = np.mean(spectra[bool_inds,:], 0)
-            self.corrected_mean_spectra_PSDperBin.append(corrected_mean_spectra_PSDperBin)
-            self.corrected_mean_uVrmsPerSqrtBin.append(np.sqrt(self.corrected_mean_spectra_PSDperBin))
-            i = i + 1
-            
-        self.features = np.array(self.corrected_mean_uVrmsPerSqrtBin)
+        #plt.show()
             
     
+#fname_20 = '/Users/jenisha/Desktop/NeuroTechX-McGill-2019/offline/data/20s_rest_20s_clench_20sMI.txt'  
+#test3 = Kiral_Korek_Preprocessing(fname_20)
+#test3.load_data_BCI([1])
+#test3.initial_preprocessing()
+#test3.epoch_and_remove_outlier()
+#test3.plots()
+
 
 fname_4 = '/Users/jenisha/Desktop/NeuroTechX-McGill-2019/offline/data/March_4/6_SUCCESS_Rest_RightClench_JawClench_ImagineClench_10secs.txt'  
 test4 = Kiral_Korek_Preprocessing(fname_4)
-test4.load_data_BCI()
+test4.load_data_BCI([1])
 test4.initial_preprocessing()
 test4.epoch_and_remove_outlier()
+test4.extract_features()
 test4.plots()            
-test4.extract_features()      
+        
             
             
         
