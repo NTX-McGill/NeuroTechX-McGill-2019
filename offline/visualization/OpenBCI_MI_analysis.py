@@ -66,9 +66,9 @@ def pad_block(block, max_length, fillval):
     padding = np.full([len(block), max_length-(len(block[0]))], fillval)
     return np.hstack((block,padding))
 
-fname = 'data/March 4/5_SUCCESS_Rest_RightAndJawClench_10secs.txt' 
-#fname = 'data/March 4/6_SUCCESS_Rest_RightClench_JawClench_ImagineClench_10secs.txt' 
-#fname = 'data/March 4/7_SUCCESS_Rest_RightClenchImagineJaw_10secs.txt'
+fname = '../data/March 4/5_SUCCESS_Rest_RightAndJawClench_10secs.txt' 
+#fname = '../data/March 4/6_SUCCESS_Rest_RightClench_JawClench_ImagineClench_10secs.txt' 
+fname = '../data/March 4/7_SUCCESS_Rest_RightClenchImagineJaw_10secs.txt'
 sampling_freq = 250
 shift = 0.1
 channel = (1)
