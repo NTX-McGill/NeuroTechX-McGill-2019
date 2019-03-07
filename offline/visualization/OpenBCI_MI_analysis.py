@@ -117,8 +117,8 @@ else:
         else:
             rest_specgram.append(d)
 #resize the blocks so that they're the same length as either the minimum or maximum length block
-'''rest_specgram = resize_blocks(rest_specgram)
-left_specgram = resize_blocks(left_specgram)
+'''rest_specgram = resize_min(rest_specgram)
+left_specgram = resize_min(left_specgram)
 '''
 rest_specgram = resize_max(rest_specgram)
 left_specgram = resize_max(left_specgram)
@@ -126,8 +126,8 @@ left_specgram = resize_max(left_specgram)
 # plot average spectrogram of both classes
 plt.figure()
 rest_av = np.nanmean(np.array(rest_specgram), axis=0)
-plot_specgram(f, rest_av,channel_name + ' rest',shift, 1)
 left_av = np.nanmean(np.array(left_specgram), axis=0)
+plot_specgram(f, rest_av,channel_name + ' rest',shift, 1)
 plot_specgram(f, left_av,channel_name + ' left',shift, 2)
 
 # plot average mu trace over time
@@ -136,21 +136,42 @@ mu_indices = np.where(np.logical_and(f>=7, f<=12))
 plt.plot(np.mean(rest_av[mu_indices], axis=0))
 plt.plot(np.mean(left_av[mu_indices], axis=0))
 
+# get mu trace for each trial
+rest_mu = np.mean(rest_specgram[:,mu_indices[0],:], axis=1)
+left_mu = np.mean(left_specgram[:,mu_indices[0],:], axis=1)
+
 # plot mu trace for each trial over time
 plt.figure()
-for spec in rest_specgram:
-    plt.plot(np.mean(spec[mu_indices], axis=0), 'm')
-for spec in left_specgram:
-    plt.plot(np.mean(spec[mu_indices], axis=0), 'c')
+for spec in rest_mu:
+    plt.plot(spec, 'm')
+for spec in left_mu:
+    plt.plot(spec, 'c')
 
 # histogram of mu levels
-colors = ['c', 'm']
+colors = ['m', 'c']
 labels = ['rest', 'left']
-re_values = np.mean(rest_specgram[:,mu_indices[0],:], axis=1).flatten()
-l_values = np.mean(left_specgram[:,mu_indices[0],:], axis=1).flatten()
+rest_mu_vals = rest_mu[~np.isnan(rest_mu)].flatten()
+left_mu_vals = left_mu[~np.isnan(left_mu)].flatten()
 plt.figure()
-plt.hist([re_values, l_values], bins=[i*.1 for i in range(40)], color=colors, label=labels)
+plt.hist([rest_mu_vals, left_mu_vals], bins=[i*.1 for i in range(40)], color=colors, label=labels)
 plt.legend()
+
+threshold = 0.4
+percent_rest = len(np.where(rest_mu_vals < threshold)[0])/len(rest_mu_vals)
+percent_left = len(np.where(left_mu_vals < threshold)[0])/len(left_mu_vals)
+print(percent_rest)
+print(percent_left)
+
+plt.figure()
+i = 0
+for spec in np.where(rest_mu < threshold, 1, 0):
+    i += 1
+    plt.subplot(19, 1, i)
+    plt.plot(spec, 'm')
+for spec in np.where(left_mu < threshold, 1, 0):
+    i += 1
+    plt.subplot(19, 1, i)
+    plt.plot(spec, 'c')
 #plt.figure()
 #plt.plot(data)
 
