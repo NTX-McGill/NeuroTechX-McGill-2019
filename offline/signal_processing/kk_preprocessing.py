@@ -12,7 +12,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import matplotlib.mlab as mlab
 
-from scipy.signal import butter, lfilter
+from scipy.signal import butter, ellip, cheby1, cheby2, lfilter, freqs
 
 import numpy.fft as fft
 
@@ -84,9 +84,65 @@ class Kiral_Korek_Preprocessing():
        self.nyq = 0.5 * self.sample_rate #Nyquist frequency
        self.low = bp_lowcut / self.nyq
        self.high = bp_highcut / self.nyq
+              
        
        #Bandpass filter
-       b_bandpass, a_bandpass = butter(bp_order, [self.low, self.high], btype='band')
+       plt.figure(figsize=(16, 12))
+       
+       plt.subplot(221)
+       b_bandpass, a_bandpass = butter(bp_order, [bp_lowcut, bp_highcut], btype='band', analog=True)
+       w, h = freqs(b_bandpass, a_bandpass)
+       #plt.plot(w, 20 * np.log10(abs(h)))
+       plt.semilogx(w, 20 * np.log10(abs(h)))
+       plt.xscale('log')
+       plt.xlim([0.1, 1000])
+       plt.title('Butterworth filter frequency response ')
+       plt.xlabel('Frequency [radians / second]')
+       plt.ylabel('Amplitude [dB]')
+       plt.margins(0, 0.1)
+       plt.grid(which='both', axis='both')
+       
+       plt.subplot(222)
+       b, a = ellip(bp_order, 5, 40, [bp_lowcut, bp_highcut], 'bandpass', analog=True)
+       w, h = freqs(b, a)
+       plt.semilogx(w, 20 * np.log10(abs(h)))
+       plt.xlim([0.1, 1000])
+       plt.title('Elliptic filter frequency response (rp=5, rs=40)')
+       plt.xlabel('Frequency [radians / second]')
+       plt.ylabel('Amplitude [dB]')
+       plt.margins(0, 0.1)
+       plt.grid(which='both', axis='both')
+       
+       plt.subplot(223)
+       b, a = cheby1(bp_order, 5, [bp_lowcut, bp_highcut], 'bandpass', analog=True)
+       w, h = freqs(b, a)
+       plt.plot(w, 20 * np.log10(abs(h)))
+       plt.xlim([0.1, 1000])
+       plt.xscale('log')
+       plt.title('Chebyshev Type I frequency response (rp=5)')
+       plt.ylabel('Amplitude [dB]')
+       plt.margins(0, 0.1)
+       plt.grid(which='both', axis='both')
+       
+       plt.subplot(224)
+       b, a = cheby2(bp_order, 5, [bp_lowcut, bp_highcut], 'bandpass', analog=True)
+       w, h = freqs(b, a)
+       plt.plot(w, 20 * np.log10(abs(h)))
+       plt.xlim([0.1, 1000])
+       plt.xscale('log')
+       plt.title('Chebyshev Type II frequency response (rp=5)')
+       plt.ylabel('Amplitude [dB]')
+       plt.margins(0, 0.1)
+       plt.grid(which='both', axis='both')
+       
+       
+       b_bandpass, a_bandpass = butter(bp_order, [self.low, self.high], btype='band', analog=True)
+
+        
+
+#       plt.figure()
+#       plt.plot(b_bandpass,a_bandpass)
+       
        self.bp_filtered_eeg_data = np.apply_along_axis(lambda l: lfilter(b_bandpass, a_bandpass ,l),0,
                                                       self.raw_eeg_data)
    
@@ -114,7 +170,6 @@ class Kiral_Korek_Preprocessing():
 #                    val = val +  mult_std * self.list_mean_channel[-1]
 #            
           
-           
             
     def epoch_data(self, data,mode="1", window_length = 2, overlap=125):
         """
@@ -268,7 +323,6 @@ class Kiral_Korek_Preprocessing():
         plt.ylabel('Frequency (Hz)')
         plt.title('Spectogram of Unfiltered')
         
-        
         self.corrected_spec_PSDperBin, self.corrected_freqs, self.corrected_t_spec = self.convert_to_freq_domain(self.corrected_eeg_data)
         ax3 = plt.subplot(223)
         plt.plot(t_sec, self.corrected_eeg_data[:,channel])
@@ -308,21 +362,17 @@ class Kiral_Korek_Preprocessing():
             i = i + 1
             
         self.features = np.array(self.corrected_mean_uVrmsPerSqrtBin)
+        return self.features
             
-    
+#%%
 
-fname_4 = '/Users/jenisha/Desktop/NeuroTechX-McGill-2019/offline/data/March_4/6_SUCCESS_Rest_RightClench_JawClench_ImagineClench_10secs.txt'  
+path='C:\\Users\\Dylan\OneDrive - McGill University\\BCI_NeuroTech\\GitHub\\NeuroTechX-McGill-2019\\offline\\data\\March 4'
+fname_4 = path + '\\6_SUCCESS_Rest_RightClench_JawClench_ImagineClench_10secs.txt'
 test4 = Kiral_Korek_Preprocessing(fname_4)
 test4.load_data_BCI()
-test4.initial_preprocessing()
+test4.initial_preprocessing(bp_lowcut =5, bp_highcut =20, bp_order=2)
 test4.epoch_and_remove_outlier()
 test4.plots()            
-test4.extract_features()      
+feats = test4.extract_features()
+
             
-            
-        
-            
-    
-        
-        
-        
