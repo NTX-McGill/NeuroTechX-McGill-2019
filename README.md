@@ -31,3 +31,4 @@ For more information, see our [facebook page](https://www.facebook.com/McGillNeu
 We couldn't do it without you guys <3
 * OpenBCI
 * moremoremore (somebody who knows who's giving us money please list them)
+* Samosas
