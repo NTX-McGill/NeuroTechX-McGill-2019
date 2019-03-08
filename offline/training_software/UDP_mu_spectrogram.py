@@ -25,6 +25,7 @@ arr = []
 specgrams = []
 set_1 = [0,1,2,3]   # the first set of electrodes we want to plot
 set_2 = [4,5,6,7]   # the second set of electrodes we want to plot
+i = 0
 
 def animate(args,client_socket, arr,specgrams, lim_hz, set_1, set_2):
     data = client_socket.recvfrom(12000)
@@ -44,25 +45,25 @@ def animate(args,client_socket, arr,specgrams, lim_hz, set_1, set_2):
     plt.bar(['left', 'right'], [np.mean(mu[set_1]), np.mean(mu[set_2])])
     
     plt.subplot(323)
-    plt.ylim(0.1,15)
+    plt.ylim(0.1,10)
     arr_ = np.array(arr)
     plt.plot(np.mean(arr_[:,set_1], axis=1))
     plt.plot(np.mean(arr_[:,set_2], axis=1))
     
     
     PSD = np.log10(np.abs(ffts[:, :lim_hz]) + 1)
-    specgrams.append(PSD)
-    if len(specgrams) > 50:
+    specgrams.append([PSD[0], np.mean(PSD[set_1], axis=0), np.mean(PSD[set_2], axis=0)])
+    if len(specgrams) > 30:
         specgrams_ = np.array(specgrams)
-        specgram1 = np.mean(specgrams_[:,set_1,:], axis=1)
-        specgram2 = np.mean(specgrams_[:,set_2,:], axis=1)
-        specgram3 = specgrams_[:,0,:]
+        specgram1 = specgrams_[:,0,:]
+        specgram2 = specgrams_[:,1,:]
+        specgram3 = specgrams_[:,2,:]
         plt.subplot(324)
-        plt.pcolor([i for i in range(len(specgram1))],[i for i in range(len(specgram1[0]))], np.array(specgram1).T)
+        plt.pcolor([i for i in range(len(specgram1))],[i for i in range(len(specgram1[0]))], specgram1.T)
         plt.subplot(325)
-        plt.pcolor([i for i in range(len(specgram2))],[i for i in range(len(specgram2[0]))], np.array(specgram2).T)
+        plt.pcolor([i for i in range(len(specgram2))],[i for i in range(len(specgram2[0]))], specgram2.T)
         plt.subplot(326)
-        plt.pcolor([i for i in range(len(specgram3))],[i for i in range(len(specgram3[0]))], np.array(specgram3).T)
+        plt.pcolor([i for i in range(len(specgram3))],[i for i in range(len(specgram3[0]))], specgram3.T)
         specgrams.pop(0)
 
 anim = animation.FuncAnimation(fig, animate, fargs=[client_socket, arr, specgrams, lim_hz, set_1, set_2],interval=200)
