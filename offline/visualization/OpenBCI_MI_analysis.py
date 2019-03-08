@@ -123,6 +123,9 @@ left_specgram = resize_min(left_specgram)
 rest_specgram = resize_max(rest_specgram)
 left_specgram = resize_max(left_specgram)
 
+np.save('spec_rest.npy', rest_specgram)
+np.save('spec_left.npy', left_specgram)
+
 # plot average spectrogram of both classes
 plt.figure()
 rest_av = np.nanmean(np.array(rest_specgram), axis=0)
