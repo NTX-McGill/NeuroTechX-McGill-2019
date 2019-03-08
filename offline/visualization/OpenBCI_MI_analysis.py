@@ -69,9 +69,10 @@ def pad_block(block, max_length, fillval):
 fname = '../data/March 4/5_SUCCESS_Rest_RightAndJawClench_10secs.txt' 
 #fname = '../data/March 4/6_SUCCESS_Rest_RightClench_JawClench_ImagineClench_10secs.txt' 
 fname = '../data/March 4/7_SUCCESS_Rest_RightClenchImagineJaw_10secs.txt'
+fname = '../data/March 4/8_SUCCESS_Left_Right_Rest_10secs_3mins_total.txt'
 sampling_freq = 250
 shift = 0.1
-channel = (1)
+channel = (7)
 channel_name = 'C4'
 continuous = False
 
@@ -84,6 +85,7 @@ data = filter_(data.T, sampling_freq, 1, 40, 1)
 ch = data
 start_indices = get_start_indices(ch)
 
+right_specgram = []
 left_specgram = []
 rest_specgram = []
 
@@ -97,10 +99,19 @@ if continuous:
         end = int(start_indices[i+1]/(sampling_freq * shift))
         d = all_spectra[:,start:end]
         # this trial alternates between rest and left motor imagery
+        
         if i % 2:
             left_specgram.append(d)
         else:
             rest_specgram.append(d)
+        '''
+        if i % 3 == 0:
+            rest_specgram.append(d)
+        if i % 3 == 1:
+            left_specgram.append(d)
+        else:
+            right_specgram.append(d)
+        '''
 else:
     #tmin, tmax = -1, 1
     tmin, tmax = 0, 0
