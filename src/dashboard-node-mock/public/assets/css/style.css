@@ -1,0 +1,548 @@
+/* Add styling here! Feel free to add comments! */
+
+.section{
+  padding-top: 10px;
+  height: 85%;
+}
+
+/* Navigation */
+.navbar .navbar-brand {
+  text-align: center;
+  display: block;
+  width: 100%;
+}
+
+/* Logo */
+.logo-image{
+  width: 80px;
+  height: auto;
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  z-index: 3;
+}
+
+
+
+.navbar .navbar-brand > .navbar-item,
+.navbar .navbar-brand .navbar-link {
+  display: inline-block;
+}
+
+a.navbar-item{
+  font-size: 30;
+}
+
+canvas {
+  margin: auto;
+  display: block;
+}
+
+/* Switch Navigation */
+#tab-content > div {
+  display: none;
+}
+
+#tab-content > div.is-active {
+  display: block;
+}
+
+.tabs.is-toggle li.is-active a {
+  background-color: black;
+  border: 1px solid black;
+}
+
+/* Graph View */
+.graphview {
+  border: none;
+  width: 100%;
+  overflow: auto;
+  height: 240px;
+}
+
+.production-graph{
+  display: inline-block;
+  height: 340px;
+}
+
+.production-container{
+  width: 60%;
+  float: left;
+}
+/*
+ *  Scrollbar
+ */
+
+.graphview::-webkit-scrollbar-track
+{
+	-webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3);
+	background-color: #F5F5F5;
+}
+
+.graphview::-webkit-scrollbar
+{
+	width: 10px;
+	background-color: #F5F5F5;
+}
+
+.graphview::-webkit-scrollbar-thumb
+{
+	background-color: #000000;
+	border: 2px solid #555555;
+}
+
+
+
+.graph-controls{
+  margin-top: -2px;
+  border: none;
+  display: inline-block;
+  width: 100%;
+  text-align: center;
+}
+
+.graph-controls > input{
+  margin-left: 2%;
+  margin-right: 2%;
+}
+.media {
+  padding-left: 5px;
+  padding-top: 1rem;
+  padding-bottom: 1rem;
+}
+.hide {
+  display: none;
+}
+.media+.media {
+  margin-top: 0rem;
+}
+
+/* Overhead */
+
+.overhead{
+  line-height: 60px;
+}
+
+
+.trial{
+  display: inline-block;
+  height: 20px;
+  float: right;
+  font-size: 20px;
+  vertical-align: middle;
+}
+
+.title{
+  display: inline-block;
+  vertical-align: middle;
+}
+/* Controls */
+#controls-text {
+  padding-top: 20px;
+  float: left;
+  width: 50%;
+}
+
+#time-right {
+    padding-top: 20px;
+}
+.left {
+  width: 50%;
+  float: left;
+
+}
+
+.right {
+  width: 50%;
+  display:inline-block;
+
+}
+.range-slider {
+  display: inline-block;
+  margin-right: 5%;
+  width: 5%;
+}
+
+.input-range {
+   width: 125px;
+   height: 10px;
+   transform: rotate(270deg);
+   background:#efefef;
+   outline:none;
+   -webkit-appearance: none;
+}
+
+.input-range::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 20px;
+  height: 20px;
+  background: black;
+
+}
+
+.input-range::-webkit-slider-thumb:hover,
+.input-range:active::-webkit-slider-thumb{
+  background: #032B5A;
+}
+
+/* @media (max-width: 1000px) {
+    .input-range {
+        width:65%;
+    }
+} */
+
+.with-unit {
+  display: inline-block;
+}
+
+/* Control buttons */
+
+#controls{
+  width:100%;
+  height: 150px;
+  position: fixed;
+  bottom: 0;
+  background-color: #ccc;
+}
+
+.selection{
+    display: inline-block;
+    margin: 0 auto;
+    text-align:center;
+}
+
+.commands{
+    margin-top: 15px;
+    display: block;
+    position: absolute;
+    text-align:center;
+    width: 100%;
+}
+
+.active{
+  background-color: rgb(90,200,250);
+}
+
+
+.active:hover{
+  cursor: default;
+  background-color: rgb(90,200,250);
+}
+
+.toggle {
+  background-color: green;
+}
+
+.toggle:hover{
+    background-color: green !important;
+    opacity: 0.7 !important;
+}
+
+.imagery-inactive {
+  background-color: rgb(90,200,250);
+}
+
+.imagery{
+  display: inline-block;
+  opacity: 0.7;
+  border:none;
+  border-radius: 10%;
+  width: 15%;
+  height: 125px;
+  text-align: center;
+  margin-left: 15px;
+  margin-right: 15px;
+  font-size: 2.5vmax;
+  font-weight: bold;
+  cursor: pointer;
+  outline: none;
+}
+
+.imagery-inactive:hover{
+    background-color: green; */
+    opacity: 1;
+}
+
+/* .imagery-active:hover {
+  background-color: green;
+  opactiy: 1;
+} */
+
+.timer{
+    display: inline-block;
+    background-color: rgb(250,250,250);
+    border-style: solid;
+    border-size: 2px;
+    border-color: black;
+    border-radius: 10%;
+    height: 100px;
+    width: 100%;
+
+    font-size: 2vmax;
+    font-weight: bold;
+    text-align: center;
+    vertical-align: middle;
+    line-height: 100px;
+}
+
+.with-unit{
+  width: 10%;
+}
+
+.loop{
+    display: inline-block;
+    background-color: rgb(255,0,0);
+    border-style: solid;
+    border-size: 2px;
+    border-color: black;
+    border-radius: 10%;
+    height: 100px;
+    width: 10%;
+    text-align: center;
+    cursor: pointer;
+
+}
+
+.loop:hover{
+    background-color: rgb(200,0,0);
+    opacity:.8;
+    -webkit-transition-duration: 0.4s; /* Safari */
+    transition-duration: 0.4s;
+}
+
+
+/* Testing Dashboard Arrows */
+
+.neurofeedback{
+  margin-top: 5px;
+  width: 100%;
+}
+
+.neurofeedback-slider {
+  -webkit-appearance: none;
+  width: 100%;
+  height: 15px;
+  border-radius: 5px;
+  background: #d3d3d3;
+  outline: none;
+  opacity: 0.7;
+  -webkit-transition: .2s;
+  transition: opacity .2s;
+}
+
+.neurofeedback-slider:hover {
+  opacity: 1;
+}
+
+.neurofeedback-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 35px;
+  height: 35px;
+  border-radius: 50%;
+  background: rgb(90, 200, 250);
+  cursor: pointer;
+}
+
+.neurofeedback-slider::-moz-range-thumb {
+  width: 25px;
+  height: 25px;
+  background: #4CAF50;
+  cursor: pointer;
+}
+
+.neurofeedback-controls{
+  margin-top: 15px;
+}
+
+.neurofeedback-label{
+  font-size: 2.5vmax;
+  font-weight: bold;
+}
+
+.neuro-left{
+  float: left;
+}
+
+.neuro-right{
+  float: right;
+}
+
+.neurofeedback-toggle{
+  position: absolute;
+  left: 47.6%;
+  display: inline-block;
+  border: 0;
+  background: transparent;
+  box-sizing: border-box;
+  width: 0;
+  height: 74px;
+
+  border-color: transparent transparent transparent rgb(80,200,120);
+  transition: 100ms all ease;
+  cursor: pointer;
+
+  border-style: solid;
+  border-width: 37px 0 37px 60px;
+}
+.paused {
+    border-style: double;
+    border-width: 0px 0 0px 60px;
+}
+
+.neurofeedback-toggle:hover {
+    border-color: transparent transparent transparent #404040;
+}
+
+
+/*Bar Graph*/
+.bar-graph-container{
+  display: inline-block;
+  height: 476px;
+  width: 40%;
+}
+
+.bar-graph-spacing{
+  height: 40px;
+}
+
+.bar-graph-axis{
+  width: 20%;
+  float: left;
+}
+
+.bar-graph-markings{
+  text-align: center;
+  list-style-type: none;
+  height: 340px;
+}
+
+
+.percent-label{
+  margin-bottom: 39.2px;
+}
+
+.bottom-label{
+  margin-bottom: 0px;
+}
+
+.bar-container{
+  display: inline-block;
+  height: 340px;
+  width: 80%;
+
+}
+
+.bar{
+  display: inline-block;
+  height: 100%;
+  width: 30%;
+
+}
+
+.left-bar{
+  float: left;
+  margin-left: 10%;
+  background-color:black;
+}
+
+.right-bar{
+  float: right;
+  margin-right: 10%;
+  background-color:black;
+}
+
+.bar-labels{
+  font-weight: bold;
+  width: 80%;
+  float: right;
+  padding: 0px;
+}
+
+.bar-label-left{
+  float: left;
+  margin-left: 22%
+}
+.bar-label-right{
+  float: right;
+  margin-right: 20.5%;
+}
+
+.bar-feedback-display{
+  display: inline-block;
+  text-align: center;
+  width: 80%;
+  float: right;
+  margin-top: 10px;
+}
+
+ .arrow-right {
+  width: 0;
+  height: 0;
+  border-top: 30px solid transparent;
+  border-bottom: 30px solid transparent;
+  border-left: 70px solid rgb(90,200,250);
+  display: inline-block;
+  margin-left: 20px;
+}
+
+
+
+.arrow-left {
+  width: 0;
+  height: 0;
+  border-top: 30px solid transparent;
+  border-bottom: 30px solid transparent;
+  border-right:70px solid rgb(90,200,250);
+  display: inline-block;
+  margin-right: 20px;
+}
+
+.arrow-labels{
+  font-size: 2.5vmax;
+}
+
+
+/* .control-buttons {
+  width: 25%;
+  float:left;
+  display: inline-block;
+  overflow: hidden;
+}
+
+.control-buttons {
+  display: inline-block;
+  font-size: 16px;
+  line-height: 1rem;
+}
+.control-buttons:after {
+content: " ";
+display: block;
+clear: both;
+}
+.radio-button-label {
+  cursor: pointer;
+  float: left;
+}
+.radio-button-label > input {
+	display: none;
+}
+.radio-button-label span {
+	cursor: pointer;
+  border: 1px solid white;
+  margin: 0;
+  background-color: #eee;
+  padding: 6px 20px;
+  display: inline-block;
+}
+.radio-button-label span:hover {
+	background-color: black;
+	color: white;
+}
+.radio-button-label > input:checked + span {
+	background-color: black;
+  color: white
+}
+.radio-button-label > input:checked + span:hover {
+	color: white;
+} */
