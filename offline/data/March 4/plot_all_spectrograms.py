@@ -10,7 +10,7 @@ import numpy as np
 import matplotlib.mlab as mlab
 import matplotlib.pyplot as plt
 
-def draw_specgram(ch, fs_Hz, fig, num_subplots, i, title):
+def draw_specgram(ch, fs_Hz, num_subplots, i, title):
     NFFT = fs_Hz*2
     overlap = NFFT - int(0.1 * fs_Hz)
     spec_PSDperHz, spec_freqs, spec_t = mlab.specgram(np.squeeze(ch),
@@ -23,7 +23,6 @@ def draw_specgram(ch, fs_Hz, fig, num_subplots, i, title):
     
     spec_PSDperBin = spec_PSDperHz * fs_Hz / float(NFFT)
     f_lim_Hz = [0, 20]   # frequency limits for plotting
-    #plt.figure(figsize=(10,5))
     plt.subplot(num_subplots,1,i)
     plt.title(title)
     plt.pcolor(spec_t, spec_freqs, 10*np.log10(spec_PSDperBin))  # dB re: 1 uV
@@ -39,7 +38,6 @@ sampling_freq = 250
 shift = 0.1
 channel = (1)
 
-plt.figure(figsize=(10,10))
 for idx, fname in enumerate(filenames):
     if not idx % 6:
         plt.figure(figsize=(8,10))
@@ -47,5 +45,4 @@ for idx, fname in enumerate(filenames):
                       delimiter=',',
                       skiprows=7,
                       usecols=channel)
-    data = filter_(data.T, sampling_freq, 1, 40, 1)
-    draw_specgram(data, sampling_freq, fig, 6,idx%6 + 1,fname)
+    draw_specgram(data, sampling_freq, 6,idx%6 + 1,fname)
