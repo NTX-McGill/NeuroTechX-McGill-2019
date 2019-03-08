@@ -11,7 +11,7 @@ We build things with Neurotech! Mostly with OpenBCI Cyton(?) headest.
 ## 3. What is our project
 
 This year we're building a mind-controlled wheelchair.
-Unlike previous research into mind-controlled chari, we are using motor imagery and not P300.
+Unlike previous research into mind-controlled chair, we are using motor imagery and not P300.
 Our setup inclues:
 - training data collection
 - live collection signal processing
@@ -24,7 +24,7 @@ Our setup inclues:
 - **frontend-dev**: frontend development
 - **master**: final project goes here
 
-For more information, see our [facebook page](https://www.facebook.com/McGillNeurotech/) or our website (PLS ADD LINK).
+For more information, see our [facebook page](https://www.facebook.com/McGillNeurotech/) or [our website](https://www.mcgillneurotech.com/).
 
 
 ## Sponsors
