@@ -10,47 +10,61 @@ import socket, time, struct
 import numpy as np
 import matplotlib.animation as animation
 import matplotlib.pyplot as plt
+import ast
 
 sampling_freq = 250
-NFFT = 256
-bin_size = sampling_freq/NFFT  # mu frequencies are between 7 and 13 Hz
+lim_hz = 40         # the upper frequency limit we want to plot on our spectrogram
 
 
 client_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM) # UDP protocol
 client_socket.bind(('127.0.0.1', 12345))
-data = client_socket.recvfrom(1024)
 
-fig = plt.figure()
+fig = plt.figure(figsize=(10,10))
 plt.yscale('log')
 arr = []
-specgram = []
+specgrams = []
+set_1 = [0,1,2,3]   # the first set of electrodes we want to plot
+set_2 = [4,5,6,7]   # the second set of electrodes we want to plot
 
-def animate(args,client_socket, arr,specgram):
-    data = client_socket.recvfrom(1024)
+def animate(args,client_socket, arr,specgrams, lim_hz, set_1, set_2):
+    data = client_socket.recvfrom(12000)
     fig.clear()
-    data = data[0].decode("utf-8")[23:]
-    data = np.fromstring(data, dtype=np.float, sep=',' )
-    mean = np.mean(data[6:13])
-    arr.append(mean)
+    ffts = np.array(ast.literal_eval(data[0].decode("utf-8"))['data'])
+    mu = np.mean(ffts[:, 6:13], axis=1)
+    
+    arr.append(mu)
     if len(arr) > 50:
         arr.pop(0)
     
-    plt.subplot(311)
+    plt.subplot(321)
+    plt.ylim(0.1,10)
+    plt.bar([i+1 for i in range(8)],mu)
+    
+    plt.subplot(322)
+    plt.bar(['left', 'right'], [np.mean(mu[set_1]), np.mean(mu[set_2])])
+    
+    plt.subplot(323)
     plt.ylim(0.1,15)
-    plt.bar(0,mean)
-    
-    plt.subplot(312)
-    plt.ylim(0.1,15)
-    plt.plot(arr)
+    arr_ = np.array(arr)
+    plt.plot(np.mean(arr_[:,set_1], axis=1))
+    plt.plot(np.mean(arr_[:,set_2], axis=1))
     
     
-    PSD = np.log10(np.abs(data[:60]) + 1)
-    specgram.append(PSD)
-    if len(specgram) > 50:
-        plt.subplot(313)
-        plt.pcolor([i for i in range(len(specgram))],[i for i in range(len(specgram[0]))], np.array(specgram).T)
-        specgram.pop(0)
+    PSD = np.log10(np.abs(ffts[:, :lim_hz]) + 1)
+    specgrams.append(PSD)
+    if len(specgrams) > 50:
+        specgrams_ = np.array(specgrams)
+        specgram1 = np.mean(specgrams_[:,set_1,:], axis=1)
+        specgram2 = np.mean(specgrams_[:,set_2,:], axis=1)
+        specgram3 = specgrams_[:,0,:]
+        plt.subplot(324)
+        plt.pcolor([i for i in range(len(specgram1))],[i for i in range(len(specgram1[0]))], np.array(specgram1).T)
+        plt.subplot(325)
+        plt.pcolor([i for i in range(len(specgram2))],[i for i in range(len(specgram2[0]))], np.array(specgram2).T)
+        plt.subplot(326)
+        plt.pcolor([i for i in range(len(specgram3))],[i for i in range(len(specgram3[0]))], np.array(specgram3).T)
+        specgrams.pop(0)
 
-anim = animation.FuncAnimation(fig, animate, fargs=[client_socket, arr, specgram],interval=200)
+anim = animation.FuncAnimation(fig, animate, fargs=[client_socket, arr, specgrams, lim_hz, set_1, set_2],interval=200)
 plt.show()
 #client_socket.close()
