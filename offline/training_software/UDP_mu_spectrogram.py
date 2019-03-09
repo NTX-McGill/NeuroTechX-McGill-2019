@@ -14,6 +14,17 @@ import ast
 import fcntl, os
 import errno
 
+''' CONFIGURABLE '''
+plot_specgrams = False   # whether or not to plot the spectrograms
+lim_hz = 40             # the upper frequency limit we want to plot on our spectrogram
+single_electrode = 0    # the single electrode we want to plot
+set_1 = [0,1,2,3]       # the set of electrodes for right imagery (left brain, C1 C3 etc.)
+set_2 = [4,5,6,7]       # the set of electrodes for left imagery (right brain, C2 C4 etc.)
+spec_length = 30        # length of spectrogram (multiply by ~0.4 to get units in seconds,
+                        # e.g. spec_length of 30 gives 0.4 * 30 = 12 seconds in spectrogram)
+                        # I found 30 to be best since it tends to slow down with more to plot
+''' DO NOT EDIT PAST THIS BLOCK '''
+
 def animate(args, client_socket, arr, plot_specgrams, specgrams, lim_hz, single_electrode, set_1, set_2, spec_length):
     data = None
     #x = 0
@@ -31,25 +42,26 @@ def animate(args, client_socket, arr, plot_specgrams, specgrams, lim_hz, single_
         mu = np.mean(ffts[:, 6:13], axis=1)
         
         arr.append(mu)
-        if len(arr) > 50:
+        if len(arr) > spec_length:
             arr.pop(0)
         
         plt.subplot(321)
-        plt.ylim(0.1,10)
+        plt.ylim(0.1,2)
         plt.bar([i+1 for i in range(8)],mu)
         
         plt.subplot(322)
         plt.bar(['left', 'right'], [np.mean(mu[set_1]), np.mean(mu[set_2])])
         
         plt.subplot(323)
-        plt.ylim(0.1,10)
+        # plt.ylim(0.1,5)
         arr_ = np.array(arr)
-        plt.plot(np.mean(arr_[:,set_1], axis=1))
-        plt.plot(np.mean(arr_[:,set_2], axis=1))
+        plt.plot(np.mean(arr_[:,set_1], axis=1), label='left')
+        plt.plot(np.mean(arr_[:,set_2], axis=1), label='right')
+        plt.legend(loc='upper right')
         
         if plot_specgrams:
             PSD = np.log10(np.abs(ffts[:, :lim_hz]) + 1)
-            specgrams.append([PSD[0], np.mean(PSD[set_1], axis=0), np.mean(PSD[set_2], axis=0)])
+            specgrams.append([PSD[single_electrode], np.mean(PSD[set_1], axis=0), np.mean(PSD[set_2], axis=0)])
             if len(specgrams) > spec_length:
                 specgrams_ = np.array(specgrams)
                 specgram1 = specgrams_[:,0,:]
@@ -66,20 +78,9 @@ def animate(args, client_socket, arr, plot_specgrams, specgrams, lim_hz, single_
 sampling_freq = 250
 arr, specgrams = [], []
 
-client_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM) # UDP protocol
+client_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)    # UDP protocol
 client_socket.bind(('127.0.0.1', 12345))
-fcntl.fcntl(client_socket, fcntl.F_SETFL, os.O_NONBLOCK)    # make socket non-blocking
-
-''' CONFIGURABLE '''
-plot_specgrams = True   # whether or not to plot the spectrograms
-lim_hz = 40             # the upper frequency limit we want to plot on our spectrogram
-single_electrode = 0    # the single electrode we want to plot
-set_1 = [0,1,2,3]       # the set of electrodes for right imagery (left brain, C1 C3 etc.)
-set_2 = [4,5,6,7]       # the set of electrodes for left imagery (right brain, C2 C4 etc.)
-spec_length = 30        # length of spectrogram (multiply by ~0.4 to get units in seconds,
-                        # e.g. spec_length of 30 gives 0.4 * 30 = 12 seconds in spectrogram)
-                        # I found 30 to be best since it tends to slow down with more to plot
-''' DO NOT EDIT PAST THIS BLOCK '''
+fcntl.fcntl(client_socket, fcntl.F_SETFL, os.O_NONBLOCK)            # make socket non-blocking
 
 
 fig = plt.figure(figsize=(10,10))
