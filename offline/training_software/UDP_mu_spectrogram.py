@@ -15,7 +15,7 @@ import fcntl, os
 import errno
 
 ''' CONFIGURABLE '''
-plot_specgrams = False   # whether or not to plot the spectrograms
+plot_specgrams = True   # whether or not to plot the spectrograms
 lim_hz = 40             # the upper frequency limit we want to plot on our spectrogram
 single_electrode = 0    # the single electrode we want to plot
 set_1 = [0,1,2,3]       # the set of electrodes for right imagery (left brain, C1 C3 etc.)
