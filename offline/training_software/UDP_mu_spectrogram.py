@@ -14,23 +14,8 @@ import ast
 import fcntl, os
 import errno
 
-sampling_freq = 250
-lim_hz = 40         # the upper frequency limit we want to plot on our spectrogram
-
-
-client_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM) # UDP protocol
-client_socket.bind(('127.0.0.1', 12345))
-fcntl.fcntl(client_socket, fcntl.F_SETFL, os.O_NONBLOCK)
-
-fig = plt.figure(figsize=(10,10))
-plt.yscale('log')
-arr = []
-specgrams = []
-set_1 = [0,1,2,3]   # the first set of electrodes we want to plot
-set_2 = [4,5,6,7]   # the second set of electrodes we want to plot
-i = 0
-
-def animate(args,client_socket, arr,specgrams, lim_hz, set_1, set_2):
+def animate(args, client_socket, arr, plot_specgrams, specgrams, lim_hz, single_electrode, set_1, set_2, spec_length):
+    data = None
     #x = 0
     while True:
         try:
@@ -62,22 +47,43 @@ def animate(args,client_socket, arr,specgrams, lim_hz, set_1, set_2):
         plt.plot(np.mean(arr_[:,set_1], axis=1))
         plt.plot(np.mean(arr_[:,set_2], axis=1))
         
-        
-        PSD = np.log10(np.abs(ffts[:, :lim_hz]) + 1)
-        specgrams.append([PSD[0], np.mean(PSD[set_1], axis=0), np.mean(PSD[set_2], axis=0)])
-        if len(specgrams) > 30:
-            specgrams_ = np.array(specgrams)
-            specgram1 = specgrams_[:,0,:]
-            specgram2 = specgrams_[:,1,:]
-            specgram3 = specgrams_[:,2,:]
-            plt.subplot(324)
-            plt.pcolor([i for i in range(len(specgram1))],[i for i in range(len(specgram1[0]))], specgram1.T)
-            plt.subplot(325)
-            plt.pcolor([i for i in range(len(specgram2))],[i for i in range(len(specgram2[0]))], specgram2.T)
-            plt.subplot(326)
-            plt.pcolor([i for i in range(len(specgram3))],[i for i in range(len(specgram3[0]))], specgram3.T)
-            specgrams.pop(0)
+        if plot_specgrams:
+            PSD = np.log10(np.abs(ffts[:, :lim_hz]) + 1)
+            specgrams.append([PSD[0], np.mean(PSD[set_1], axis=0), np.mean(PSD[set_2], axis=0)])
+            if len(specgrams) > spec_length:
+                specgrams_ = np.array(specgrams)
+                specgram1 = specgrams_[:,0,:]
+                specgram2 = specgrams_[:,1,:]
+                specgram3 = specgrams_[:,2,:]
+                plt.subplot(324)
+                plt.pcolor([i for i in range(len(specgram1))],[i for i in range(len(specgram1[0]))], specgram1.T)
+                plt.subplot(325)
+                plt.pcolor([i for i in range(len(specgram2))],[i for i in range(len(specgram2[0]))], specgram2.T)
+                plt.subplot(326)
+                plt.pcolor([i for i in range(len(specgram3))],[i for i in range(len(specgram3[0]))], specgram3.T)
+                specgrams.pop(0)
+                
+sampling_freq = 250
+arr, specgrams = [], []
 
-anim = animation.FuncAnimation(fig, animate, fargs=[client_socket, arr, specgrams, lim_hz, set_1, set_2],interval=300)
+client_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM) # UDP protocol
+client_socket.bind(('127.0.0.1', 12345))
+fcntl.fcntl(client_socket, fcntl.F_SETFL, os.O_NONBLOCK)    # make socket non-blocking
+
+''' CONFIGURABLE '''
+plot_specgrams = True   # whether or not to plot the spectrograms
+lim_hz = 40             # the upper frequency limit we want to plot on our spectrogram
+single_electrode = 0    # the single electrode we want to plot
+set_1 = [0,1,2,3]       # the set of electrodes for right imagery (left brain, C1 C3 etc.)
+set_2 = [4,5,6,7]       # the set of electrodes for left imagery (right brain, C2 C4 etc.)
+spec_length = 30        # length of spectrogram (multiply by ~0.4 to get units in seconds,
+                        # e.g. spec_length of 30 gives 0.4 * 30 = 12 seconds in spectrogram)
+                        # I found 30 to be best since it tends to slow down with more to plot
+''' DO NOT EDIT PAST THIS BLOCK '''
+
+
+fig = plt.figure(figsize=(10,10))
+plt.yscale('log')
+anim = animation.FuncAnimation(fig, animate, fargs=[client_socket, arr, plot_specgrams, specgrams, lim_hz, single_electrode, set_1, set_2, spec_length],interval=300)
 plt.show()
 #client_socket.close()
