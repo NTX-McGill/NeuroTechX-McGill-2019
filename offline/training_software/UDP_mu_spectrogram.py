@@ -23,6 +23,7 @@ set_2 = [4,5,6,7]       # the set of electrodes for left imagery (right brain, C
 spec_length = 30        # length of spectrogram (multiply by ~0.4 to get units in seconds,
                         # e.g. spec_length of 30 gives 0.4 * 30 = 12 seconds in spectrogram)
                         # I found 30 to be best since it tends to slow down with more to plot
+port = 12347            # which port to listen on
 ''' DO NOT EDIT PAST THIS BLOCK '''
 
 def animate(args, client_socket, arr, plot_specgrams, specgrams, lim_hz, single_electrode, set_1, set_2, spec_length):
@@ -79,7 +80,7 @@ sampling_freq = 250
 arr, specgrams = [], []
 
 client_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)    # UDP protocol
-client_socket.bind(('127.0.0.1', 12345))
+client_socket.bind(('127.0.0.1', port))
 fcntl.fcntl(client_socket, fcntl.F_SETFL, os.O_NONBLOCK)            # make socket non-blocking
 
 
