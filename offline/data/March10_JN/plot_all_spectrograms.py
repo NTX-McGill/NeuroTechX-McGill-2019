@@ -34,11 +34,9 @@ def draw_specgram(ch, fs_Hz, num_subplots, i, title):
     plt.subplots_adjust(hspace=1)
 
 filenames = sorted([f for f in glob.glob("*.txt")])
-print(filenames) # for testing purposes
 sampling_freq = 250
 shift = 0.1
 channel = (1)
-
 for idx, fname in enumerate(filenames):
     if not idx % 6:
         plt.figure(figsize=(8,10))
@@ -47,3 +45,4 @@ for idx, fname in enumerate(filenames):
                       skiprows=7,
                       usecols=channel)
     draw_specgram(data, sampling_freq, 6,idx%6 + 1,fname)
+plt.show()
