@@ -11,7 +11,6 @@ import numpy as np
 import matplotlib.animation as animation
 import matplotlib.pyplot as plt
 import ast
-import fcntl, os
 import errno
 
 ''' CONFIGURABLE '''
@@ -81,7 +80,7 @@ arr, specgrams = [], []
 
 client_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)    # UDP protocol
 client_socket.bind(('127.0.0.1', port))
-fcntl.fcntl(client_socket, fcntl.F_SETFL, os.O_NONBLOCK)            # make socket non-blocking
+client_socket.setblocking(0)                                        # make socket non-blocking     
 
 
 fig = plt.figure(figsize=(10,10))
