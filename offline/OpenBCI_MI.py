@@ -117,8 +117,8 @@ else:
         else:
             rest_specgram.append(d)
 #resize the blocks so that they're the same length as either the minimum or maximum length block
-'''rest_specgram = resize_blocks(rest_specgram)
-left_specgram = resize_blocks(left_specgram)
+'''rest_specgram = resize_min(rest_specgram)
+left_specgram = resize_min(left_specgram)
 '''
 rest_specgram = resize_max(rest_specgram)
 left_specgram = resize_max(left_specgram)
