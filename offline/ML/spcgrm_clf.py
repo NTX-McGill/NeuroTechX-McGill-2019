@@ -63,3 +63,5 @@ SVM = SVC(kernel='rbf', gamma='auto')
 
 LDA = run_model(LDA, 'LDA', X_train, X_test, y_train, y_test)
 SVM = run_model(SVM, 'SVM', X_train, X_test, y_train, y_test)
+
+print('test')
