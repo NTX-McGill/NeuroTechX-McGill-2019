@@ -2,7 +2,7 @@ March 11th recordings
 
 room: small VR room :( gpu interference?
 
-_SESSION 1_
+__SESSION 1__
 
 test subject: rebecca
 
@@ -27,11 +27,12 @@ test subject: rebecca
 - A1+A2, ear lobes
 
 *PARADIGM*
+
 1 - Alternating rest and right clench (10 sec, with jaw clench)
 
 2 - Alternating rest and left clench (10 sec, with jaw clench)
 
-_SESSION 2_
+__SESSION 2__
 
 test subject: marley
 
@@ -49,5 +50,6 @@ playing around with electrodes to find mu
 - A1+A2, ear lobes
 
 *PARADIGM*
+
 last run - 1 min rest, 1 min clenching both fists
 
