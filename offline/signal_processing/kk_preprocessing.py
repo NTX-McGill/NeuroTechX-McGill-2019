@@ -385,8 +385,8 @@ class Kiral_Korek_Preprocessing():
             
 #%%
 
-path='C:\\Users\\Dylan\OneDrive - McGill University\\BCI_NeuroTech\\GitHub\\NeuroTechX-McGill-2019\\offline\\data\\March 4'
-fname_4 = path + '\\1_JawRest_JawRightClench_10s.txt'
+path='C:\\Users\\Dylan\OneDrive - McGill University\\BCI_NeuroTech\\GitHub\\NeuroTechX-McGill-2019\\offline\\data\\'
+fname_4 = path + 'March 11\\1_JawRest_JawRightClench_10s.txt'
 test4 = Kiral_Korek_Preprocessing(fname_4)
 test4.load_data_BCI()
 test4.initial_preprocessing(bp_lowcut =5, bp_highcut =20, bp_order=2)
