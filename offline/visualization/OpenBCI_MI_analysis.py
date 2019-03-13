@@ -128,11 +128,16 @@ else:
         else:
             rest_specgram.append(d)
 #resize the blocks so that they're the same length as either the minimum or maximum length block
-'''rest_specgram = resize_min(rest_specgram)
+rest_specgram = resize_min(rest_specgram)
 left_specgram = resize_min(left_specgram)
-'''
+
+"""
 rest_specgram = resize_max(rest_specgram)
 left_specgram = resize_max(left_specgram)
+print(type(f), f)
+"""
+np.save('spec_rest.npy', rest_specgram)
+np.save('spec_left.npy', left_specgram)
 
 # plot average spectrogram of both classes
 plt.figure()

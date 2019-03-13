@@ -1,2 +1,4 @@
 .DS_Store
+offline/visualization/spec_left.npy
+offline/visualization/spec_rest.npy
 node_modules
