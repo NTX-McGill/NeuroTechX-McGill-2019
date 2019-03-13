@@ -8,6 +8,7 @@ Created on Mon Mar  4 15:26:48 2019
 
 import numpy as np
 import pandas as pd
+from copy import deepcopy
 
 import matplotlib.pyplot as plt
 import matplotlib.mlab as mlab
@@ -31,14 +32,14 @@ Input:
 
 
 class Kiral_Korek_Preprocessing():
-    def __init__(self, path, name_channels=["C3"]):
+    def __init__(self, path, name_channels=["C1", "C2", "C3", "C4", "Cp1", "Cp2", "Cp3", "Cp4"]):
         self.path = path
         self.sample_rate = 250 #Default sampling rate for OpenBCI
         self.name_channel = name_channels
         
 
     
-    def load_data_BCI(self, list_channels=[1]):
+    def load_data_BCI(self, list_channels=[2, 7, 1, 8, 4, 5, 3, 6]):
         """
         
         Load the data from OpenBCI txt file
@@ -68,6 +69,7 @@ class Kiral_Korek_Preprocessing():
                           notch_freq_Hz  = [60.0, 120.0], notch_order =2):
        """
        Filters the data by applying
+       - An SL filter
        - A zero-phase Butterworth bandpass was applied from 1 – 70 Hz. 
        - A 60-120 Hz notch filter to suppress line noise
       
@@ -85,7 +87,24 @@ class Kiral_Korek_Preprocessing():
        self.low = bp_lowcut / self.nyq
        self.high = bp_highcut / self.nyq
               
-       
+
+       # SL filter
+       self.sl_filtered_data = self.raw_eeg_data
+       raw_channels = self.raw_eeg_data.transpose()
+       sl_channels = deepcopy(raw_channels)
+
+       # Subtract average of adjacent electrodes
+       sl_channels[0] -= (raw_channels[1] + raw_channels[2] + raw_channels[4]) / 3 # C1 -= (C2 + C3 + Cp1) / 3
+       sl_channels[1] -= (raw_channels[0] + raw_channels[3] + raw_channels[5]) / 3 # C2 -= (C1 + C4 + Cp2) / 3
+       sl_channels[2] -= (raw_channels[0] + raw_channels[6]) / 3 # C3 -= (C1 + Cp3) / 2
+       sl_channels[3] -= (raw_channels[1] + raw_channels[7]) / 3 # C4 -= (C2 + Cp4) / 2
+       sl_channels[4] -= (raw_channels[5] + raw_channels[6] + raw_channels[0]) / 3 # Cp1 -= (Cp2 + Cp3 + C1) / 3
+       sl_channels[5] -= (raw_channels[4] + raw_channels[7] + raw_channels[1]) / 3 # Cp2 -= (Cp1 + Cp4 + C2) / 3
+       sl_channels[6] -= (raw_channels[4] + raw_channels[2]) / 3 # Cp3 -= (Cp1 + C3) / 2
+       sl_channels[7] -= (raw_channels[5] + raw_channels[3]) / 3 # Cp4 -= (Cp2 + C4) / 2
+
+       self.sl_filtered_data = sl_channels.transpose()
+
        #Bandpass filter
        plt.figure(figsize=(16, 12))
        
@@ -144,7 +163,7 @@ class Kiral_Korek_Preprocessing():
 #       plt.plot(b_bandpass,a_bandpass)
        
        self.bp_filtered_eeg_data = np.apply_along_axis(lambda l: lfilter(b_bandpass, a_bandpass ,l),0,
-                                                      self.raw_eeg_data)
+                                                      self.sl_filtered_data)
    
        self.notch_filtered_eeg_data = self.bp_filtered_eeg_data
        
@@ -304,7 +323,7 @@ class Kiral_Korek_Preprocessing():
         
         fig = plt.figure()
 
-        t_sec = np.array(range(0, self.raw_eeg_data.size)) / self.sample_rate
+        t_sec = np.array(range(0, self.raw_eeg_data[:,channel].size)) / self.sample_rate
         
         ax1 = plt.subplot(221)
         plt.plot(t_sec, self.raw_eeg_data[:,channel])
@@ -367,7 +386,7 @@ class Kiral_Korek_Preprocessing():
 #%%
 
 path='C:\\Users\\Dylan\OneDrive - McGill University\\BCI_NeuroTech\\GitHub\\NeuroTechX-McGill-2019\\offline\\data\\March 4'
-fname_4 = path + '\\6_SUCCESS_Rest_RightClench_JawClench_ImagineClench_10secs.txt'
+fname_4 = path + '\\1_JawRest_JawRightClench_10s.txt'
 test4 = Kiral_Korek_Preprocessing(fname_4)
 test4.load_data_BCI()
 test4.initial_preprocessing(bp_lowcut =5, bp_highcut =20, bp_order=2)
