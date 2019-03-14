@@ -29,7 +29,6 @@ For more information, see our [facebook page](https://www.facebook.com/McGillNeu
 
 ## Sponsors
 We couldn't do it without you guys <3
+* DeepMind
 * OpenBCI
-* Deepmind
-* moremoremore (somebody who knows who's giving us money please list them)
-* Samosas
+(more posted soon)
