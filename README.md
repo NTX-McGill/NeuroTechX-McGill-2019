@@ -31,4 +31,3 @@ For more information, see our [facebook page](https://www.facebook.com/McGillNeu
 We couldn't do it without you guys <3
 * DeepMind
 * OpenBCI
-(more posted soon)
