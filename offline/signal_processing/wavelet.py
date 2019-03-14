@@ -3,7 +3,7 @@ import math
 import cmath
 import matplotlib.pyplot as plt
 import matplotlib.animation as ani
-from mpl_toolkits.mplot3d import axes3d
+from mpl_toolkits.mplot3d import axes3d as plt3
 
 """
 Morlet wavelets are finite sections of a complex sinusoidal wave modulated
@@ -86,9 +86,9 @@ class Wavelet:
         plt.title(str(self.freq)+' Hz Wavelet')
 
         ax = fig.add_subplot(grid[1:, :2], projection='3d')
-        ax.plot(self.t, self.wavelet.imag, self.wavelet.real)
-        ax.set_zlabel('Real Weights')
-        ax.set_ylabel('Imaginary Weights')
+        ax.plot(self.t, self.wavelet.real, self.wavelet.imag)
+        ax.set_ylabel('Real Weights')
+        ax.set_zlabel('Imaginary Weights')
         ax.set_xlabel('Time')
         plt.title(str(self.freq)+' Hz Wavelet')
 
@@ -155,5 +155,5 @@ class Wavelet:
 # fig = plt.figure(1)
 # anim = ani.FuncAnimation(fig, Wavelet.wavelet_ani, frames=125,
 #                         interval=20)
-w1 = Wavelet(12)  # Uncomment this and next line for example plots
+w1 = Wavelet(14)  # Uncomment this and next line for example plots
 w1.wavelet_plots()
