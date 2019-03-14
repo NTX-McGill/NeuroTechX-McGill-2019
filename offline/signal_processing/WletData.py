@@ -1,5 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
+from mpl_toolkits.mplot3d import Axes3D as plt3
 
 """
 WletData objects are meant to group together raw data series with their
@@ -39,22 +40,32 @@ class WletData:
 
     def plots(self):
         # Plots the raw data, the filtered data and the power data.
-        plt.subplot(311)
+        ax = plt.subplot(311)
+        ax.set_xlim([2, 20])
         plt.plot(self.tr, self.raw)
         plt.grid(True)
         plt.title('Raw Data')
         plt.ylabel('Voltage ' + r'($\mu$V)')
-        plt.subplot(312)
+        ax = plt.subplot(312)
+        ax.set_xlim([2, 20])
         plt.plot(self.tf, self.filtered)
         plt.title('Data Filtered at ' + str(self.freq)+' Hz')
         plt.ylabel('Voltage ' + r'($\mu$V)')
         plt.grid(True)
-        plt.subplot(313)
+        ax = plt.subplot(313)
+        ax.set_xlim([2, 20])
         plt.plot(self.tf, self.power)
         plt.title('Power at ' + str(self.freq)+' Hz')
         plt.ylabel('Power ' + r'($\mu$V $^2$)')
         plt.xlabel('Time (sec)')
         plt.grid(True)
+        fig = plt.figure()
+        ax = fig.gca(projection='3d')
+        ax.plot(self.tf, self.filtered.real, self.filtered.imag)
+        ax.set_ylabel('Real')
+        ax.set_zlabel('Imaginary')
+        ax.set_xlabel('Time (sec)')
+        plt.title('Analytical Signal at ' +str(self.freq)+' Hz')
 
 # To run the example, use a path to a data file that the constructor can use.
 # For now, it only uses data from the first channel in that data file.
