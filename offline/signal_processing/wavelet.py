@@ -3,6 +3,7 @@ import math
 import cmath
 import matplotlib.pyplot as plt
 import matplotlib.animation as ani
+from mpl_toolkits.mplot3d import axes3d
 
 """
 Morlet wavelets are finite sections of a complex sinusoidal wave modulated
@@ -72,11 +73,8 @@ class Wavelet:
         return fData, power
 
     def wavelet_plots(self):
+        fig = plt.figure()
         frex = np.linspace(0, self.nyq, np.floor(len(self.t)/2)+1)
-        if plt.fignum_exists(1) == False:
-            fig = plt.figure()
-        else:
-            fig = plt.gcf()
         grid = plt.GridSpec(3, 3)
         plt.subplot(grid[0, :])
         plt.grid(True)
@@ -87,10 +85,6 @@ class Wavelet:
         plt.ylabel('Weights')
         plt.title(str(self.freq)+' Hz Wavelet')
 
-        # 3D plot may cause run-time trouble in Python versions older than 3.7
-        # feel free to comment out the following  6 lines. This will cause a
-        # gap in the lower-left quadrant of the resulting plot when calling
-        # WaveletInstance.wavelet_plot()
         ax = fig.add_subplot(grid[1:, :2], projection='3d')
         ax.plot(self.t, self.wavelet.imag, self.wavelet.real)
         ax.set_zlabel('Real Weights')
@@ -161,5 +155,5 @@ class Wavelet:
 # fig = plt.figure(1)
 # anim = ani.FuncAnimation(fig, Wavelet.wavelet_ani, frames=125,
 #                         interval=20)
-# w1 = Wavelet(12) # Uncomment this and next line for example plots
-# w1.wavelet_plots()
+w1 = Wavelet(12)  # Uncomment this and next line for example plots
+w1.wavelet_plots()
