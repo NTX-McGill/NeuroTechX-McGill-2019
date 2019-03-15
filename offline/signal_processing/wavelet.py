@@ -68,8 +68,20 @@ class Wavelet:
 
     def filt(self, data):
         # This method convolves a dataset with an instance
-        fData = np.convolve(self.wavelet, data, mode='same')
-        power = fData*np.conj(fData)
+        try:
+            nCh = np.ma.size(data, 1)
+            fData = np.ma.zeros((np.ma.size(data, 0), np.ma.size(data, 1)),
+                                dtype=complex)
+            power = np.ma.zeros((np.ma.size(data, 0), np.ma.size(data, 1)))
+            for i in range(nCh):
+                fData[:, i] = np.convolve(self.wavelet, data[:, i], mode='same')
+                power[:, i] = fData[:, i]*np.conj(fData[:, i])
+                power = power.real
+        except (ValueError, IndexError) as e:
+            nCh = 1
+            fData = np.convolve(self.wavelet, data, mode='same')
+            power = fData*np.conj(fData)
+            power = power.real
         return fData, power
 
     def wavelet_plots(self):
@@ -96,6 +108,7 @@ class Wavelet:
         x = np.fft.rfft(self.wavelet.real)
         y = abs(x)
         y = y/max(y)
+        self.y = y
         ax = plt.subplot(grid[1:, 2])
         ax.set_ylim([-0.01, 1.01])
         ax.set_xlim([0, 125])
@@ -105,11 +118,24 @@ class Wavelet:
         plt.xlabel('Frequency (Hz)')
         plt.title(str(self.freq)+' Hz Wavelet: Spectral Content')
         x = np.arange(0, self.nyq, 20)
+        y2 = np.arange(0, 1, 0.1)
         if (self.freq % 20 != 0):
             x = np.append(x, self.freq)
             x.sort()
         plt.xticks(x)
+        plt.yticks(y2)
         plt.grid(True)
+
+        # Find bandwidth
+        mx = np.argmax(y)
+        z = abs(y-0.5)
+        mid = [np.argmin(z[0:mx]), (np.argmin(z[mx:])+mx)]
+        bw = frex[mid[1]]-frex[mid[0]]
+        plt.plot([frex[mid[0]], frex[mid[0]]], [-0.01, y[mid[0]]], 'k:')
+        plt.plot([frex[mid[1]], frex[mid[1]]], [-0.01, y[mid[1]]], 'k:')
+        plt.plot([0, frex[mid[1]]], [y[mid[0]], y[mid[0]]], 'k:')
+        plt.text(80, 0.1, 'bandwidth = ' + str(bw) + ' Hz \n(' +
+                 str(frex[mid[0]]) + ' Hz to ' + str(frex[mid[1]]) + ' Hz)')
 
     # Irrelevant method when using only one or a few Wavelets
     def wavelet_plots2(self):
@@ -155,5 +181,5 @@ class Wavelet:
 # fig = plt.figure(1)
 # anim = ani.FuncAnimation(fig, Wavelet.wavelet_ani, frames=125,
 #                         interval=20)
-w1 = Wavelet(14)  # Uncomment this and next line for example plots
+w1 = Wavelet(10)  # Uncomment this and next line for example plots
 w1.wavelet_plots()
