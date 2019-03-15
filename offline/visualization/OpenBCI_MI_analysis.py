@@ -149,6 +149,7 @@ plot_specgram(f, left_av,channel_name + ' left',shift, 2)
 # plot average mu trace over time
 fig = plt.figure()
 mu_indices = np.where(np.logical_and(f>=7, f<=12))
+print(mu_indices)
 plt.plot(np.mean(rest_av[mu_indices], axis=0))
 plt.plot(np.mean(left_av[mu_indices], axis=0))
 
