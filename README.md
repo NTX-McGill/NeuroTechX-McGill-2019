@@ -28,7 +28,10 @@ Our setup includes:
 For more information, see our [facebook page](https://www.facebook.com/McGillNeurotech/) or [our website](https://www.mcgillneurotech.com/).
 
 
-## Sponsors
+## Partners
 We couldn't do it without you guys <3
 * DeepMind
 * OpenBCI
+* Building 21
+* McGill University
+* Muse
