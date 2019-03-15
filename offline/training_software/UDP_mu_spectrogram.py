@@ -17,9 +17,9 @@ import errno
 plot_specgrams = True   # whether or not to plot the spectrograms
 lim_hz = 40             # the upper frequency limit we want to plot on our spectrogram
 single_electrode = 0    # the single electrode we want to plot
-set_1 = [0,1,2,3]       # the set of electrodes for right imagery (left brain, C1 C3 etc.)
-set_2 = [4,5,6,7]       # the set of electrodes for left imagery (right brain, C2 C4 etc.)
-spec_length = 30        # length of spectrogram (multiply by ~0.4 to get units in seconds,
+set_1 = [1]       # the set≥ of electrodes for right imagery (left brain, C1 C3 etc.)
+set_2 = [2]       # the set of electrodes for left imagery (right brain, C2 C4 etc.)
+spec_length = 50        # length of spectrogram (multiply by ~0.4 to get units in seconds,
                         # e.g. spec_length of 30 gives 0.4 * 30 = 12 seconds in spectrogram)
                         # I found 30 to be best since it tends to slow down with more to plot
 port = 12347            # which port to listen on
