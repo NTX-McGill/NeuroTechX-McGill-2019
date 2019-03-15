@@ -28,8 +28,6 @@ class RealTimeProcessWavelet():
 
         self.num_channels = 2
         
-        500*0.25/2
-        
         self.crop = math.floor(0.25* self.sample_rate)
         
         self.tr = (np.linspace(0, len(input_raw)/self.sample_rate, len(input_raw)))[self.crop:-self.crop]
@@ -94,38 +92,13 @@ class RealTimeProcessWavelet():
             plt.ylabel('Ch ' + str(1) + 'Power ' + r'($\mu$V $^2$)')
             plt.xlabel('Time (sec)')
     
-#    def wavelet_plots(self):
-#        fig = plt.figure()
-#        ax = fig.add_subplot(1, 1, 1)
-#        frex = np.linspace(0, self.nyquist, np.floor(len(self.time)/2)+1)
-#
-#        # FFT for spectral content.
-#        x = np.fft.rfft(self.wavelet.real)
-#        y = abs(x)
-#        y  =  y /max(y )
-#
-#        ax.set_ylim([-0.01, 1.01])
-#        ax.set_xlim([0, 125])
-#        plt.plot(frex, y)
-#        plt.plot([self.frequency, self.frequency], [-0.01, 1.01], 'k:')
-#        plt.ylabel('Normalized Power')
-#        plt.xlabel('Frequency (Hz)')
-#        plt.title(str(self.frequency)+' Hz Wavelet: Spectral Content')
-#        x = np.arange(0, self.nyquist, 20)
-#        y2 = np.arange(0, 1, 0.1)
-#        if (self.frequency % 20 != 0):
-#            x = np.append(x, self.frequency)
-#            x.sort()
-#        plt.xticks(x)
-#        plt.yticks(y2)
-#        plt.grid(True)
-#        
+      
 path='/Users/jenisha/Desktop/NeuroTechX-McGill-2019/offline/data/March_11/'
 fname= path +  '1_JawRest_JawRightClench_10s.txt'
 
 raw_eeg_data = np.loadtxt(fname, delimiter=',',skiprows=7, usecols=[1,8])
 data= raw_eeg_data[0:500,::]
-data2= raw_eeg_data[10000:10500,::]
+data2= raw_eeg_data[5000:5500,::]
 
 t = RealTimeProcessWavelet(data)
 t.wavelet(10)
