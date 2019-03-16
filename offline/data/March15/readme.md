@@ -7,13 +7,13 @@ __SESSION 1__
 test subject: roland
 
 *10/20 MEASUREMENTS*
-- nasion-inion:  cm
-- mid-point:  cm
-- 10%:  cm
-- interauricular distance: cm
-- mid-point: cm
-- 10%:  cm
-- 20%:  cm
+- nasion-inion: 38.5 cm
+- mid-point: 19.25 cm
+- 10%:  3.85 cm
+- interauricular distance: 38 cm
+- mid-point: 19 cm
+- 10%: 3.8 cm
+- 20%: 7.6 cm
 
 *ELECTRODES*
 - C3, chan 1
