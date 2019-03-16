@@ -1,6 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D as plt3
+from wavelet import Wavelet
 
 """
 WletData objects are meant to group together raw data series with their
@@ -135,8 +136,16 @@ try:
     del(w)
 except NameError:
     pass
-w = WletData(1, 10, r'D:\Santiago\University\NeurotechX\6_SUCCESS_Rest_RightClench_JawClench_ImagineClench_10secs.txt')
+
+path='/Users/jenisha/Desktop/NeuroTechX-McGill-2019/offline/data/March_11/'
+fname= path +  '1_JawRest_JawRightClench_10s.txt'
+w = WletData([1,8], 10, fname)
 w.all_power_plots()
+
+
+
+        
+        
 
 # z is the feature matrix! It is saved as a masked array, to import it use
 # np.load('feature_matrix')
