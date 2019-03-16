@@ -46,6 +46,8 @@ notes: wearing glasses
 *PARADIGM*
 
 2 - Alternating rest, left and right clench (10 sec), 4 electrodes (C1, C2, C3, C4)
+
 3 - Alternating rest, left and right clench (10 sec), 8 electrodes
+
 4 - Alternating rest, left and right motor imagery (10 sec), 8 electrodes
 
