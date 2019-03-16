@@ -69,10 +69,10 @@ def pad_block(block, max_length, fillval):
 fname = '../data/March 4/5_SUCCESS_Rest_RightAndJawClench_10secs.txt' 
 #fname = '../data/March 4/6_SUCCESS_Rest_RightClench_JawClench_ImagineClench_10secs.txt' 
 fname = '../data/March 4/7_SUCCESS_Rest_RightClenchImagineJaw_10secs.txt'
-fname = '../data/March 4/8_SUCCESS_Left_Right_Rest_10secs_3mins_total.txt'
+#fname = '../data/March 4/8_SUCCESS_Left_Right_Rest_10secs_3mins_total.txt'
 sampling_freq = 250
 shift = 0.1
-channel = (7)
+channel = (1)
 channel_name = 'C4'
 continuous = False
 
@@ -128,16 +128,11 @@ else:
         else:
             rest_specgram.append(d)
 #resize the blocks so that they're the same length as either the minimum or maximum length block
-rest_specgram = resize_min(rest_specgram)
+'''rest_specgram = resize_min(rest_specgram)
 left_specgram = resize_min(left_specgram)
-
-"""
+'''
 rest_specgram = resize_max(rest_specgram)
 left_specgram = resize_max(left_specgram)
-print(type(f), f)
-"""
-np.save('spec_rest.npy', rest_specgram)
-np.save('spec_left.npy', left_specgram)
 
 # plot average spectrogram of both classes
 plt.figure()
