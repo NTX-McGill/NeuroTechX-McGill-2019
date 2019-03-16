@@ -1,0 +1,61 @@
+<html>
+<head>
+  <title>Training Dashboard</title>
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css" integrity="sha384-GJzZqFGwb1QTTN6wy59ffF1BuGJpLSa9DkKMp0DgiMDm4iYMj70gZWKYbI706tWS" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.6.3/css/all.css" integrity="sha384-UHRtZLI+pbxtHCWp1t77Bi1L4ZtiqrqD80Kn4Z8NTSRyMA2Fd33n5dQ8lWUE00s/" crossorigin="anonymous">
+  <script src="https://use.fontawesome.com/releases/v5.3.1/js/all.js"></script>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+  <script src="assets/js/sortable.js"></script>
+  <script src="assets/js/list.js"></script>
+  <script src="assets/js/socket.io.js"></script>
+
+  <link rel="stylesheet" href="./assets/css/list.css">
+  <script>
+    var socket = io();
+  </script>
+</head>
+<body>
+<div class="container-fluid" style="margin-top: 20px">
+<div style="margin-bottom: 10px;"><strong>Queue</strong></div>
+<div class="left" id="commandBank">
+  <div id="commandList" class="list-group col">
+    <div class="list-group-item tinted" data-direction="left" data-duration="10"><i class="fas fa-arrows-alt handle"></i> Left 10s <a href='#' class='remove'>REMOVE ME</a></div>
+    <div class="list-group-item tinted" data-direction="right" data-duration="10"><i class="fas fa-arrows-alt handle"></i> Right 10s <a href='#' class='remove'>REMOVE ME</a></div>
+    <div class="list-group-item tinted" data-direction="rest" data-duration="10"><i class="fas fa-arrows-alt handle"></i> Rest 10s <a href='#' class='remove'>REMOVE ME</a></div>
+
+  </div>
+  <div class="addItem" style="margin-top: 20px">
+    <label for="durationInput"><strong>Add to Queue</strong></label>
+    <div class="form-group row">
+      <label for="durationInput" class="col-sm-6 col-form-label">Duration (sec)</label>
+      <input id="durationInput" type="text" class="timer form-control" value="10" style="width: 100px"></input>
+    </div>
+    <div class="btn-group btn-group-toggle" data-toggle="buttons" style="margin-bottom: 20px;">
+      <button class="selection btn btn-outline-secondary direction-left">Left</button>
+      <button class="selection btn btn-outline-secondary direction-rest">Rest</button>
+      <button class="selection btn btn-outline-secondary direction-right">Right</button>
+    </div><br>
+  </div>
+  <button class="selection btn btn-primary btn collect" style="margin-bottom: 20px;">Collect</button>
+
+</div>
+  <h3> Collecting now: <span id="collectDirection"> None </span></h3>
+  <h3> Time left: <span id="collectTime">N/A</span></h3>
+</div>
+<script>
+  var left = document.getElementById('commandList');
+
+  new Sortable(left, {
+    group: {
+        name: 'shared',
+        handle: '.handle', // To clone: set pull to 'clone'
+        put: false
+    },
+    animation: 150,
+    sort: true,
+    handle: '.handle'
+});
+
+  </script>
+</body>
+</html>
