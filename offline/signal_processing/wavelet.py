@@ -183,3 +183,4 @@ class Wavelet:
 #                         interval=20)
 w1 = Wavelet(10)  # Uncomment this and next line for example plots
 w1.wavelet_plots()
+t_wave1 = w1.wavelet

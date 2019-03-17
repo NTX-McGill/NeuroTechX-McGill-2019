@@ -108,6 +108,7 @@ class Kiral_Korek_Preprocessing():
        #Bandpass filter
        plt.figure(figsize=(16, 12))
        
+       # bunch of different filters
        plt.subplot(221)
        b_bandpass, a_bandpass = butter(bp_order, [bp_lowcut, bp_highcut], btype='band', analog=True)
        w, h = freqs(b_bandpass, a_bandpass)
@@ -153,6 +154,14 @@ class Kiral_Korek_Preprocessing():
        plt.ylabel('Amplitude [dB]')
        plt.margins(0, 0.1)
        plt.grid(which='both', axis='both')
+    
+       # filter designed using the windowing method (firwin). this filter with specified parameters seem to have decent passband, good supression of 60/120 hz artifacts and would be useful online due to relitavely short memory (in this case 2^6-1 = 63)
+       # can vue time domain of filter plt.plot(b). x-axis is sample
+       b = firwin(2**6-1, [0.5, 30], width=0.05, pass_zero=False, fs = sampling_freq)  # length = order + 1
+       plt.figure()
+       b_fft = np.fft.rfft(b)
+       f = np.linspace(0,125,len(b_fft))
+       plt.plot(f, abs(b_fft))
        
        
        b_bandpass, a_bandpass = butter(bp_order, [self.low, self.high], btype='band', analog=True)
@@ -387,6 +396,7 @@ class Kiral_Korek_Preprocessing():
 
 path='C:\\Users\\Dylan\OneDrive - McGill University\\BCI_NeuroTech\\GitHub\\NeuroTechX-McGill-2019\\offline\\data\\'
 fname_4 = path + 'March 11\\1_JawRest_JawRightClench_10s.txt'
+
 test4 = Kiral_Korek_Preprocessing(fname_4)
 test4.load_data_BCI()
 test4.initial_preprocessing(bp_lowcut =5, bp_highcut =20, bp_order=2)
