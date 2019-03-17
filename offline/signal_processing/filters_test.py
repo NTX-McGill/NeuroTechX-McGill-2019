@@ -36,16 +36,15 @@ class Kiral_Korek_Preprocessing():
         self.path = path
         self.sample_rate = 250 #Default sampling rate for OpenBCI
         self.name_channel = name_channels
-        
 
-    
-    def load_data_BCI(self, list_channels=[2, 7, 1, 8, 4, 5, 3, 6]):
+    def load_data_BCI(self,interval = (0,500), list_channels=[2, 7, 1, 8, 4, 5, 3, 6]):
         """
         
         Load the data from OpenBCI txt file
 
         Input:
             list_channel: lists of channels to use
+            2 s interval to take data from [included, not included]
 
         
         """
@@ -56,7 +55,7 @@ class Kiral_Korek_Preprocessing():
         self.raw_eeg_data = np.loadtxt(self.path, 
                                        delimiter=',',
                                        skiprows=7,
-                                       usecols=list_channels)
+                                       usecols=list_channels)[interval[0]:interval[1],::]
 
         #expand the dimmension if only one channel             
         if self.number_channels == 1:
@@ -87,24 +86,25 @@ class Kiral_Korek_Preprocessing():
        self.low = bp_lowcut / self.nyq
        self.high = bp_highcut / self.nyq
        
+       
        #Butter
-       #b_bandpass, a_bandpass = butter(bp_order, [bp_lowcut, bp_highcut], btype='band', analog=True)
+       b_bandpass, a_bandpass = butter(bp_order, [self.low , self.high], btype='band', analog=True)
        
        #Ellip
-       #b_bandpass, a_bandpass = ellip(bp_order, 5, 40, [bp_lowcut, bp_highcut], 'bandpass', analog=True)
+       #b_bandpass, a_bandpass = ellip(bp_order, 5, 40, [self.low , self.high], 'bandpass', analog=True)
        
        #Cheby type 1
-       #b_bandpass, a_bandpass =cheby1(bp_order, 5, [bp_lowcut, bp_highcut], 'bandpass', analog=True)
+       #b_bandpass, a_bandpass =cheby1(bp_order, 5, [self.low , self.high], 'bandpass', analog=True)
        
        #Cheby type 2
-       #b_bandpass, a_bandpass =cheby2(bp_order, 5, [bp_lowcut, bp_highcut], 'bandpass', analog=True)
+       #b_bandpass, a_bandpass =cheby2(bp_order, 5, [self.low , self.high], 'bandpass', analog=True)
        
        #Firwin filter (replace b_bandpass and a_bandpass in line with coefficients)
        #coefficients =  firwin(2**6-1, [0.5, 30], width=0.05, pass_zero=False, fs = sampling_freq)
        
        
        self.bp_filtered_eeg_data = np.apply_along_axis(lambda l: lfilter(b_bandpass, a_bandpass ,l),0,
-                                                      self.sl_filtered_data)
+                                                      self.raw_eeg_data)
    
        self.notch_filtered_eeg_data = self.bp_filtered_eeg_data
        
@@ -113,8 +113,10 @@ class Kiral_Korek_Preprocessing():
             b_notch, a_notch = butter(notch_order, bp_stop_Hz/self.nyq , 'bandstop')
             self.notch_filtered_eeg_data = np.apply_along_axis(lambda l: lfilter(b_notch, a_notch,l),0,
                                                               self.notch_filtered_eeg_data)
+       self.corrected_eeg_data = self.notch_filtered_eeg_data
 
-    def convert_to_freq_domain(self, data, NFFT = 500, FFTstep = 125):
+
+    def convert_to_freq_domain(self, data, NFFT = 250, FFTstep = 10):
         
         """
         
@@ -155,8 +157,10 @@ class Kiral_Korek_Preprocessing():
         
         return (np.array(list_spec_PSDperBin), np.array(list_freqs), np.array(list_t_spec))
     
+            
     
-    def plots(self, num_channels=1):
+    
+    def plots(self, num_channels=8):
         """
        
         Plot the raw and filtered data of a channel as well as their spectrograms
@@ -167,7 +171,9 @@ class Kiral_Korek_Preprocessing():
         """
         self.raw_spec_PSDperBin, self.raw_freqs, self.raw_t_spec = self.convert_to_freq_domain(self.raw_eeg_data)
         
-        for i in range(num_channels):  
+        self.corrected_spec_PSDperBin, self.corrected_freqs, self.corrected_t_spec = self.convert_to_freq_domain(self.corrected_eeg_data)
+        
+        for channel in range(num_channels):  
             fig = plt.figure()
     
             t_sec = np.array(range(0, self.raw_eeg_data[:,channel].size)) / self.sample_rate
@@ -189,10 +195,9 @@ class Kiral_Korek_Preprocessing():
             plt.ylabel('Frequency (Hz)')
             plt.title('Spectogram of Unfiltered')
             
-            self.corrected_spec_PSDperBin, self.corrected_freqs, self.corrected_t_spec = self.convert_to_freq_domain(self.corrected_eeg_data)
+            
             ax3 = plt.subplot(223)
             plt.plot(t_sec, self.corrected_eeg_data[:,channel])
-            plt.ylim(-100, 100)
             plt.ylabel('EEG (uV)')
             plt.xlabel('Time (sec)')
             plt.title('Filtered')
@@ -202,8 +207,7 @@ class Kiral_Korek_Preprocessing():
             plt.pcolor(self.corrected_t_spec[channel], self.corrected_freqs[channel], 
                        10*np.log10(self.corrected_spec_PSDperBin[channel]))
             plt.clim(25-5+np.array([-40, 0]))
-            plt.xlim(t_sec[0], t_sec[-1])
-            plt.ylim([0, 60])  
+            plt.xlim(t_sec[0], t_sec[-1]) 
             plt.xlabel('Time (sec)')
             plt.ylabel('Frequency (Hz)')
             plt.title('Spectogram of Filtered')
@@ -214,8 +218,15 @@ class Kiral_Korek_Preprocessing():
             plt.show()
             
 
-#%%
+path='/Users/jenisha/Desktop/NeuroTechX-McGill-2019/offline/data/March_11/'
+fname= path +  '1_JawRest_JawRightClench_10s.txt'
 
-\
+test4 = Kiral_Korek_Preprocessing(fname)
+test4.load_data_BCI()
+test4.initial_preprocessing(bp_lowcut =5, bp_highcut =20, bp_order=2)
+
+test4.plots()            
+
+    
 
             
