@@ -1,7 +1,8 @@
 March 8 Trials
 
-Trial 1 and 2 - Laetitia 
-Trial 3 and 4 - Marley
+Trial 1 and 2 - subj 003
+
+Trial 3 and 4 - subj 004
 
 *Notes for further recordings*
 Settings: 
