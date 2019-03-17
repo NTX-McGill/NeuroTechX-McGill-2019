@@ -2,6 +2,10 @@ import numpy as np
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D as plt3
 from wavelet import Wavelet
+<<<<<<< HEAD
+=======
+
+>>>>>>> b31bac4ab29b602f238bd1d9512e776bb3a387f5
 """
 WletData objects are meant to group together raw data series with their
 respective Morlet wavelet-filtered data and power data. They contain
@@ -135,10 +139,24 @@ try:
     del(w)
 except NameError:
     pass
+<<<<<<< HEAD
 #w = WletData(1, 10, r'D:\Santiago\University\NeurotechX\6_SUCCESS_Rest_RightClench_JawClench_ImagineClench_10secs.txt')
 w = WletData(1, 12, '../data/March 4/6_SUCCESS_Rest_RightClench_JawClench_ImagineClench_10secs.txt')
 w.all_power_plots()
 plt.show()
+=======
+
+path='/Users/jenisha/Desktop/NeuroTechX-McGill-2019/offline/data/March_11/'
+fname= path +  '1_JawRest_JawRightClench_10s.txt'
+w = WletData([1,8], 10, fname)
+w.all_power_plots()
+
+
+
+        
+        
+
+>>>>>>> b31bac4ab29b602f238bd1d9512e776bb3a387f5
 # z is the feature matrix! It is saved as a masked array, to import it use
 # np.load('feature_matrix')
 z = w.feat_mat(125, 62)
