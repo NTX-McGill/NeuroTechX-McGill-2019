@@ -32,18 +32,21 @@ def predict(ch):
         return "F"  # forward
 
 
-@sio.on('timeseries')
+@sio.on('timeseries-prediction')
 def on_message(data):
-    buffer_data.append(data)
-    if len(buffer_data > 500):
-        to_pop = len(buffer_data) - 500
-        buffer_data.pop(0:to_pop)
-    elif len(buffer_data = 500):
-        # we have enough data to make a prediction
-        response = predict(data)
-        sio.emit('data from ML', {'response': response})
+    global buffer_data
+    buffer_data += data['data'] # concatenate lists
+    print(len(buffer_data))
+
+    if len(buffer_data) < 500:
+        # lacking data
+        response = "F" # go forward otherwise
     else:
-        sio.emit('data from ML', {'response': "F"}) # go forward otherwise
+        # we have enough data to make a prediction
+        to_pop = len(buffer_data) - 500
+        buffer_data = buffer_data[to_pop:]
+        response = predict(data)
+    sio.emit('data from ML', {'response': response})
 
 
 sio.connect('http://localhost:3000')
