@@ -13,7 +13,7 @@ from copy import deepcopy
 import matplotlib.pyplot as plt
 import matplotlib.mlab as mlab
 
-from scipy.signal import butter, ellip, cheby1, cheby2, lfilter, freqs
+from scipy.signal import butter, ellip, cheby1, cheby2, lfilter, freqs,iirfilter
 
 import numpy.fft as fft
 
@@ -32,14 +32,15 @@ Input:
 
 
 class Kiral_Korek_Preprocessing():
-    def __init__(self, path, name_channels=["C1", "C2", "C3", "C4", "Cp1", "Cp2", "Cp3", "Cp4"]):
+    def __init__(self, path, name_channels=["C3", "C1", "Cp3", "Cp1", "Cp2", "Cp4", "C2", "C4"]):
         self.path = path
         self.sample_rate = 250 #Default sampling rate for OpenBCI
         self.name_channel = name_channels
 
-    def load_data_BCI(self,interval = (0,500), list_channels=[2, 7, 1, 8, 4, 5, 3, 6]):
+    def load_data_BCI(self,interval = (500,1000), list_channels=[1, 2, 3, 4, 5, 6, 7, 8]):
         """
-        
+        list_channels=[2, 7, 1, 8, 4, 5, 3, 6])
+        name_channels=["C1", "C2", "C3", "C4", "Cp1", "Cp2", "Cp3", "Cp4"]
         Load the data from OpenBCI txt file
 
         Input:
@@ -100,11 +101,14 @@ class Kiral_Korek_Preprocessing():
        #b_bandpass, a_bandpass =cheby2(bp_order, 5, [self.low , self.high], 'bandpass', analog=True)
        
        #Firwin filter (replace b_bandpass and a_bandpass in line with coefficients)
-       #coefficients =  firwin(2**6-1, [0.5, 30], width=0.05, pass_zero=False, fs = sampling_freq)
+       #coefficients =  firwin(2**6-1, [0.5, 30], width=0.05, pass_zero=False, fs = self.sample_rate)
        
        
        self.bp_filtered_eeg_data = np.apply_along_axis(lambda l: lfilter(b_bandpass, a_bandpass ,l),0,
                                                       self.raw_eeg_data)
+       
+#       self.bp_filtered_eeg_data = np.apply_along_axis(lambda l: lfilter(coefficients ,1.0,l),0,
+#                                                      self.raw_eeg_data)
    
        self.notch_filtered_eeg_data = self.bp_filtered_eeg_data
        
@@ -116,7 +120,7 @@ class Kiral_Korek_Preprocessing():
        self.corrected_eeg_data = self.notch_filtered_eeg_data
 
 
-    def convert_to_freq_domain(self, data, NFFT = 250, FFTstep = 10):
+    def convert_to_freq_domain(self, data, NFFT = 250, FFTstep = 1):
         
         """
         
@@ -175,6 +179,7 @@ class Kiral_Korek_Preprocessing():
         
         for channel in range(num_channels):  
             fig = plt.figure()
+            fig.suptitle(self.name_channel[channel])
     
             t_sec = np.array(range(0, self.raw_eeg_data[:,channel].size)) / self.sample_rate
             
