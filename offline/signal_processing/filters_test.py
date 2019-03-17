@@ -101,7 +101,7 @@ class Kiral_Korek_Preprocessing():
        #b_bandpass, a_bandpass =cheby2(bp_order, 5, [self.low , self.high], 'bandpass', analog=True)
        
        #Firwin filter (replace b_bandpass and a_bandpass in line with coefficients)
-       #coefficients =  firwin(2**6-1, [0.5, 30], width=0.05, pass_zero=False, fs = self.sample_rate)
+#       coefficients =  firwin(2**6-1, [0.5, 30], width=0.05, pass_zero=False, fs = self.sample_rate)
        
        
        self.bp_filtered_eeg_data = np.apply_along_axis(lambda l: lfilter(b_bandpass, a_bandpass ,l),0,
@@ -118,6 +118,8 @@ class Kiral_Korek_Preprocessing():
             self.notch_filtered_eeg_data = np.apply_along_axis(lambda l: lfilter(b_notch, a_notch,l),0,
                                                               self.notch_filtered_eeg_data)
        self.corrected_eeg_data = self.notch_filtered_eeg_data
+       
+       #self.corrected_eeg_data = self.raw_eeg_data
 
 
     def convert_to_freq_domain(self, data, NFFT = 250, FFTstep = 1):
@@ -195,7 +197,6 @@ class Kiral_Korek_Preprocessing():
                        10*np.log10(self.raw_spec_PSDperBin[channel]))
             plt.clim(25-5+np.array([-40, 0]))
             plt.xlim(t_sec[0], t_sec[-1])
-            plt.ylim([0, 60]) 
             plt.xlabel('Time (sec)')
             plt.ylabel('Frequency (Hz)')
             plt.title('Spectogram of Unfiltered')
@@ -221,6 +222,52 @@ class Kiral_Korek_Preprocessing():
     
             plt.tight_layout()
             plt.show()
+    
+    def plots2(self, num_channels=8):
+        """
+       
+        Plot the raw and filtered data of a channel as well as their spectrograms
+        
+        Input:
+            - channel: channel whose data is to plot
+        
+        """
+
+
+        
+        for channel in range(num_channels):  
+            fig = plt.figure()
+
+            fig.suptitle(self.name_channel[channel])
+    
+            self.t_sec = np.array(range(0, self.raw_eeg_data[:,channel].size)) / self.sample_rate
+            
+            ax1 = plt.subplot(221)
+            plt.plot(self.t_sec, self.raw_eeg_data[:,channel])
+            plt.ylabel('EEG (uV)')
+            plt.xlabel('Time (sec)')
+            plt.title('Raw')
+            plt.xlim(self.t_sec[0], self.t_sec[-1])
+            
+            self.corrected_eeg_data = self.raw_eeg_data[:,channel]
+            self.ps = np.abs(np.fft.fft(self.corrected_eeg_data))**2
+            time_step = 1 / 250
+            self.freqs = np.fft.fftfreq(self.corrected_eeg_data.size, time_step)
+            self.idx = np.argsort(self.freqs)
+            
+            ax2 = plt.subplot(222)
+            plt.xlim(self.t_sec[0], self.t_sec[-1])
+            plt.xlabel('Frequency (Hz)')
+            plt.ylabel('Power')
+            plt.plot(self.freqs[self.idx], self.ps[self.idx])
+            plt.title('PSD of Unfiltered')
+            
+
+    
+    
+    
+            plt.tight_layout()
+            plt.show()
             
 
 path='/Users/jenisha/Desktop/NeuroTechX-McGill-2019/offline/data/March_11/'
@@ -228,9 +275,9 @@ fname= path +  '1_JawRest_JawRightClench_10s.txt'
 
 test4 = Kiral_Korek_Preprocessing(fname)
 test4.load_data_BCI()
-test4.initial_preprocessing(bp_lowcut =5, bp_highcut =20, bp_order=2)
+#test4.initial_preprocessing(bp_lowcut =5, bp_highcut =20, bp_order=2)
 
-test4.plots()            
+test4.plots2()            
 
     
 
