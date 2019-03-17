@@ -1,6 +1,6 @@
 March 10 Trials
 
-Test subject: Danielle's dad
+Test subject: 005
 
 Electrodes: A1+A2 (ear lobes), C1 (chan 2), C2 (chan 7), C3 (chan 1), C4 (chan 8)
 
