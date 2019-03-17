@@ -4,7 +4,7 @@ room: small VR room :( gpu interference?
 
 __SESSION 1__
 
-test subject: rebecca
+test subject: 006
 
 *10/20 MEASUREMENTS*
 - nasion-inion: 36 cm
@@ -34,7 +34,7 @@ test subject: rebecca
 
 __SESSION 2__
 
-test subject: marley
+test subject: 004
 
 playing around with electrodes to find mu 
 
