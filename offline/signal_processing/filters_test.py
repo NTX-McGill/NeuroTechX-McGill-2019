@@ -156,7 +156,7 @@ class Kiral_Korek_Preprocessing():
         return (np.array(list_spec_PSDperBin), np.array(list_freqs), np.array(list_t_spec))
     
     
-    def plots(self, num_channels=0):
+    def plots(self, num_channels=1):
         """
        
         Plot the raw and filtered data of a channel as well as their spectrograms
