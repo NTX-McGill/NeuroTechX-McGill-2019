@@ -1,0 +1,20 @@
+{
+  "name": "dashboard",
+  "version": "1.0.0",
+  "description": "",
+  "main": "server.js",
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@openbci/cyton": "^2.0.1",
+    "csv-writer": "^1.2.0",
+    "dgram": "^1.0.1",
+    "events": "^3.0.0",
+    "express": "^4.16.4",
+    "http": "0.0.0",
+    "node-osc": "^3.0.0",
+    "osc": "^2.2.4",
+    "osc-js": "^2.0.3",
+    "socket.io": "^2.2.0"
+  }
+}
