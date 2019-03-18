@@ -18,7 +18,63 @@ import numpy.fft as fft
 from scipy import signal
 import matplotlib.mlab as mlab
 import matplotlib.pyplot as plt
+from sklearn.metrics import confusion_matrix
+from sklearn.utils.multiclass import unique_labels
+import seaborn as sn
+import pandas as pd
 
+def plot_confusion_matrix(y_true, y_pred, classes,
+                          normalize=False,
+                          title=None,
+                          cmap=plt.cm.Blues):
+    """
+    This function prints and plots the confusion matrix.
+    Normalization can be applied by setting `normalize=True`.
+    """
+    if not title:
+        if normalize:
+            title = 'Normalized confusion matrix'
+        else:
+            title = 'Confusion matrix, without normalization'
+
+    # Compute confusion matrix
+    cm = confusion_matrix(y_true, y_pred)
+    # Only use the labels that appear in the data
+    classes = classes[unique_labels(y_true, y_pred)]
+    if normalize:
+        cm = cm.astype('float') / cm.sum(axis=1)[:, np.newaxis]
+        print("Normalized confusion matrix")
+    else:
+        print('Confusion matrix, without normalization')
+
+    print(cm)
+
+    fig, ax = plt.subplots()
+    im = ax.imshow(cm, interpolation='nearest', cmap=cmap)
+    ax.figure.colorbar(im, ax=ax)
+    # We want to show all ticks...
+    ax.set(xticks=np.arange(cm.shape[1]),
+           yticks=np.arange(cm.shape[0]),
+           # ... and label them with the respective list entries
+           xticklabels=classes, yticklabels=classes,
+           title=title,
+           ylabel='True label',
+           xlabel='Predicted label')
+
+    # Rotate the tick labels and set their alignment.
+    plt.setp(ax.get_xticklabels(), rotation=45, ha="right",
+             rotation_mode="anchor")
+
+    # Loop over data dimensions and create text annotations.
+    fmt = '.2f' if normalize else 'd'
+    thresh = cm.max() / 2.
+    for i in range(cm.shape[0]):
+        for j in range(cm.shape[1]):
+            ax.text(j, i, format(cm[i, j], fmt),
+                    ha="center", va="center",
+                    color="white" if cm[i, j] > thresh else "black")
+    fig.tight_layout()
+    return ax
 def filter_(arr, fs_Hz, lowcut, highcut, order):
    nyq = 0.5 * fs_Hz
    b, a = signal.butter(1, [lowcut/nyq, highcut/nyq], btype='band')
@@ -92,49 +148,129 @@ def epoch_data(data, window_length, shift):
         i += shift
     return np.array(arr)
 """ BASELINE PREDICTION ALGORITHM FOR MVP """
-def predict(ch):
+def predict(ch, threshold, plot=False):
     # ch has shape (2, 500)
-    threshold = 1
     
     psd1,freqs = mlab.psd(np.squeeze(ch[0]),
                            NFFT=500,
                            Fs=250)
-    mu_indices = np.where(np.logical_and(freqs>=7, freqs<=12))
+    mu_indices = np.where(np.logical_and(freqs>=10, freqs<=12))
     mu1 = np.mean(psd1[mu_indices])
     
     psd2,freqs = mlab.psd(np.squeeze(ch[1]),
                            NFFT=500,
                            Fs=250)
     mu2 = np.mean(psd2[mu_indices])
-        
-    #plt.plot(freqs,psd1)
+    if plot:
+        #plt.subplot(2,1,1)
+        plt.plot(freqs,psd1)
+        #plt.subplot(2,1,2)
+        #plt.plot(freqs,psd2)
     
     return int(mu1 < threshold), int(mu2 < threshold)     # return 1,0 for left, 0,1 for right, 1,1 for both and 0,0 for rest
 """ END """
 
-fname = 'data/March 4/5_SUCCESS_Rest_RightAndJawClench_10secs.txt' 
-#fname = 'data/March 4/6_SUCCESS_Rest_RightClench_JawClench_ImagineClench_10secs.txt' 
-#fname = 'data/March 4/7_SUCCESS_Rest_RightClenchImagineJaw_10secs.txt'
+fs_Hz = 250
 sampling_freq = 250
-shift = 0.1
-channel = (1,7)
+window_s = 2
+shift = 0.5
+channel = (1,2)
 channel_name = 'C4'
 continuous = False
 psd = True
+Viet = True
+Marley = False
+colormap = sn.cubehelix_palette(as_cmap=True)
 
-data = np.loadtxt(fname,
-                  delimiter=',',
-                  skiprows=7,
-                  usecols=channel)
-data = filter_(data, sampling_freq, 1, 40, 1)
-ch = data.T[0]     
-start_indices = get_start_indices(ch)
+left_data = []
+rest_data = []
 
-epochs = epoch_data(data, 500, int(.5*250))    # shape n x 500 x 2
-plt.figure()
-for epoch in epochs:
-    print(predict(epoch.T))
+if Viet:
+    fname = 'data/March 4/5_SUCCESS_Rest_RightAndJawClench_10secs.txt' 
+    #fname = 'data/March 4/6_SUCCESS_Rest_RightClench_JawClench_ImagineClench_10secs.txt' 
+    #fname = 'data/March 4/7_SUCCESS_Rest_RightClenchImagineJaw_10secs.txt'
+    data = np.loadtxt(fname,
+                      delimiter=',',
+                      skiprows=7,
+                      usecols=channel)
+    data_ = filter_(data, sampling_freq, 1, 40, 1)
+    ch = data_.T[0]     
+    start_indices = get_start_indices(ch)
+    for i in range(len(start_indices) - 1):
+        start = int(max(start_indices[i] + tmin * sampling_freq, 0))
+        end = int(min(start_indices[i+1] + tmax * sampling_freq, start_indices[-1]))
+        if i % 2:
+            left_data.append(data[start:end])
+        else:
+            rest_data.append(data[start:end])
+if Marley:
+    fname = 'data/March11_Marley/Marley_prolonged_trial.txt'
+    data = np.loadtxt(fname,
+                      delimiter=',',
+                      skiprows=7,
+                      usecols=channel)
+    data = filter_(data, sampling_freq, 1, 40, 1)
+    rest_indices = [i * 10 * fs_Hz for i in range(7)]
+    left_indices = [(i+6) * 10 * fs_Hz for i in range(7)]
+    start_indices = rest_indices
+    for i in range(len(start_indices) - 1):
+        start = int(max(start_indices[i] + tmin * sampling_freq, 0))
+        end = int(min(start_indices[i+1] + tmax * sampling_freq, start_indices[-1]))
+        rest_data.append(data[start:end])
+    start_indices = left_indices
+    for i in range(len(start_indices) - 1):
+        start = int(max(start_indices[i] + tmin * sampling_freq, 0))
+        end = int(min(start_indices[i+1] + tmax * sampling_freq, start_indices[-1]))
+        left_data.append(data[start:end])
+
+
+
+fig1.clf()
+fig2.clf()
+fig1 = plt.figure("psd")
+fig2 = plt.figure("cm", figsize=(10,10))
+
+for thresh in range (6):
+    threshold = 0.8 + 0.2 * thresh
+    left = []
+    rest = []
+    
+    plt.figure("psd")
+    plt.subplot(2,1,1)
+    plt.ylim([0,25])
+    plt.xlim([6,20])
+    for trial in left_data:
+        epochs = epoch_data(trial, 250 * window_s, int(shift*250))    # shape n x 500 x 2
+        for epoch in epochs:
+            left.append(predict(epoch.T, threshold, plot=True)[0])
+    
+    plt.subplot(2,1,2)
+    plt.ylim([0,25])
+    plt.xlim([6,20])
+    for trial in rest_data:
+        epochs = epoch_data(trial, 250 * window_s, int(shift*250))    # shape n x 500 x 2
+        for epoch in epochs:
+            rest.append(predict(epoch.T, threshold, plot=True)[0])
+    left_true = sum(left)/len(left)
+    left_false = 1 - left_true
+    rest_false = sum(rest)/len(rest)
+    rest_true = 1 - rest_false
+    overall = (sum(left) + sum(rest))/len(left+rest)
+    
+    plt.figure("cm")
+    array = [[left_true,left_false],
+         [rest_false,rest_true]]
+    df_cm = pd.DataFrame(array, index = [i for i in "LR"],
+                      columns = [i for i in "LR"])
+    plt.subplot(3,2,thresh+1)
+    sn.heatmap(df_cm, cmap =colormap,annot=True)
+    plt.title("Threshold: " + "{:1.1f}".format(threshold))
+    plt.subplots_adjust(hspace=0.3)
+    
 """
+m = [[left_true,left_false],
+     [rest_false,rest_true]]
+plt.matshow(m, cmap='Greys')
 left_specgram = []
 rest_specgram = []
 
