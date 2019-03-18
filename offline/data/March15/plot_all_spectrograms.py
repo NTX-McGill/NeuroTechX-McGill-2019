@@ -10,10 +10,11 @@ import numpy as np
 import matplotlib.mlab as mlab
 import matplotlib.pyplot as plt
 import pandas as pd
+from scipy import signal
 
-def draw_specgram(ch, fs_Hz, fig, num_subplots, i, title):
+def get_spectral_content(ch, fs_Hz, shift=0.1):
     NFFT = fs_Hz*2
-    overlap = NFFT - int(0.1 * fs_Hz)
+    overlap = NFFT - int(shift * fs_Hz)
     spec_PSDperHz, spec_freqs, spec_t = mlab.specgram(np.squeeze(ch),
                                    NFFT=NFFT,
                                    window=mlab.window_hanning,
@@ -21,11 +22,14 @@ def draw_specgram(ch, fs_Hz, fig, num_subplots, i, title):
                                    noverlap=overlap
                                    ) # returns PSD power per Hz
     # convert the units of the spectral data
-    print(len(spec_t))
     spec_PSDperBin = spec_PSDperHz * fs_Hz / float(NFFT)
+    return spec_t, spec_freqs, spec_PSDperBin  # dB re: 1 uV
+
+def draw_specgram(spec_freqs, spec_PSDperBin, fig, num_subplots, i, title):
+    spec_t = [idx*.1 for idx in range(len(spec_PSDperBin[0]))]
     f_lim_Hz = [0, 20]   # frequency limits for plotting
     #plt.figure(figsize=(10,5))
-    plt.subplot(num_subplots,1,i)
+    plt.subplot(num_subplots,2,i)
     #plt.title(title)
     plt.pcolor(spec_t, spec_freqs, 10*np.log10(spec_PSDperBin))  # dB re: 1 uV
     plt.clim([-25,26])
@@ -35,7 +39,6 @@ def draw_specgram(ch, fs_Hz, fig, num_subplots, i, title):
     plt.ylabel('Frequency (Hz)')
     #plt.subplots_adjust(hspace=1)
     #plt.gca().set_aspect('equal', adjustable='box')
-from scipy import signal
 
 def filter_(arr, fs_Hz, lowcut, highcut, order):
    nyq = 0.5 * fs_Hz
@@ -47,6 +50,7 @@ filenames = sorted([f for f in glob.glob("*.txt")])
 sampling_freq = 250
 shift = 0.1
 channel = (1,2,3,4,5,6,7,8,13)
+average = True
 fname = '1_rest_left_right_10s_OpenBCI-RAW-2019-03-15_18-09-34.txt'
 fname = '2_RestLeftRight_10s_OpenBCI-RAW-2019-03-15_18-27-01.txt'
 markers = '2_RestLeftRight_10s_time-stamp-64-2019-2-15-18-31-46.csv'
@@ -70,17 +74,46 @@ eeg = eeg[indices]
 
 data = filter_(eeg, sampling_freq, 1, 40, 1)
 
-# TODO: multi channel average
-fig = plt.figure(figsize=(8,10))
+
+fig = plt.figure(figsize=(20,10))
 length = 60
 data.resize((int(len(data)/(250 * length)) + 1, 250 * length,data.shape[-1]))
-num_rows = data.shape[0] * data.shape[-1]
-idx = 0
-for block in data:
-    for channel in block.T:
+
+
+
+if average:
+    idx = 0
+    all_spectra = []
+    for block in data:
+        all_spectra.append([])
+        for channel in block.T:
+            t,f,d = get_spectral_content(channel, fs_Hz)
+            all_spectra[idx].append(d)
         idx += 1
-        draw_specgram(channel, sampling_freq, fig, num_rows, idx, fname)
-plt.savefig('prolonged_trials.png', dpi=500)
+    set_1 = [0,1]
+    set_2 = [6,7]
+    all_spectra = np.array(all_spectra)
+    
+    left = np.mean(all_spectra[:,set_1,:,:], axis=1)
+    right = np.mean(all_spectra[:,set_2,:,:], axis=1)
+    idx = 0
+    num_rows = max(len(left), 5)
+    for spec in left:
+        idx += 1
+        draw_specgram(f, spec, fig, num_rows, idx * 2 - 1, fname)
+    idx = 0
+    for spec in right:
+        idx += 1
+        draw_specgram(f, spec, fig, num_rows, idx * 2, fname)
+else:
+    #TODO: fix the number of columns in figure
+    num_rows = data.shape[0] * data.shape[-1]
+    idx = 0
+    for block in data:
+        for channel in block.T:
+            idx += 1
+            t,f,d = get_spectral_content(channel, fs_Hz)
+            draw_specgram(f, d, fig, num_rows, idx, fname)
 
 '''
 for idx, fname in enumerate(filenames):
