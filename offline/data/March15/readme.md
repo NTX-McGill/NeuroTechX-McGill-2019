@@ -4,7 +4,7 @@ room: back office (potential interference: computer, printer)
 
 __SESSION 1__
 
-test subject: roland
+test subject: 007
 
 *10/20 MEASUREMENTS*
 - nasion-inion: 38.5 cm
@@ -26,7 +26,7 @@ test subject: roland
 
 __SESSION 2__
 
-test subject: kate
+test subject: 008
 notes: wearing glasses
 
 *10/20 MEASUREMENTS*

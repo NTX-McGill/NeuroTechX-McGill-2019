@@ -49,12 +49,13 @@ np.nan_to_num(rest_specgram, copy=False)
 
 # 1 is left, 0 is rest
 y = np.asarray([1 if i < left_specgram.shape[0] else 0 for i in range(left_specgram.shape[0]*2)])
-print(y[755], y[757]), #A little sanity check
+print(y[left_specgram.shape[0]-1], y[left_specgram.shape[0]+1]), #A little sanity check
+np.savetxt('left.csv', left_specgram[:100, 14:24], delimiter=',')
+np.savetxt('rest.csv', rest_specgram[:100, 14:24], delimiter=',')
 X = np.concatenate((left_specgram, rest_specgram), axis=0)
 np.random.shuffle(X)    # Shaking things up a lil bit
 # Some ml stuff
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2)
-
 print()
 print()
 #LDA

@@ -1,3 +1,12 @@
+<<<<<<< HEAD
+"""
+@author: viet
+"""
+import numpy as np
+
+X = np.load('feature_matrix')
+print(X.shape)
+=======
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
@@ -403,3 +412,4 @@ test4.plots()
 feats = test4.extract_features()
 
             
+>>>>>>> b31bac4ab29b602f238bd1d9512e776bb3a387f5
