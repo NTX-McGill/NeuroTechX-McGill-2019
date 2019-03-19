@@ -10,10 +10,22 @@ const fs = require('fs');
 var osc = require('node-osc');
 var oscServer = new osc.Server(12345, '127.0.0.1');
 
+
+let colormap = require('colormap');
+ 
+let colors = colormap({
+  colormap: 'viridis',
+  format: 'hex',
+  alpha: 1
+});
+counter = 0;
+counter2 = 0;
+console.log(colors);
+
 const createCSVWriter = require('csv-writer').createObjectCsvWriter;
 var csvTimeWriter, csvFFTWriters;
 
-const sendRate = 0.25; //In fraction per second
+const sendRate = .2; //In fraction per second
 const samplesPerSecond = 250;
 var samplesToSend = samplesPerSecond * sendRate;
 var toSend = [];
@@ -106,35 +118,53 @@ function setupCsvWriters(){
 var trialName=null;
 
 oscServer.on("message", function (data) {
-
     let time = getTimeValue();//Milliseconds since January 1 1970. Adjust?
     let dataWithoutFirst = [];
 
     let toWrite = {'time': time, 'data': data.slice(1), 'direction': direction};
-
-    if(mode == "production"){
-      toSend.push(toWrite);
-      if(toSend.length > samplesToSend){
-        io.sockets.emit('timeseries-prediction', {'data': toSend});
-        toSend = [];
-      }
-
-    }
-    else{
-      if (data[0] == 'fft') {
-        if (collecting) {
-          appendSample(toWrite, type="fft"); // Write to file
+    if (data[0] == 'fft'){
+      if (data[1] == 1) {
+      counter += 1;
+        if (counter % 5 == 0) {
+          io.sockets.emit('fft-test', {'data': data.slice(1)});
+          console.log(counter);
         }
-        io.sockets.emit('fft', {'time': time, 'eeg': data.slice(1)});
-        // Regardless of if we're collecting, we're always sending data to client
-        // This data is used to make the graphs
       }
-      else {
+      if (data[1] == 2) {
+        counter2 += 1;
+        if (counter2 % 5 == 0) {
+          io.sockets.emit('fft-test2', {'data': data.slice(1)});
+        }
+      }
+    }
+      else if (data[0] == '/openbci' && data.length < 10){
         if (collecting) {
           appendSample(toWrite, type="time");
         }
         io.sockets.emit('timeseries', {'time': time, 'eeg': data.slice(1)});
         //This data is used to make the graphs
+      }
+    
+    if(mode == "production"){
+      //console.log(data.slice(1).length)
+      //io.sockets.emit('timeseries-prediction', {'data': toSend});
+      toSend.push(toWrite);
+      if(toSend.length > samplesToSend){
+        if (data[1] == 1) {
+        //io.sockets.emit('timeseries-prediction', {'data': toSend});
+        toSend = [];
+        }
+      }
+
+    }
+    else{
+      if (data[0] == 'fft') {
+        /*if (collecting) {
+          appendSample(toWrite, type="fft"); // Write to file
+        }
+        io.sockets.emit('fft', {'time': time, 'eeg': data.slice(1)});*/
+        // Regardless of if we're collecting, we're always sending data to client
+        // This data is used to make the graphs
       }
     }
 
@@ -156,7 +186,9 @@ function appendSample(data, type){
     }
   }
   //When fft data is passed
+  /*
   if (type =='fft') {
+    console.log('fft');
     let fftSamplesToPush = [];
     //For each channel gets values for 1-125Hz
     for (i=0; i<8; i++) {
@@ -172,7 +204,7 @@ function appendSample(data, type){
     }
   }
 
-  else if (type == 'time') {
+  else*/ if (type == 'time') {
     let timeSampleToPush = {time: data['time'],
                     direction: data['direction'],
                     channel1: channelData[0],
@@ -218,9 +250,12 @@ function endTest(saved){
 
 //Socket IO:
 io.on('connection', function(socket){
-  console.log('A user connected');
-
+  console.log('A user connected socket');
+  socket.on("fft-test", function(data){
+    console.log(data);
+  });
   if(mode == "production"){
+    console.log('data');
     socket.on("data from ML", function(data){
       io.sockets.emit('to robotics', {'response': data['response']});
     });
