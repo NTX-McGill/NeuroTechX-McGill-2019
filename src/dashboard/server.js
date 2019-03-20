@@ -18,9 +18,10 @@ let colors = colormap({
   format: 'hex',
   alpha: 1
 });
-counter = 0;
+counter = 0;      // I use a counter for each spectrogram, there's probably a better way to do this
 counter2 = 0;
-console.log(colors);
+// I didn't know how to get the colormap on the frontend so I just logged it and copy pasted the array
+// console.log(colors);
 
 const createCSVWriter = require('csv-writer').createObjectCsvWriter;
 var csvTimeWriter, csvFFTWriters;
@@ -122,21 +123,23 @@ oscServer.on("message", function (data) {
     let dataWithoutFirst = [];
 
     let toWrite = {'time': time, 'data': data.slice(1), 'direction': direction};
+    var n = 5;       // we send the fft once for every n packets we get, can tune according to the resolution and time length you want to see
     if (data[0] == 'fft'){
-      if (data[1] == 1) {
+      if (data[1] == 1) {     // channel 1
       counter += 1;
-        if (counter % 5 == 0) {
+        if (counter % n == 0) { 
           io.sockets.emit('fft-test', {'data': data.slice(1)});
           console.log(counter);
         }
       }
-      if (data[1] == 2) {
+      if (data[1] == 2) {     // channel 2
         counter2 += 1;
-        if (counter2 % 5 == 0) {
+        if (counter2 % n == 0) {
           io.sockets.emit('fft-test2', {'data': data.slice(1)});
         }
       }
     }
+      // TODO: why is there fft in the /openbci address?
       else if (data[0] == '/openbci' && data.length < 10){
         if (collecting) {
           appendSample(toWrite, type="time");
@@ -146,14 +149,10 @@ oscServer.on("message", function (data) {
       }
     
     if(mode == "production"){
-      //console.log(data.slice(1).length)
-      //io.sockets.emit('timeseries-prediction', {'data': toSend});
       toSend.push(toWrite);
       if(toSend.length > samplesToSend){
-        if (data[1] == 1) {
-        //io.sockets.emit('timeseries-prediction', {'data': toSend});
+        io.sockets.emit('timeseries-prediction', {'data': toSend});
         toSend = [];
-        }
       }
 
     }
@@ -251,9 +250,7 @@ function endTest(saved){
 //Socket IO:
 io.on('connection', function(socket){
   console.log('A user connected socket');
-  socket.on("fft-test", function(data){
-    console.log(data);
-  });
+
   if(mode == "production"){
     console.log('data');
     socket.on("data from ML", function(data){
