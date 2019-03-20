@@ -12,7 +12,7 @@ var oscServer = new osc.Server(12345, '127.0.0.1');
 
 
 let colormap = require('colormap');
- 
+
 let colors = colormap({
   colormap: 'viridis',
   format: 'hex',
@@ -68,7 +68,6 @@ function getTimeValue() {
 /*Time csv writer*/
 /* Formatting header of time CSV */
 const timeHeader = [{id: 'time', title: 'TIME'},
-                    {id: 'direction', title: 'DIRECTION'},
                     {id: 'channel1', title: 'CHANNEL 1'},
                     {id: 'channel2', title: 'CHANNEL 2'},
                     {id: 'channel3', title: 'CHANNEL 3'},
@@ -76,13 +75,13 @@ const timeHeader = [{id: 'time', title: 'TIME'},
                     {id: 'channel5', title: 'CHANNEL 5'},
                     {id: 'channel6', title: 'CHANNEL 6'},
                     {id: 'channel7', title: 'CHANNEL 7'},
-                    {id: 'channel8', title: 'CHANNEL 8'}]
+                    {id: 'channel8', title: 'CHANNEL 8'},
+                    {id: 'direction', title: 'STATE'},]
 
 /* Setting up array for actually storing the time data where each index has
 the header data (time, channels 1-8) */
 const timeHeaderToWrite = {
                   time: 'Time',
-                  direction: 'Direction',
                   channel1: 'Channel 1',
                   channel2: 'Channel 2',
                   channel3: 'Channel 3',
@@ -90,7 +89,8 @@ const timeHeaderToWrite = {
                   channel5: 'Channel 5',
                   channel6: 'Channel 6',
                   channel7: 'Channel 7',
-                  channel8: 'Channel 8'
+                  channel8: 'Channel 8',
+                  direction: 'Direction',
                 };
 
 var timeSamples = [timeHeaderToWrite];
@@ -127,7 +127,7 @@ oscServer.on("message", function (data) {
     if (data[0] == 'fft'){
       if (data[1] == 1) {     // channel 1
       counter += 1;
-        if (counter % n == 0) { 
+        if (counter % n == 0) {
           io.sockets.emit('fft-test', {'data': data.slice(1)});
           console.log(counter);
         }
@@ -147,7 +147,7 @@ oscServer.on("message", function (data) {
         io.sockets.emit('timeseries', {'time': time, 'eeg': data.slice(1)});
         //This data is used to make the graphs
       }
-    
+
     if(mode == "production"){
       toSend.push(toWrite);
       if(toSend.length > samplesToSend){
@@ -205,7 +205,6 @@ function appendSample(data, type){
 
   else*/ if (type == 'time') {
     let timeSampleToPush = {time: data['time'],
-                    direction: data['direction'],
                     channel1: channelData[0],
                     channel2: channelData[1],
                     channel3: channelData[2],
@@ -213,7 +212,8 @@ function appendSample(data, type){
                     channel5: channelData[4],
                     channel6: channelData[5],
                     channel7: channelData[6],
-                    channel8: channelData[7]
+                    channel8: channelData[7],
+                    direction: data['direction'],
                   }
     //channelData is 1D for time
     timeSamples.push(timeSampleToPush);
