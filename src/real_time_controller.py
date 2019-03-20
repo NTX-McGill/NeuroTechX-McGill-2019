@@ -12,6 +12,7 @@ ser = serial.Serial('COM3',baudrate = 9600, timeout = 1)
 @sio.on('timeseries')
 def on_message(data):
     instruction = data['response']  # type of motion
+    print(instruction)
     try:
         ser.write(instruction.encode('utf-8')) #send instruction
     except:
