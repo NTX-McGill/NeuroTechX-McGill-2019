@@ -84,7 +84,7 @@ $(document).ready(function() {
         $('#current-command').html(direction);
         $('#collectTime').html(durationLeft);
         let j = 0;
-        let time = 0;
+        let time = 1;
         // $('#command-display').addClass('command-display-use');
 
         //Controlling the timer.

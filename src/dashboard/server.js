@@ -290,8 +290,7 @@ io.on('connection', function(socket){
     collecting = true;
 
     let j = 0;
-    let time = 0;
-    console.log(totalTime)
+    let time = 1;
     collectionTimer = setInterval(function(){
         if (time < totalTime) {
           if (time >= times[j]){
