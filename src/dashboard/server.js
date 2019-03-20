@@ -106,7 +106,7 @@ function setupCsvWriters(){
    //Formatting date as YYYY-MM-DD-hr-min-sec
 
     csvTimeWriter = createCSVWriter({
-          path: __dirname + '/data/time-test-' + trialName + '-'
+          path: __dirname + '/data/' + trialName + '-'
                           + day + '.csv',
           //File name of CSV for time test
           header: timeHeader,
@@ -117,10 +117,17 @@ function setupCsvWriters(){
 
 
 var trialName=null;
-
+var timeTesting = getTimeValue();
+var numSamples = 0;
 oscServer.on("message", function (data) {
+    numSamples++;
     let time = getTimeValue();//Milliseconds since January 1 1970. Adjust?
     let dataWithoutFirst = [];
+    if ((time - timeTesting) > 1000) {
+      timeTesting = time;
+      console.log("Sample rate: " + numSamples);
+      numSamples = 0;
+    }
 
     let toWrite = {'time': time, 'data': data.slice(1), 'direction': direction};
     var n = 5;       // we send the fft once for every n packets we get, can tune according to the resolution and time length you want to see
@@ -129,7 +136,7 @@ oscServer.on("message", function (data) {
       counter += 1;
         if (counter % n == 0) {
           io.sockets.emit('fft-test', {'data': data.slice(1)});
-          console.log(counter);
+          // console.log(counter);
         }
       }
       if (data[1] == 2) {     // channel 2
