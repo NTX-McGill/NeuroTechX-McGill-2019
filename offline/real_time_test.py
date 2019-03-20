@@ -172,15 +172,17 @@ def predict(ch, threshold, plot=False):
 
 fs_Hz = 250
 sampling_freq = 250
-window_s = 2
+window_s = 4
 shift = 0.5
 channel = (1,2)
 channel_name = 'C4'
 continuous = False
 psd = True
-Viet = True
-Marley = False
+Viet = 0
+Marley = 1
+Andy = 0
 colormap = sn.cubehelix_palette(as_cmap=True)
+tmin, tmax = 0,0
 
 left_data = []
 rest_data = []
@@ -188,7 +190,7 @@ rest_data = []
 if Viet:
     fname = 'data/March 4/5_SUCCESS_Rest_RightAndJawClench_10secs.txt' 
     #fname = 'data/March 4/6_SUCCESS_Rest_RightClench_JawClench_ImagineClench_10secs.txt' 
-    #fname = 'data/March 4/7_SUCCESS_Rest_RightClenchImagineJaw_10secs.txt'
+    fname = 'data/March 4/7_SUCCESS_Rest_RightClenchImagineJaw_10secs.txt'
     data = np.loadtxt(fname,
                       delimiter=',',
                       skiprows=7,
@@ -222,14 +224,41 @@ if Marley:
         start = int(max(start_indices[i] + tmin * sampling_freq, 0))
         end = int(min(start_indices[i+1] + tmax * sampling_freq, start_indices[-1]))
         left_data.append(data[start:end])
+if Andy:
+    fname = 'OpenBCI-RAW-2019-03-18_18-46-51.txt'
+    markers = 'time-stamp-67-2019-2-18-18-47-12.csv'
+    fname = 'data/March18/OpenBCI-RAW-2019-03-18_19-35-36.txt'
+    markers = 'data/March18/time-stamp-68-2019-2-18-19-36-0.csv'
+    df = pd.read_csv(markers)
+    start = df['START TIME'].iloc[0]
+    end = df['START TIME'].iloc[-1] + 60000
+    channel = (1,2,13)
+    data = np.loadtxt(fname,
+                      delimiter=',',
+                      skiprows=7,
+                      usecols=channel)
+    eeg = data[:,:-1]
+    timestamps = data[:,-1]
+    indices = np.where(np.logical_and(timestamps>=start, timestamps<=end))
+    a = eeg[indices]
+    rest_indices = [i * 10 * fs_Hz for i in range(7)]
+    left_indices = [(i+6) * 10 * fs_Hz for i in range(7)]
+    start_indices = rest_indices
+    for i in range(len(start_indices) - 1):
+        start = int(max(start_indices[i] + tmin * sampling_freq, 0))
+        end = int(min(start_indices[i+1] + tmax * sampling_freq, start_indices[-1]))
+        rest_data.append(data[start:end])
+    start_indices = left_indices
+    for i in range(len(start_indices) - 1):
+        start = int(max(start_indices[i] + tmin * sampling_freq, 0))
+        end = int(min(start_indices[i+1] + tmax * sampling_freq, start_indices[-1]))
+        left_data.append(data[start:end])
 
 
-
-fig1.clf()
-fig2.clf()
 fig1 = plt.figure("psd")
 fig2 = plt.figure("cm", figsize=(10,10))
-
+fig1.clf()
+fig2.clf()
 for thresh in range (6):
     threshold = 0.8 + 0.2 * thresh
     left = []
@@ -255,7 +284,8 @@ for thresh in range (6):
     left_false = 1 - left_true
     rest_false = sum(rest)/len(rest)
     rest_true = 1 - rest_false
-    overall = (sum(left) + sum(rest))/len(left+rest)
+    overall = (sum(left) + len(rest) - sum(rest))/len(left+rest)
+    print(overall)
     
     plt.figure("cm")
     array = [[left_true,left_false],
@@ -266,6 +296,7 @@ for thresh in range (6):
     sn.heatmap(df_cm, cmap =colormap,annot=True)
     plt.title("Threshold: " + "{:1.1f}".format(threshold))
     plt.subplots_adjust(hspace=0.3)
+plt.show()
     
 """
 m = [[left_true,left_false],
