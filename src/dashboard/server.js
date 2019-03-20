@@ -291,6 +291,7 @@ io.on('connection', function(socket){
 
     let j = 0;
     let time = 0;
+    console.log(totalTime)
     collectionTimer = setInterval(function(){
         if (time < totalTime) {
           if (time >= times[j]){
