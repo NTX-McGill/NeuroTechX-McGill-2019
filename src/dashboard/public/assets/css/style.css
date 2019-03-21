@@ -38,6 +38,11 @@ canvas {
   display: block;
 }
 
+/* For the alerts */
+.sps-alert-inactive {
+  display: none;
+}
+
 /* Switch Navigation */
 #tab-content > div {
   display: none;
@@ -555,4 +560,3 @@ div.smoothie-chart-tooltip {
   font-size: 10px;
   pointer-events: none;
 }
-        

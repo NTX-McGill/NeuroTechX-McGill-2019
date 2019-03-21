@@ -10,10 +10,22 @@ const fs = require('fs');
 var osc = require('node-osc');
 var oscServer = new osc.Server(12345, '127.0.0.1');
 
+let colormap = require('colormap');
+
+let colors = colormap({
+  colormap: 'viridis',
+  format: 'hex',
+  alpha: 1
+});
+counter = 0;      // I use a counter for each spectrogram, there's probably a better way to do this
+counter2 = 0;
+// I didn't know how to get the colormap on the frontend so I just logged it and copy pasted the array
+// console.log(colors);
+
 const createCSVWriter = require('csv-writer').createObjectCsvWriter;
 var csvTimeWriter, csvFFTWriters;
 
-const sendRate = 0.25; //In fraction per second
+const sendRate = .2; //In fraction per second
 const samplesPerSecond = 250;
 var samplesToSend = samplesPerSecond * sendRate;
 var toSend = [];
@@ -26,6 +38,7 @@ var duration = 0;
 var direction = "none";
 var active = [];
 var collectionTimer=null;
+const expectedSampleRate = 250; // samples per second
 
 /*EXPRESS*/
 // Sets static directory as public
@@ -55,7 +68,6 @@ function getTimeValue() {
 /*Time csv writer*/
 /* Formatting header of time CSV */
 const timeHeader = [{id: 'time', title: 'TIME'},
-                    {id: 'direction', title: 'DIRECTION'},
                     {id: 'channel1', title: 'CHANNEL 1'},
                     {id: 'channel2', title: 'CHANNEL 2'},
                     {id: 'channel3', title: 'CHANNEL 3'},
@@ -63,13 +75,13 @@ const timeHeader = [{id: 'time', title: 'TIME'},
                     {id: 'channel5', title: 'CHANNEL 5'},
                     {id: 'channel6', title: 'CHANNEL 6'},
                     {id: 'channel7', title: 'CHANNEL 7'},
-                    {id: 'channel8', title: 'CHANNEL 8'}]
+                    {id: 'channel8', title: 'CHANNEL 8'},
+                    {id: 'direction', title: 'STATE'},]
 
 /* Setting up array for actually storing the time data where each index has
 the header data (time, channels 1-8) */
 const timeHeaderToWrite = {
                   time: 'Time',
-                  direction: 'Direction',
                   channel1: 'Channel 1',
                   channel2: 'Channel 2',
                   channel3: 'Channel 3',
@@ -77,7 +89,8 @@ const timeHeaderToWrite = {
                   channel5: 'Channel 5',
                   channel6: 'Channel 6',
                   channel7: 'Channel 7',
-                  channel8: 'Channel 8'
+                  channel8: 'Channel 8',
+                  direction: 'Direction',
                 };
 
 var timeSamples = [timeHeaderToWrite];
@@ -93,7 +106,7 @@ function setupCsvWriters(){
    //Formatting date as YYYY-MM-DD-hr-min-sec
 
     csvTimeWriter = createCSVWriter({
-          path: __dirname + '/data/time-test-' + trialName + '-'
+          path: __dirname + '/data/' + trialName + '-'
                           + day + '.csv',
           //File name of CSV for time test
           header: timeHeader,
@@ -104,13 +117,49 @@ function setupCsvWriters(){
 
 
 var trialName=null;
-
+var timeTesting = getTimeValue();
+var numSamples = 0;
 oscServer.on("message", function (data) {
-
     let time = getTimeValue();//Milliseconds since January 1 1970. Adjust?
     let dataWithoutFirst = [];
 
     let toWrite = {'time': time, 'data': data.slice(1), 'direction': direction};
+    var n = 5;       // we send the fft once for every n packets we get, can tune according to the resolution and time length you want to see
+    if (data[0] == 'fft'){
+      if (data[1] == 1) {     // channel 1
+      counter += 1;
+        if (counter % n == 0) {
+          io.sockets.emit('fft-test', {'data': data.slice(1)});
+          // console.log(counter);
+        }
+      }
+      if (data[1] == 8) {     // channel 2
+        counter2 += 1;
+        if (counter2 % n == 0) {
+          io.sockets.emit('fft-test2', {'data': data.slice(1)});
+        }
+      }
+    }
+      // TODO: why is there fft in the /openbci address?
+      else if (data[0] == '/openbci' && data.length < 10){
+        if (collecting) {
+          appendSample(toWrite, type="time");
+        }
+        io.sockets.emit('timeseries', {'time': time, 'eeg': data.slice(1)});
+        //This data is used to make the graphs
+
+        numSamples++;
+        if ((time - timeTesting) > 1000) { // check every second
+          if (numSamples < expectedSampleRate*0.9 || // check for ± 10%
+              numSamples > expectedSampleRate*1.1) {
+                io.sockets.emit('sample rate high', {'sample rate': numSamples});
+                console.log("-------- IRREGULAR SAMPLE RATE --------\n")
+              }
+          timeTesting = time;
+          console.log("Sample rate: " + numSamples);
+          numSamples = 0;
+        }
+      }
 
     if(mode == "production"){
       toSend.push(toWrite);
@@ -120,25 +169,6 @@ oscServer.on("message", function (data) {
       }
 
     }
-    else{
-      if (data[0] == 'fft') {
-        if (collecting) {
-          appendSample(toWrite, type="fft"); // Write to file
-        }
-        io.sockets.emit('fft', {'time': time, 'eeg': data.slice(1)});
-        // Regardless of if we're collecting, we're always sending data to client
-        // This data is used to make the graphs
-      }
-      else {
-        if (collecting) {
-          appendSample(toWrite, type="time");
-        }
-        io.sockets.emit('timeseries', {'time': time, 'eeg': data.slice(1)});
-        //This data is used to make the graphs
-      }
-    }
-
-      // console.log(data);
 });
 
 /* When we're collecting data (collecing = True), this function is run for every
@@ -155,26 +185,9 @@ function appendSample(data, type){
       channelData[i] = null;
     }
   }
-  //When fft data is passed
-  if (type =='fft') {
-    let fftSamplesToPush = [];
-    //For each channel gets values for 1-125Hz
-    for (i=0; i<8; i++) {
-      fftSamplesToPush.push({time: data['time']});
-      for (j=0; j<125; j++) {
-         fftSamplesToPush[i]['f' + (j+1)] = channelData[i][j];
-         //channelData is 2D for fft
-      }
-    }
-    for (i=0; i<8; i++) {
-      fftSamples[i].push(fftSamplesToPush[i]);
-      //Pushing 8 125 value arrays to global fftSamples variable
-    }
-  }
 
-  else if (type == 'time') {
+  if (type == 'time') {
     let timeSampleToPush = {time: data['time'],
-                    direction: data['direction'],
                     channel1: channelData[0],
                     channel2: channelData[1],
                     channel3: channelData[2],
@@ -182,7 +195,8 @@ function appendSample(data, type){
                     channel5: channelData[4],
                     channel6: channelData[5],
                     channel7: channelData[6],
-                    channel8: channelData[7]
+                    channel8: channelData[7],
+                    direction: data['direction'],
                   }
     //channelData is 1D for time
     timeSamples.push(timeSampleToPush);
@@ -218,9 +232,10 @@ function endTest(saved){
 
 //Socket IO:
 io.on('connection', function(socket){
-  console.log('A user connected');
+  console.log('A user connected socket');
 
   if(mode == "production"){
+    console.log('data');
     socket.on("data from ML", function(data){
       io.sockets.emit('to robotics', {'response': data['response']});
     });
@@ -258,7 +273,7 @@ io.on('connection', function(socket){
     collecting = true;
 
     let j = 0;
-    let time = 0;
+    let time = 1;
     collectionTimer = setInterval(function(){
         if (time < totalTime) {
           if (time >= times[j]){
