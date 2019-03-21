@@ -6,8 +6,7 @@ from sklearn.metrics import classification_report, confusion_matrix , accuracy_s
 from keras.models import Sequential
 from keras.layers import Dense
 from keras.wrappers.scikit_learn import KerasClassifier
-from sklearn.model_selection import cross_val_score
-from sklearn.model_selection import StratifiedKFold
+from sklearn.model_selection import train_test_split
 import tensorflow as tf
 tf.logging.set_verbosity(tf.logging.ERROR)
 import warnings
@@ -104,13 +103,12 @@ def get_temporal_power_features(fname, window_len):
     return np.concatenate((rest_windows, left_windows)), labels
 
 
-def run_random_forest(X_data, y_data):
+def run_random_forest(X_train, X_test, y_train, y_test):
+    print("===================================================================================")
     print("Running RandomForest classifier...")
     clf = RandomForestClassifier()
-    kfold = StratifiedKFold(n_splits=5, shuffle=True, random_state=39)
-    results = cross_val_score(clf, X_data, y_data, cv=kfold)
-    print("RandomForest - Results: %.2f%% (%.2f%%)" % (results.mean()*100, results.std()*100))
-
+    clf.fit(X_train, y_train)
+    print_results(clf, X_test, y_test)
 
 def get_nn_model():
     model = Sequential()
@@ -119,17 +117,16 @@ def get_nn_model():
     model.add(Dense(30, kernel_initializer='normal', activation='relu'))
     model.add(Dense(10, kernel_initializer='normal', activation='relu'))
     model.add(Dense(1, kernel_initializer='normal', activation='sigmoid'))
-    # Compile model
+
     model.compile(loss='binary_crossentropy', optimizer='adam', metrics=['accuracy'])
     return model
 
-def run_nn(X_data, y_data):
+def run_nn(X_train, X_test, y_train, y_test):
+    print("===================================================================================")
     print("Running Neural Network classifier...")
     estimator = KerasClassifier(build_fn=get_nn_model, epochs=10, batch_size=32, verbose=0)
-    kfold = StratifiedKFold(n_splits=5, shuffle=True, random_state=39)
-    results = cross_val_score(estimator, X_data, y_data, cv=kfold)
-    print("Neural Network - Results: %.2f%% (%.2f%%)" % (results.mean()*100, results.std()*100))
-
+    estimator.fit(X_train, y_train)
+    print_results(estimator, X_test, y_test)
 
 def print_results(clf, X_test, y_test):
     y_pred = clf.predict(X_test)
@@ -145,6 +142,8 @@ fname2 = '../data/March 4/7_SUCCESS_Rest_RightClenchImagineJaw_10secs.txt'
 window_len = 10
 
 X_data, y_data = get_temporal_power_features(fname, window_len)
+X_train, X_test, y_train, y_test = train_test_split(X_data, y_data, test_size=0.2, random_state=42)
 
-run_random_forest(X_data, y_data)
-run_nn(X_data, y_data)
+run_random_forest(X_train, X_test, y_train, y_test)
+run_nn(X_train, X_test, y_train, y_test)
+
