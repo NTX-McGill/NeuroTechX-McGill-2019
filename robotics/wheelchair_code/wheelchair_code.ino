@@ -67,9 +67,9 @@ void right(int sensorValue){
 //Written for NeuroTech
 //Declare the global var
 byte state = 'S';
-float timeout = 250; //number of milliseconds for speeding up. 
-int maxMotorSpeed = 200;//OUT O 256
-int lMotorSpeed = 0,rMotorSpeed = 0;
+float timeout = 250; //number of milliseconds for ramping up. 
+signed int maxMotorSpeed = 200;//OUT O 256
+signed int lMotorSpeed = 0,rMotorSpeed = 0;
 
 
 
@@ -87,9 +87,10 @@ void loop() {
     //====================================================
     //SMOOTH ACCELERATION OF MOTORS
     //====================================================
-    int start= millis();
-    int lPrevSpeed = lMotorSpeed;
-    int rPrevSpeed = rMotorSpeed;
+    unsigned long start= millis();
+    signed long deltaT = 0;
+    signed int lPrevSpeed = lMotorSpeed;
+    signed int rPrevSpeed = rMotorSpeed;
     switch(state)
     {
       
@@ -97,56 +98,61 @@ void loop() {
     case('F'):
       do
       {
-        float deltaT = millis() - start;
-        rMotorSpeed = min(maxMotorSpeed, int(deltaT/timeout * maxMotorSpeed + rPrevSpeed));
-        lMotorSpeed = min(maxMotorSpeed, int(deltaT/timeout * maxMotorSpeed + lPrevSpeed));
+        deltaT = millis() - start;
+        rMotorSpeed = min(maxMotorSpeed, (deltaT/timeout * maxMotorSpeed + rPrevSpeed));
+        lMotorSpeed = min(maxMotorSpeed, (deltaT/timeout * maxMotorSpeed + lPrevSpeed));
       }
-      while(lMotorSpeed != maxMotorSpeed || rMotorSpeed != maxMotorSpeed);
+      while((lMotorSpeed != maxMotorSpeed || rMotorSpeed != maxMotorSpeed) && deltaT <= timeout);
       break;
       
     //CASE 2: STOP
     case('S'):
       do
       {
-        float deltaT = millis() - start;
+        deltaT = millis() - start;
         //rightspeed update
-        if(rPrevSpeed <0)                    rMotorSpeed = max(0, int(deltaT/timeout * maxMotorSpeed + rPrevSpeed));
-        else if (rPrevSpeed >0)              rMotorSpeed = min(0, int(-1*deltaT/timeout * maxMotorSpeed + rPrevSpeed));
+        if(rPrevSpeed <0)                    rMotorSpeed = min(0, int(deltaT/timeout * maxMotorSpeed + rPrevSpeed));
+        else if (rPrevSpeed >0)              rMotorSpeed = max(0, int(-1*deltaT/timeout * maxMotorSpeed + rPrevSpeed));
         //left speed update
-        if(lPrevSpeed <0)                    lMotorSpeed = max(0, int(deltaT/timeout * maxMotorSpeed + lPrevSpeed));
-        else if (lPrevSpeed >0)              lMotorSpeed = min(0, int(-1*deltaT/timeout * maxMotorSpeed + lPrevSpeed));
+        if(lPrevSpeed <0)                    lMotorSpeed = min(0, int(deltaT/timeout * maxMotorSpeed + lPrevSpeed));
+        else if (lPrevSpeed >0)              lMotorSpeed = max(0, int(-1*deltaT/timeout * maxMotorSpeed + lPrevSpeed));
       }
-      while(lMotorSpeed != 0 || rMotorSpeed != 0);
+      while((lMotorSpeed != 0 || rMotorSpeed != 0) && deltaT <= timeout);
       break;
     //CASE 3: LEFT 
     case('R'):
       do
       {
-        float deltaT = millis() - start;
+        deltaT = millis() - start;
         
         //rightspeed update
-        if(rPrevSpeed <0)                    rMotorSpeed = max(0, int(deltaT/timeout * maxMotorSpeed + rPrevSpeed));
-        else if (rPrevSpeed >0)              rMotorSpeed = min(0, int(-1*deltaT/timeout * maxMotorSpeed + rPrevSpeed));
+        if(rPrevSpeed <0)                    rMotorSpeed = min(0, int(deltaT/timeout * maxMotorSpeed + rPrevSpeed));
+        else if (rPrevSpeed >0)              rMotorSpeed = max(0, int(-1*deltaT/timeout * maxMotorSpeed + rPrevSpeed));
         //left speed update
         lMotorSpeed = min(maxMotorSpeed, int(deltaT/timeout * maxMotorSpeed + lPrevSpeed));
-        
       }
-      while(lMotorSpeed != maxMotorSpeed || rMotorSpeed != 0);
+      while((lMotorSpeed != maxMotorSpeed || rMotorSpeed != 0) && deltaT <= timeout);
       break;
     //CASE 4: RIGHT
     case('L'):
       do
       {
-        float deltaT = millis() - start;
+        deltaT = millis() - start;
         
         //rightspeed update
         rMotorSpeed = min(maxMotorSpeed, int(deltaT/timeout * maxMotorSpeed + rPrevSpeed));
         
         //left speed update
-        if(lPrevSpeed <0)                    lMotorSpeed = max(0, int(deltaT/timeout * maxMotorSpeed + lPrevSpeed));
-        else if (lPrevSpeed >0)              lMotorSpeed = min(0, int(-1*deltaT/timeout * maxMotorSpeed + lPrevSpeed));
+        if(lPrevSpeed <0)                    lMotorSpeed = min(0, int(deltaT/timeout * maxMotorSpeed + lPrevSpeed));
+        else if (lPrevSpeed >0)              lMotorSpeed = max(0, int(-1*deltaT/timeout * maxMotorSpeed + lPrevSpeed));
       }
-      while(lMotorSpeed != 0 || rMotorSpeed != maxMotorSpeed);
+      while((lMotorSpeed != 0 || rMotorSpeed != maxMotorSpeed)&& deltaT <= timeout);
+      break;
+
+    //CASE 5: DEBUG
+    case('D'):
+      Serial.write(rMotorSpeed);
+      Serial.write(lMotorSpeed);
       break;
     }
     right(rMotorSpeed);
