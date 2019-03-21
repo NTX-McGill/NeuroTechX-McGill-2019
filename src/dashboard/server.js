@@ -152,10 +152,10 @@ oscServer.on("message", function (data) {
         if ((time - timeTesting) > 1000) { // check every second
           if (numSamples < expectedSampleRate*0.9 || // check for ± 10%
               numSamples > expectedSampleRate*1.1) {
-                io.sockets.emit('sample rate high', {'sample rate': numSamples})
+                io.sockets.emit('sample rate high', {'sample rate': numSamples});
+                console.log("Sample rate: " + numSamples);
               }
           timeTesting = time;
-          console.log("Sample rate: " + numSamples);
           numSamples = 0;
         }
       }
