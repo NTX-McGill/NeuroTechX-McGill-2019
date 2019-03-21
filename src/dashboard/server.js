@@ -153,9 +153,10 @@ oscServer.on("message", function (data) {
           if (numSamples < expectedSampleRate*0.9 || // check for ± 10%
               numSamples > expectedSampleRate*1.1) {
                 io.sockets.emit('sample rate high', {'sample rate': numSamples});
-                console.log("Sample rate: " + numSamples);
+                console.log("-------- IRREGULAR SAMPLE RATE --------\n")
               }
           timeTesting = time;
+          console.log("Sample rate: " + numSamples);
           numSamples = 0;
         }
       }
