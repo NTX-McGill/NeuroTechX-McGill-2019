@@ -1,4 +1,4 @@
-March  20th recordigns
+March  20th recordings
 
 room: green room
 
@@ -19,6 +19,9 @@ test subject: 010
 
 *10/20 MEASUREMENTS*
 file didn't save on my phone :'-)
+
+*ELECTRODES*
+C1 to C4 only (usual placement)
 
 *PARADIGM*
 I don't know -- Marley?
