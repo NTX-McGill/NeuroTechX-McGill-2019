@@ -30,6 +30,17 @@
 
   <script>
     var socket = io();
+
+    socket.on('sample rate high', function (data) {
+      console.log(data['sample rate']);
+      $('#sps-alert').removeClass('sps-alert-inactive');
+      $('#sps').html(data['sample rate']);
+
+    });
+
+    $('#btn-collect').on('click', function(){
+      $('#sps-alert').addClass('sps-alert-inactive');
+    });
   </script>
 </head>
 <body>
@@ -83,6 +94,9 @@
         <div class="is-active" data-content='1'>
                 <!-- "container-queue" is for left half of dashboard that holds queue information -->
                 <div class="container-queue">
+                  <!-- <div class="alert alert-danger sps-alert-inactive" id="sps-alert" role="alert">
+                    Irregular sample rate (<span id="sps">150</span> samples per second)
+                  </div> -->
                     <!--"header" class name is used for Queue and Display headers -->
                         <!-- commandBank is contains the queue of commands -->
                         <div class="left" id="commandBank">
@@ -205,7 +219,7 @@
 
 </section>
 <script>
-  
+
   var left = document.getElementById('commandList');
 
   new Sortable(left, {

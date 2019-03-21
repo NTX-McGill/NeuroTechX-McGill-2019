@@ -10,7 +10,6 @@ const fs = require('fs');
 var osc = require('node-osc');
 var oscServer = new osc.Server(12345, '127.0.0.1');
 
-
 let colormap = require('colormap');
 
 let colors = colormap({
@@ -39,6 +38,7 @@ var duration = 0;
 var direction = "none";
 var active = [];
 var collectionTimer=null;
+const expectedSampleRate = 250; // samples per second
 
 /*EXPRESS*/
 // Sets static directory as public
@@ -120,14 +120,8 @@ var trialName=null;
 var timeTesting = getTimeValue();
 var numSamples = 0;
 oscServer.on("message", function (data) {
-    numSamples++;
     let time = getTimeValue();//Milliseconds since January 1 1970. Adjust?
     let dataWithoutFirst = [];
-    if ((time - timeTesting) > 1000) {
-      timeTesting = time;
-      console.log("Sample rate: " + numSamples);
-      numSamples = 0;
-    }
 
     let toWrite = {'time': time, 'data': data.slice(1), 'direction': direction};
     var n = 5;       // we send the fft once for every n packets we get, can tune according to the resolution and time length you want to see
@@ -153,6 +147,17 @@ oscServer.on("message", function (data) {
         }
         io.sockets.emit('timeseries', {'time': time, 'eeg': data.slice(1)});
         //This data is used to make the graphs
+
+        numSamples++;
+        if ((time - timeTesting) > 1000) { // check every second
+          if (numSamples < expectedSampleRate*0.9 || // check for ± 10%
+              numSamples > expectedSampleRate*1.1) {
+                io.sockets.emit('sample rate high', {'sample rate': numSamples})
+              }
+          timeTesting = time;
+          console.log("Sample rate: " + numSamples);
+          numSamples = 0;
+        }
       }
 
     if(mode == "production"){
@@ -163,18 +168,6 @@ oscServer.on("message", function (data) {
       }
 
     }
-    else{
-      if (data[0] == 'fft') {
-        /*if (collecting) {
-          appendSample(toWrite, type="fft"); // Write to file
-        }
-        io.sockets.emit('fft', {'time': time, 'eeg': data.slice(1)});*/
-        // Regardless of if we're collecting, we're always sending data to client
-        // This data is used to make the graphs
-      }
-    }
-
-      // console.log(data);
 });
 
 /* When we're collecting data (collecing = True), this function is run for every
@@ -191,26 +184,8 @@ function appendSample(data, type){
       channelData[i] = null;
     }
   }
-  //When fft data is passed
-  /*
-  if (type =='fft') {
-    console.log('fft');
-    let fftSamplesToPush = [];
-    //For each channel gets values for 1-125Hz
-    for (i=0; i<8; i++) {
-      fftSamplesToPush.push({time: data['time']});
-      for (j=0; j<125; j++) {
-         fftSamplesToPush[i]['f' + (j+1)] = channelData[i][j];
-         //channelData is 2D for fft
-      }
-    }
-    for (i=0; i<8; i++) {
-      fftSamples[i].push(fftSamplesToPush[i]);
-      //Pushing 8 125 value arrays to global fftSamples variable
-    }
-  }
 
-  else*/ if (type == 'time') {
+  if (type == 'time') {
     let timeSampleToPush = {time: data['time'],
                     channel1: channelData[0],
                     channel2: channelData[1],
