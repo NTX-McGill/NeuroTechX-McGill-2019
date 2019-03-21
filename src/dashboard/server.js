@@ -133,7 +133,7 @@ oscServer.on("message", function (data) {
           // console.log(counter);
         }
       }
-      if (data[1] == 2) {     // channel 2
+      if (data[1] == 8) {     // channel 2
         counter2 += 1;
         if (counter2 % n == 0) {
           io.sockets.emit('fft-test2', {'data': data.slice(1)});
