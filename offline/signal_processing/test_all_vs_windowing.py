@@ -119,18 +119,35 @@ class Test_Filtering():
                                                       self.raw_eeg_data)
        
        self.corrected_epoched_eeg_data = []
+       self.corrected_epoched_eeg_data_psd =[]
+       
        for raw in self.raw_eeg_data.T:  
            epoched = self.epoch_data(raw,mode="1",window_length = 2,overlap=0)
            epoch_filtered = []
+           epoch_filtered_psd = np.zeros(251)
            
            for epoch in epoched:
-                epoch_filtered.extend(lfilter(b_bandpass, a_bandpass ,epoch))
+               filtered = lfilter(b_bandpass, a_bandpass ,epoch)
+               epoch_filtered.extend(filtered[1::])
+  
+               psd,_ = mlab.psd(np.squeeze(filtered),
+                           NFFT=500,
+                           Fs=250)
+
+               if len(filtered) == 500:
+                   epoch_filtered_psd= np.vstack((epoch_filtered_psd,psd))
            
         
            self.corrected_epoched_eeg_data.append(epoch_filtered)
+  
+           epoch_filtered_psd = np.delete(epoch_filtered_psd, (0), axis=0)
+           epoch_filtered_psd_mean = np.mean(epoch_filtered_psd, axis=0)
+           self.corrected_epoched_eeg_data_psd.append(epoch_filtered_psd_mean)
            
   
        self.corrected_eeg_data = self.corrected_epoched_eeg_data 
+
+           
            
                 
 
@@ -145,23 +162,39 @@ class Test_Filtering():
         """
 
         fig, axs = plt.subplots(8,2)
-        axs = axs.ravel()
+        fig2, axs2 = plt.subplots(8,2)
+        axs,axs2 = axs.ravel(),axs2.ravel()
         
-        print(len(axs))
 
         t_sec = np.array(range(0, self.raw_eeg_data[:,0].size)) / self.sample_rate
         i = 0
         for idx, channel in enumerate(range(num_channels)):  
             #fig.suptitle(self.name_channel[channel])   
 
-            axs[i].plot(self.bp_filtered_eeg_data[1::,channel])
+            axs[i].plot(self.bp_filtered_eeg_data[1:,channel])
             axs[i].set_title(str(self.name_channel[channel])+'_All')
+            
+            psd,freqs = mlab.psd(np.squeeze(self.bp_filtered_eeg_data[1:,channel]),
+                           NFFT=500,
+                           Fs=250)
+            
+            axs2[i].plot(freqs,psd)
+            axs2[i].set_title(str(self.name_channel[channel])+'_All')
+            axs2[i].set_ylim(0,0.01)
 
             
             i = i + 1
 
-            axs[i].plot(self.corrected_eeg_data[channel][1:])
+            axs[i].plot(self.corrected_eeg_data[channel][::])
             axs[i].set_title(str(self.name_channel[channel])+'_Epoched')
+            
+            self.psd2,self.freqs2 = mlab.psd(np.squeeze(self.corrected_eeg_data[channel][::]),
+                           NFFT=500,
+                           Fs=250)
+            
+            axs2[i].plot(self.freqs2,self.corrected_epoched_eeg_data_psd[channel])
+            axs2[i].set_title(str(self.name_channel[channel])+'_Epoched')
+            axs2[i].set_ylim(0,0.01)
 
             
             i = i + 1
@@ -169,7 +202,7 @@ class Test_Filtering():
         
         plt.show()              
                 
-            
+plt.close('all')            
 path='/Users/jenisha/Desktop/NeuroTechX-McGill-2019/offline/data/March_11/'
 fname= path +  '1_JawRest_JawRightClench_10s.txt'
 
