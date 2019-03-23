@@ -1,5 +1,8 @@
 March 22nd recordings - session 2
 
+__Access text files:___
+https://mcgill-my.sharepoint.com/:f:/g/personal/danielle_nadin_mail_mcgill_ca/EvnX8dl35lVKuNKu-TTFmscB2fjG2gwjXmbmIY8LlXmebg?e=IVfHXa
+
 room: blue room
 
 test subject: 001
@@ -32,4 +35,6 @@ test subject: 001
 6 - 25 rest, 15 left, 15 right x 4 (actual clenching)
 
 7 - 25 rest, 20 left, 20 right x 5 (MI)
+
+
 
