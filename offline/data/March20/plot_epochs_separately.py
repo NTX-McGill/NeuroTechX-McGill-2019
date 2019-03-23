@@ -60,15 +60,12 @@ shift = 0.1
 channel = (1,2,3,4,5,6,7,8,13)
 fs_Hz = 250
 #fname = 'time-test-JingMingImagined10s-2019-3-20-10-12-1.csv'
-csv = "time-test-JingMingImaginedREALLYGOOD-2019-3-20-10-21-44.csv"
+
 csv = "time-test-JingMingActual_10s-2019-3-20-10-51-28.csv"
 csv = "time-test-JingMingActual-2019-3-20-9-54-59.csv"
 csv = "time-test-JingMingActual-2019-3-20-10-5-15.csv"
-#fname = '3_restleftright_10s_OpenBCI-RAW-2019-03-15_18-46-11.txt'
-#markers = '3_restleftright_10s_time-stamp-65-2019-2-15-18-52-10.csv'
-#fname = 'Marley_prolonged_trial.txt'
-#fname = 'OpenBCI-RAW-2019-03-11_17-21-55.txt'
-#fname = '../March 4/5_SUCCESS_Rest_RightAndJawClench_10secs.txt'
+csv = "time-test-JingMingImagined10s-2019-3-20-10-12-1.csv"
+#csv = "time-test-JingMingImaginedREALLYGOOD-2019-3-20-10-21-44.csv"
 df = pd.read_csv(csv)
 
 fname = 'OpenBCI-RAW-2019-03-20_10-04-29.txt'
@@ -125,7 +122,7 @@ for direction, data in all_data.items():
             all_spectra.append(d)
         all_spectra = np.array(all_spectra)
         left.append(np.mean(all_spectra[set_1], axis=0))
-        right.append(np.mean(all_spectra[set_1], axis=0))
+        right.append(np.mean(all_spectra[set_2], axis=0))
     idx = 0
     num_rows = max(len(left), 5)
     for spec in left:
