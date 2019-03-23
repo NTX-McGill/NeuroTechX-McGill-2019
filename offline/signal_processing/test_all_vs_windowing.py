@@ -23,7 +23,7 @@ from scipy.signal import butter, ellip, cheby1, cheby2, lfilter, freqs,iirfilter
 import numpy.fft as fft
 
 
-class Kiral_Korek_Preprocessing():
+class Test_Filtering():
     def __init__(self, path, name_channels=["C3", "C1", "Cp3", "Cp1", "Cp2", "Cp4", "C2", "C4"]):
         self.path = path
         self.sample_rate = 250 #Default sampling rate for OpenBCI
@@ -37,8 +37,6 @@ class Kiral_Korek_Preprocessing():
 
         Input:
             list_channel: lists of channels to use
-            2 s interval to take data from [included, not included]
-
         
         """
         self.number_channels = len(list_channels)
@@ -48,7 +46,7 @@ class Kiral_Korek_Preprocessing():
         self.raw_eeg_data = np.loadtxt(self.path, 
                                        delimiter=',',
                                        skiprows=7,
-                                       usecols=list_channels)[interval[0]:interval[1],::]
+                                       usecols=list_channels)
 
         #expand the dimmension if only one channel             
         if self.number_channels == 1:
@@ -131,13 +129,8 @@ class Kiral_Korek_Preprocessing():
         
            self.corrected_epoched_eeg_data.append(epoch_filtered)
            
-#           
-#       self.corrected_eeg_data = []
-#       for channel in self.corrected_epoched_eeg_data:
-#            de_epoched = [i for epoch in channel for i in epoch]
-#            self.corrected_eeg_data.append(de_epoched)
   
-       self.corrected_eeg_data = self.corrected_epoched_eeg_data #np.array(self.corrected_eeg_data).transpose()
+       self.corrected_eeg_data = self.corrected_epoched_eeg_data 
            
                 
 
@@ -180,7 +173,7 @@ class Kiral_Korek_Preprocessing():
 path='/Users/jenisha/Desktop/NeuroTechX-McGill-2019/offline/data/March_11/'
 fname= path +  '1_JawRest_JawRightClench_10s.txt'
 
-test4 = Kiral_Korek_Preprocessing(fname)
+test4 = Test_Filtering(fname)
 test4.load_data_BCI()
 test4.initial_preprocessing(bp_lowcut =5, bp_highcut =20, bp_order=2)
 test4.plots()  
