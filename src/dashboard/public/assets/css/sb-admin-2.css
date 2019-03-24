@@ -862,7 +862,7 @@ pre code {
   margin-left: 91.66667%;
 }
 
-@media (min-width: 576px) {
+/* @media (min-width: 576px) {
   .col-sm {
     -ms-flex-preferred-size: 0;
     flex-basis: 0;
@@ -1061,9 +1061,9 @@ pre code {
   .offset-sm-11 {
     margin-left: 91.66667%;
   }
-}
+} */
 
-@media (min-width: 768px) {
+/* @media (min-width: 768px) {
   .col-md {
     -ms-flex-preferred-size: 0;
     flex-basis: 0;
@@ -1262,7 +1262,7 @@ pre code {
   .offset-md-11 {
     margin-left: 91.66667%;
   }
-}
+} */
 
 @media (min-width: 992px) {
   .col-lg {
@@ -2483,7 +2483,7 @@ textarea.form-control {
   width: 100%;
 }
 
-@media (min-width: 576px) {
+/* @media (min-width: 576px) {
   .form-inline label {
     display: -webkit-box;
     display: -ms-flexbox;
@@ -2578,7 +2578,7 @@ textarea.form-control {
   transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out, border-color 0.15s ease-in-out, -webkit-box-shadow 0.15s ease-in-out;
   transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out, border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
   transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out, border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out, -webkit-box-shadow 0.15s ease-in-out;
-}
+} */
 
 @media (prefers-reduced-motion: reduce) {
   .btn {
@@ -3309,7 +3309,7 @@ input[type="button"].btn-block {
   left: auto;
 }
 
-@media (min-width: 576px) {
+/* @media (min-width: 576px) {
   .dropdown-menu-sm-left {
     right: auto;
     left: 0;
@@ -3318,8 +3318,8 @@ input[type="button"].btn-block {
     right: 0;
     left: auto;
   }
-}
-
+} */
+/*
 @media (min-width: 768px) {
   .dropdown-menu-md-left {
     right: auto;
@@ -3329,7 +3329,7 @@ input[type="button"].btn-block {
     right: 0;
     left: auto;
   }
-}
+} */
 
 @media (min-width: 992px) {
   .dropdown-menu-lg-left {
@@ -4519,7 +4519,7 @@ input[type="button"].btn-block {
   background-size: 100% 100%;
 }
 
-@media (max-width: 575.98px) {
+/* @media (max-width: 575.98px) {
   .navbar-expand-sm > .container,
   .navbar-expand-sm > .container-fluid {
     padding-right: 0;
@@ -4573,7 +4573,7 @@ input[type="button"].btn-block {
     padding-right: 0;
     padding-left: 0;
   }
-}
+} */
 
 @media (min-width: 768px) {
   .navbar-expand-md {
@@ -4994,7 +4994,7 @@ input[type="button"].btn-block {
   margin-bottom: 0.75rem;
 }
 
-@media (min-width: 576px) {
+/* @media (min-width: 576px) {
   .card-deck {
     -webkit-box-orient: horizontal;
     -webkit-box-direction: normal;
@@ -5267,7 +5267,7 @@ input[type="button"].btn-block {
   transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out, border-color 0.15s ease-in-out, -webkit-box-shadow 0.15s ease-in-out;
   transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out, border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
   transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out, border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out, -webkit-box-shadow 0.15s ease-in-out;
-}
+} */
 
 @media (prefers-reduced-motion: reduce) {
   .badge {
@@ -11033,7 +11033,7 @@ a:focus {
   color: #3a3b45;
 }
 
-@media (min-width: 576px) {
+/* @media (min-width: 576px) {
   .topbar .dropdown {
     position: relative;
   }
@@ -11047,7 +11047,7 @@ a:focus {
   .topbar .dropdown-list .dropdown-item .text-truncate {
     max-width: 13.375rem;
   }
-}
+} */
 
 .topbar.navbar-light .navbar-nav .nav-item .nav-link {
   color: #d1d3e2;
@@ -11219,7 +11219,7 @@ a:focus {
   font-size: 0.65rem;
 }
 
-@media (min-width: 768px) {
+@media (min-width: 100px) {
   .sidebar {
     width: 14rem !important;
   }
