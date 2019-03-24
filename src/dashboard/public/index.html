@@ -310,7 +310,10 @@
   <!-- Spectrogram -->
   <script src="assets/js/spectrogram.js"></script>
 
-  <script>var socket = io();</script>
+  <script>
+    var socket = io();
+    socket.emit('production', {on: false});
+  </script>
   <script>
 
     var left = document.getElementById('commandList');

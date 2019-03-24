@@ -2,6 +2,8 @@ import numpy as np
 import matplotlib.mlab as mlab
 import socketio
 import pickle
+from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
+
 sio = socketio.Client()
 
 buffer_data = []
@@ -27,7 +29,14 @@ def predict(ch):
                            Fs=250)
     mu2 = np.mean(psd2[mu_indices])
 
-    return clf.predict_proba(np.array([mu1,mu2]).reshape(1,-1))
+    result = list(clf.predict_proba(np.array([mu1,mu2]).reshape(1,-1))[0])
+
+    if result[0] > 0.6:
+        return "L"
+    elif result[1] > 0.6:
+        return "R"
+    else:
+        return "F"
 
 
 @sio.on('timeseries-prediction')
@@ -43,7 +52,6 @@ def on_message(data):
         to_pop = len(buffer_data) - 500
         buffer_data = buffer_data[to_pop:]
         response = predict(buffer_data)
-    print(response)
     sio.emit('data from ML', {'response': response})
 
 

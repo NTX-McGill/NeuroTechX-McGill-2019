@@ -5,18 +5,17 @@ import socketio
 
 sio = socketio.Client()
 
-ser = serial.Serial('COM3',baudrate = 9600, timeout = 1)
+ser = serial.Serial('/dev/cu.usbmodem14201',baudrate = 9600, timeout = 1)
 
 #define the FSM states
 
-@sio.on('timeseries')
+@sio.on('to robotics')
 def on_message(data):
     instruction = data['response']  # type of motion
     try:
         ser.write(instruction.encode('utf-8')) #send instruction
     except:
         print("Not a recognized command")
-        continue
 
 
 """Need to do async stuff to allow reading while waitin"""

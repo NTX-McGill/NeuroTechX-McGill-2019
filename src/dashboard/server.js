@@ -291,9 +291,15 @@ io.on('connection', function(socket){
   //Production
   socket.on('production', function(data){
     toSend = [];
-    mode = "production";
-    console.log(mode);
+    if (data['on'] == true) {
+      mode = "production";
+      console.log(mode);
+    }
+    else {
+      mode = "training";
+      console.log(mode);
+    }
     // var process = spawn('python',["../real_time_ML.py"]);
-    console.log('spawned')
+    // console.log('spawned')
   });
 });

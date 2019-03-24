@@ -21,7 +21,7 @@ var chart = new Chart(ctx, {
       yAxes: [{
         ticks: {
           beginAtZero: true,
-          max: 5,
+          max: 3,
         }
       }]
     }
@@ -37,14 +37,14 @@ function getMu(data) {
 
 socket.on('fft-test', function (data) { // 1st channel ("left")
   // update left datapoint
-  chart.data.datasets[0].data[0] = getMu(data)
+  chart.data.datasets[0].data[1] = getMu(data)
 
   chart.update()
 });
 
 socket.on('fft-test2', function (data) { // 2nd channel ("right")
   // update right datapoint
-  chart.data.datasets[0].data[1] = getMu(data)
+  chart.data.datasets[0].data[0] = getMu(data)
 
   chart.update()
 });
