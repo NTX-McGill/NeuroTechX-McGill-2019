@@ -34,17 +34,16 @@ def predict(ch):
 def on_message(data):
     global buffer_data
     buffer_data += data['data'] # concatenate lists
-    print(len(buffer_data))
 
     if len(buffer_data) < 500:
         # lacking data
-        print(buffer_data)
         response = "F" # go forward otherwise
     else:
         # we have enough data to make a prediction
         to_pop = len(buffer_data) - 500
         buffer_data = buffer_data[to_pop:]
         response = predict(buffer_data)
+    print(response)
     sio.emit('data from ML', {'response': response})
 
 

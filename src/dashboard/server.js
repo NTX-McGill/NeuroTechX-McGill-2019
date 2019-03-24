@@ -157,9 +157,7 @@ oscServer.on("message", function (data) {
 
     if(mode == "production"){
       toSend.push(data.slice(1));
-      console.log('hi')
       if(toSend.length >= samplesToSend){
-        console.log(toSend)
         io.sockets.emit('timeseries-prediction', {'data': toSend});
         toSend = [];
       }
