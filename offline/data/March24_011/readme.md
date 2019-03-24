@@ -35,6 +35,6 @@ test subject: 011
 
 6 - 20 rest 20 left 20 right x 4 (MI) - imagined grabbing objects
 
-7 - 20 rest 3 fast eye blinking x 4 
+7 - 20 rest 3 fast eye blinking x 4 - right marker = fast eye blinking
 
 
