@@ -22,6 +22,17 @@ from sklearn.metrics import confusion_matrix
 from sklearn.utils.multiclass import unique_labels
 import seaborn as sn
 import pandas as pd
+from sklearn import model_selection
+from sklearn.metrics import classification_report
+from sklearn.metrics import confusion_matrix
+from sklearn.metrics import accuracy_score
+from sklearn.linear_model import LogisticRegression
+from sklearn.tree import DecisionTreeClassifier
+from sklearn.neighbors import KNeighborsClassifier
+from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
+from sklearn.naive_bayes import GaussianNB
+from sklearn.svm import SVC
+
 
 def plot_confusion_matrix(y_true, y_pred, classes,
                           normalize=False,
@@ -151,29 +162,34 @@ def merge_dols(dol1, dol2):
     keys = set(dol1).union(dol2)
     no = []
     return dict((k, dol1.get(k, no) + dol2.get(k, no)) for k in keys)
-def get_data(fname, csv):
-    df = pd.read_csv(csv)
-    channel = (1,2,3,4,5,6,7,8,13)
-    data = np.loadtxt(fname,
-                  delimiter=',',
-                  skiprows=7,
-                  usecols=channel)
-    eeg = data[:,:-1]
-    timestamps = data[:,-1]
-    prev = 0
-    prev_direction = df['Direction'][prev]
+def get_data(csvs):
     all_data = {'Right': [], 'Left': [], 'Rest': []}
-    for idx,el in enumerate(df['Direction']):
-        if el != prev_direction or idx == len(df.index) - 1:
-            start = df['Time'][prev]
-            end = df['Time'][idx]
-            indices = np.where(np.logical_and(timestamps>=start, timestamps<=end))
-            trial = eeg[indices]
-            all_data[prev_direction].append(trial)
-            print(idx - prev, prev_direction)
-            print(len(trial))
-            prev = idx
-            prev_direction = el
+    for csv in csvs:
+        path_c = csv.split('/')
+        fname = "/".join(path_c[:-1] + [csv_map[path_c[-1]]])
+        df = pd.read_csv(csv)
+        channel = (1,2,3,4,5,6,7,8,13)
+        data = np.loadtxt(fname,
+                      delimiter=',',
+                      skiprows=7,
+                      usecols=channel)
+        eeg = data[:,:-1]
+        timestamps = data[:,-1]
+        prev = 0
+        prev_direction = df['Direction'][prev]
+        data = {'Right': [], 'Left': [], 'Rest': []}
+        for idx,el in enumerate(df['Direction']):
+            if el != prev_direction or idx == len(df.index) - 1:
+                start = df['Time'][prev]
+                end = df['Time'][idx]
+                indices = np.where(np.logical_and(timestamps>=start, timestamps<=end))
+                trial = eeg[indices]
+                all_data[prev_direction].append(trial)
+                #print(idx - prev, prev_direction)
+                #print(len(trial))
+                prev = idx
+                prev_direction = el
+        all_data = merge_dols(all_data, data)
     return all_data
 """ BASELINE PREDICTION ALGORITHM FOR MVP """
 def predict(ch, threshold):
@@ -195,19 +211,30 @@ def predict(ch, threshold):
     return mu1, mu2, freqs, psd1, psd2
 """ END """
 
+csv_map = {"10_008-2019-3-22-15-8-55.csv": "10_008_OpenBCI-RAW-2019-03-22_15-07-58.txt",
+           "9_008-2019-3-22-14-59-0.csv": "8to9_008_OpenBCI-RAW-2019-03-22_13-49-24.txt",
+           "8_008-2019-3-22-14-45-53.csv": "8to9_008_OpenBCI-RAW-2019-03-22_13-49-24.txt",
+           "7_008-2019-3-22-14-27-46.csv": "4to7_008_OpenBCI-RAW-2019-03-22_13-49-24.txt",
+           "6_008-2019-3-22-14-19-52.csv": "4to7_008_OpenBCI-RAW-2019-03-22_13-49-24.txt",
+           "5_008-2019-3-22-14-10-26.csv": "4to7_008_OpenBCI-RAW-2019-03-22_13-49-24.txt",
+           "5-001-rest25s_left10s_right10s_MI-2019-3-22-16-35-57.csv": "1to5_001_OpenBCI-RAW-2019-03-22_15-56-26.txt",
+           "4-001-rest25s_left15s_right15s_MI-2019-3-22-16-27-44.csv": "1to5_001_OpenBCI-RAW-2019-03-22_15-56-26.txt",
+           "6-001-rest25s_left15s_right15s_MI-2019-3-22-16-46-17.csv": "6to7_001_OpenBCI-RAW-2019-03-22_16-44-46.txt",
+           "7-001-rest25s_left20s_right20s_MI-2019-3-22-16-54-17.csv": "6to7_001_OpenBCI-RAW-2019-03-22_16-44-46.txt",
+           "time-test-JingMingImagined_10s-2019-3-20-10-28-35.csv": 'OpenBCI-RAW-2019-03-20_10-04-29.txt',
+           "time-test-JingMingImagined_10s-2019-3-20-10-30-26.csv": 'OpenBCI-RAW-2019-03-20_10-04-29.txt',
+           "time-test-JingMingImagined_10s-2019-3-20-10-35-31.csv": 'OpenBCI-RAW-2019-03-20_10-04-29.txt'}
 fs_Hz = 250
 sampling_freq = 250
 window_s = 2
-shift = 0.5
+shift = 0.1
 channel = (1,2)
 channel_name = 'C4'
-continuous = False
-psd = True
 Viet = 0
 Marley = 0
 Andy = 0
 cm = 0
-plot_psd = 1
+plot_psd = 0
 colormap = sn.cubehelix_palette(as_cmap=True)
 tmin, tmax = 0,0
 
@@ -281,48 +308,27 @@ if Andy:
         end = int(min(start_indices[i+1] + tmax * sampling_freq, start_indices[-1]))
         left_data.append(data[start:end])
 else:
-    folder = "data/March22_008/"
-    csv = "9_008-2019-3-22-14-59-0.csv"
-    #csv = "8_008-2019-3-22-14-45-53.csv"
-    #csv = "7_008-2019-3-22-14-27-46.csv"
-    #csv = "6_008-2019-3-22-14-19-52.csv"
-    #csv = "5_008-2019-3-22-14-10-26.csv"
-    
-    fname = "8to9_008_OpenBCI-RAW-2019-03-22_13-49-24.txt"
-    #fname = "4to7_008_OpenBCI-RAW-2019-03-22_13-49-24.txt"
-
-    data1 = get_data(folder + fname, folder + csv)
-    
-    csv = "10_008-2019-3-22-15-8-55.csv"
-    fname = "10_008_OpenBCI-RAW-2019-03-22_15-07-58.txt"
-    data2 = get_data(folder + fname, folder + csv)
-    
-    all_data = merge_dols(data1,data2)
-    
-    folder = "data/March22_001/"
-    fname = "1to5_001_OpenBCI-RAW-2019-03-22_15-56-26.txt"
-    csv1 = "5-001-rest25s_left10s_right10s_MI-2019-3-22-16-35-57.csv"
-    csv2 = "4-001-rest25s_left15s_right15s_MI-2019-3-22-16-27-44.csv"
-    data3 = get_data(folder + fname, folder + csv1)
-    all_data = merge_dols(all_data,data3)
-    
-    #data4 = get_data(folder + fname, folder + csv2)
-    #all_data = merge_dols(all_data,data4)
-    fname = "6to7_001_OpenBCI-RAW-2019-03-22_16-44-46.txt"
-    csv = "6-001-rest25s_left15s_right15s_MI-2019-3-22-16-46-17.csv"
-    #csv = "7-001-rest25s_left20s_right20s_MI-2019-3-22-16-54-17.csv"
-    
-    folder = "data/March20/"
-    fname = 'OpenBCI-RAW-2019-03-20_10-04-29.txt'
-    csv = "time-test-JingMingImagined_10s-2019-3-20-10-28-35.csv"
-    csv = "time-test-JingMingImagined_10s-2019-3-20-10-30-26.csv"
-    csv = "time-test-JingMingImagined_10s-2019-3-20-10-35-31.csv"
-    #data4 = get_data(folder + fname, folder + csv)
-
-    all_data = data1
+    csvs = ["data/March22_008/9_008-2019-3-22-14-59-0.csv",
+           "data/March22_008/8_008-2019-3-22-14-45-53.csv",
+           "data/March22_008/7_008-2019-3-22-14-27-46.csv",
+           #"data/March22_008/6_008-2019-3-22-14-19-52.csv",
+           #"data/March22_008/5_008-2019-3-22-14-10-26.csv",
+           "data/March22_008/10_008-2019-3-22-15-8-55.csv",
+           "data/March22_001/5-001-rest25s_left10s_right10s_MI-2019-3-22-16-35-57.csv",
+           "data/March22_001/4-001-rest25s_left15s_right15s_MI-2019-3-22-16-27-44.csv",
+           #"data/March22_001/6-001-rest25s_left15s_right15s_MI-2019-3-22-16-46-17.csv",
+           #"data/March22_001/7-001-rest25s_left20s_right20s_MI-2019-3-22-16-54-17.csv",
+           "data/March20/time-test-JingMingImagined_10s-2019-3-20-10-28-35.csv",
+           "data/March20/time-test-JingMingImagined_10s-2019-3-20-10-30-26.csv",
+           #"data/March20/time-test-JingMingImagined_10s-2019-3-20-10-35-31.csv"
+           ]
+    all_data = get_data(csvs)
 fig1 = plt.figure("psd")
 fig1.clf()
-for thresh in range (6):
+classes = ['Left', 'Right', 'Rest']
+all_psds = {'Right': [], 'Left': [], 'Rest': []}
+all_mu = {'Right': [], 'Left': [], 'Rest': []}
+for thresh in range (1):
     threshold = 0.8 + 0.2 * thresh
     left = []
     rest = []
@@ -330,52 +336,22 @@ for thresh in range (6):
     
     idx = 1
     plt.figure("psd")
-    plt.ylim([0,25])
-    plt.xlim([6,20])
-    for trial in all_data['Left']:
-        epochs = epoch_data(trial, 250 * window_s, int(shift*250))    # shape n x 500 x 2
-        for epoch in epochs:
-            mu1, mu2, freqs, psd1, psd2 = predict(epoch.T, threshold)
-            left.append([mu1,mu2])
-            if plot_psd:
-                plt.subplot(3,2,idx)
-                plt.plot(freqs, psd1)
-                plt.ylim([0,25])
-                plt.xlim([6,20])
-                plt.subplot(3,2,idx+1)
-                plt.plot(freqs, psd2)
-                plt.ylim([0,25])
-                plt.xlim([6,20])
-    idx = 3
-    for trial in all_data['Right']:
-        epochs = epoch_data(trial, 250 * window_s, int(shift*250))    # shape n x 500 x 2
-        for epoch in epochs:
-            mu1, mu2, freqs, psd1, psd2 = predict(epoch.T, threshold)
-            right.append([mu1,mu2])
-            if plot_psd:
-                plt.subplot(3,2,idx)
-                plt.plot(freqs, psd1)
-                plt.ylim([0,25])
-                plt.xlim([6,20])
-                plt.subplot(3,2,idx+1)
-                plt.plot(freqs, psd2)
-                plt.ylim([0,25])
-                plt.xlim([6,20])
-    idx = 5
-    for trial in all_data['Rest']:
-        epochs = epoch_data(trial, 250 * window_s, int(shift*250))    # shape n x 500 x 2
-        for epoch in epochs:
-            mu1, mu2, freqs, psd1, psd2 = predict(epoch.T, threshold)
-            rest.append([mu1,mu2])
-            if plot_psd:
-                plt.subplot(3,2,idx)
-                plt.plot(freqs, psd1)
-                plt.ylim([0,25])
-                plt.xlim([6,20])
-                plt.subplot(3,2,idx+1)
-                plt.plot(freqs, psd2)
-                plt.ylim([0,25])
-                plt.xlim([6,20])
+    for direction, data in all_data.items():
+        for trial in data:
+            epochs = epoch_data(trial, 250 * window_s, int(shift*250))    # shape n x 500 x 2
+            for epoch in epochs:
+                mu1, mu2, freqs, psd1, psd2 = predict(epoch.T, threshold)
+                all_mu[direction].append([mu1,mu2])
+                all_psds[direction].append([psd1,psd2])
+                if plot_psd:
+                    plt.subplot(3,2,idx)
+                    plt.plot(freqs, psd1)
+                    plt.ylim([0,25])
+                    plt.xlim([6,20])
+                    plt.subplot(3,2,idx+1)
+                    plt.plot(freqs, psd2)
+                    plt.ylim([0,25])
+                    plt.xlim([6,20])
     if cm:
         left_true = sum(left)/len(left)
         left_false = 1 - left_true
@@ -398,19 +374,67 @@ for thresh in range (6):
         plt.subplots_adjust(hspace=0.3)
 fig3 = plt.figure("scatter")
 fig3.clf()
-right = np.array(right)
-plt.scatter(right.T[0], right.T[1], s=2)
-left = np.array(left)
-plt.scatter(left.T[0], left.T[1], s=2)
-rest = np.array(rest)
-plt.scatter(rest.T[0], rest.T[1], s=2)
+for direction, mu in all_mu.items():
+    mu = np.log10(np.array(mu).T)
+    plt.scatter(mu[0], mu[1], s=2)
+plt.axis('scaled')
 plt.show()
 
+
+mean_plt = 1
+if mean_plt:
+    plt.figure()
+    for direction, mu in all_mu.items():
+        mu = np.array(mu).T
+        plt.scatter(np.mean(mu[0]), np.mean(mu[1]), s=2)
+    plt.axis('scaled')
 last = 0
 if last:
     plt.scatter(r_saved[0], r_saved[1], s=2, color='blue')
     plt.scatter(l_saved[0], l_saved[1], s=2, color='red')
-    
+all_features = []
+for direction, psd in all_psds.items():
+    mu_indices = np.where(np.logical_and(freqs>=10, freqs<=12))
+    features = np.squeeze(np.mean(np.array(psd)[:,:,mu_indices], axis=-1))
+    arr = np.hstack((features, np.full([features.shape[0],1], classes.index(direction))))
+    all_features.append(arr)
+data = np.vstack(all_features[:-1])
+X = data[:,:-1]
+Y = data[:,-1]
+validation_size = 0.20
+seed = 7
+X_train, X_validation, Y_train, Y_validation = model_selection.train_test_split(X, Y, test_size=validation_size, random_state=seed)
+
+# Test options and evaluation metric
+scoring = 'accuracy'
+
+# Spot Check Algorithms
+models = []
+models.append(('LR', LogisticRegression(solver='lbfgs')))
+models.append(('LDA', LinearDiscriminantAnalysis()))
+models.append(('KNN', KNeighborsClassifier()))
+models.append(('CART', DecisionTreeClassifier()))
+models.append(('NB', GaussianNB(var_smoothing=0.001)))
+models.append(('SVM', SVC(gamma='scale')))
+# evaluate each model in turn
+results = []
+names = []
+
+for name, model in models:
+	kfold = model_selection.KFold(n_splits=10, random_state=seed)
+	cv_results = model_selection.cross_val_score(model, X_train, Y_train, cv=kfold, scoring=scoring)
+	results.append(cv_results)
+	names.append(name)
+	msg = "%s: %f (%f)" % (name, cv_results.mean(), cv_results.std())
+	print(msg)
+        
+fig, ax = plt.subplots()
+for direction, mu in all_mu.items():
+    mu = np.log10(np.array(mu).T)
+    sn.kdeplot(mu[0], mu[1], ax=ax, shade_lowest=False, alpha=0.6)
+ax.collections[0].set_alpha(0)
+ax.collections[10].set_alpha(0)
+ax.set(aspect="equal")
 """
 m = [[left_true,left_false],
      [rest_false,rest_true]]
