@@ -39,13 +39,18 @@ var direction = "none";
 var active = [];
 var collectionTimer=null;
 const expectedSampleRate = 250; // samples per second
+var path = require('path');
 
 /*EXPRESS*/
 // Sets static directory as public
 app_express.use(express.static(__dirname + '/public'));
 
 app_express.get('/', (req, res) => {
-  res.send('index');
+  res.sendFile(path.join(__dirname + '/public/index.html'));
+});
+
+app_express.get('/production', (req, res) => {
+  res.sendFile(path.join(__dirname + '/public/production.html'));
 });
 
 console.log('Listening on Port 3000!')
