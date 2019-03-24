@@ -147,6 +147,10 @@ def epoch_data(data, window_length, shift):
         arr.append(data[i:i+window_length])
         i += shift
     return np.array(arr)
+def merge_dols(dol1, dol2):
+    keys = set(dol1).union(dol2)
+    no = []
+    return dict((k, dol1.get(k, no) + dol2.get(k, no)) for k in keys)
 def get_data(fname, csv):
     df = pd.read_csv(csv)
     channel = (1,2,3,4,5,6,7,8,13)
@@ -178,7 +182,7 @@ def predict(ch, threshold):
     psd1,freqs = mlab.psd(np.squeeze(ch[0]),
                            NFFT=500,
                            Fs=250)
-    mu_indices = np.where(np.logical_and(freqs>=7, freqs<=12))
+    mu_indices = np.where(np.logical_and(freqs>=10, freqs<=12))
     mu1 = np.mean(psd1[mu_indices])
     
     psd2,freqs = mlab.psd(np.squeeze(ch[7]),
@@ -188,12 +192,12 @@ def predict(ch, threshold):
     
     #return int(mu1 < threshold), int(mu2 < threshold), freqs, psd1, psd2     # return 1,0 for left, 0,1 for right, 1,1 for both and 0,0 for rest
     #return mu1/np.mean(psd1[8:40]), mu2/np.mean(psd2[8:40]), freqs, psd1, psd2
-    return mu1/np.mean(psd1[8:40]), mu2/np.mean(psd2[8:40]), freqs, psd1, psd2
+    return mu1, mu2, freqs, psd1, psd2
 """ END """
 
 fs_Hz = 250
 sampling_freq = 250
-window_s = 4
+window_s = 2
 shift = 0.5
 channel = (1,2)
 channel_name = 'C4'
@@ -203,6 +207,7 @@ Viet = 0
 Marley = 0
 Andy = 0
 cm = 0
+plot_psd = 1
 colormap = sn.cubehelix_palette(as_cmap=True)
 tmin, tmax = 0,0
 
@@ -277,26 +282,46 @@ if Andy:
         left_data.append(data[start:end])
 else:
     folder = "data/March22_008/"
-    csv = "10_008-2019-3-22-15-8-55.csv"
-    #csv = "9_008-2019-3-22-14-59-0.csv"
+    csv = "9_008-2019-3-22-14-59-0.csv"
     #csv = "8_008-2019-3-22-14-45-53.csv"
     #csv = "7_008-2019-3-22-14-27-46.csv"
     #csv = "6_008-2019-3-22-14-19-52.csv"
     #csv = "5_008-2019-3-22-14-10-26.csv"
     
-    fname = "10_008_OpenBCI-RAW-2019-03-22_15-07-58.txt"
-    #fname = "8to9_008_OpenBCI-RAW-2019-03-22_13-49-24.txt"
+    fname = "8to9_008_OpenBCI-RAW-2019-03-22_13-49-24.txt"
     #fname = "4to7_008_OpenBCI-RAW-2019-03-22_13-49-24.txt"
 
-    all_data = get_data(folder + fname, folder + csv)
-    left_data = all_data['Left']
-    rest_data = all_data['Rest']
+    data1 = get_data(folder + fname, folder + csv)
+    
+    csv = "10_008-2019-3-22-15-8-55.csv"
+    fname = "10_008_OpenBCI-RAW-2019-03-22_15-07-58.txt"
+    data2 = get_data(folder + fname, folder + csv)
+    
+    all_data = merge_dols(data1,data2)
+    
+    folder = "data/March22_001/"
+    fname = "1to5_001_OpenBCI-RAW-2019-03-22_15-56-26.txt"
+    csv1 = "5-001-rest25s_left10s_right10s_MI-2019-3-22-16-35-57.csv"
+    csv2 = "4-001-rest25s_left15s_right15s_MI-2019-3-22-16-27-44.csv"
+    data3 = get_data(folder + fname, folder + csv1)
+    all_data = merge_dols(all_data,data3)
+    
+    #data4 = get_data(folder + fname, folder + csv2)
+    #all_data = merge_dols(all_data,data4)
+    fname = "6to7_001_OpenBCI-RAW-2019-03-22_16-44-46.txt"
+    csv = "6-001-rest25s_left15s_right15s_MI-2019-3-22-16-46-17.csv"
+    #csv = "7-001-rest25s_left20s_right20s_MI-2019-3-22-16-54-17.csv"
+    
+    folder = "data/March20/"
+    fname = 'OpenBCI-RAW-2019-03-20_10-04-29.txt'
+    csv = "time-test-JingMingImagined_10s-2019-3-20-10-28-35.csv"
+    csv = "time-test-JingMingImagined_10s-2019-3-20-10-30-26.csv"
+    csv = "time-test-JingMingImagined_10s-2019-3-20-10-35-31.csv"
+    #data4 = get_data(folder + fname, folder + csv)
 
-
+    all_data = data1
 fig1 = plt.figure("psd")
-fig2 = plt.figure("cm", figsize=(10,10))
 fig1.clf()
-fig2.clf()
 for thresh in range (6):
     threshold = 0.8 + 0.2 * thresh
     left = []
@@ -307,47 +332,50 @@ for thresh in range (6):
     plt.figure("psd")
     plt.ylim([0,25])
     plt.xlim([6,20])
-    for trial in left_data:
+    for trial in all_data['Left']:
         epochs = epoch_data(trial, 250 * window_s, int(shift*250))    # shape n x 500 x 2
         for epoch in epochs:
             mu1, mu2, freqs, psd1, psd2 = predict(epoch.T, threshold)
-            plt.subplot(3,2,idx)
-            plt.plot(freqs, psd1)
-            plt.ylim([0,25])
-            plt.xlim([6,20])
-            plt.subplot(3,2,idx+1)
-            plt.plot(freqs, psd2)
-            plt.ylim([0,25])
-            plt.xlim([6,20])
             left.append([mu1,mu2])
+            if plot_psd:
+                plt.subplot(3,2,idx)
+                plt.plot(freqs, psd1)
+                plt.ylim([0,25])
+                plt.xlim([6,20])
+                plt.subplot(3,2,idx+1)
+                plt.plot(freqs, psd2)
+                plt.ylim([0,25])
+                plt.xlim([6,20])
     idx = 3
     for trial in all_data['Right']:
         epochs = epoch_data(trial, 250 * window_s, int(shift*250))    # shape n x 500 x 2
         for epoch in epochs:
             mu1, mu2, freqs, psd1, psd2 = predict(epoch.T, threshold)
-            plt.subplot(3,2,idx)
-            plt.plot(freqs, psd1)
-            plt.ylim([0,25])
-            plt.xlim([6,20])
-            plt.subplot(3,2,idx+1)
-            plt.plot(freqs, psd2)
-            plt.ylim([0,25])
-            plt.xlim([6,20])
             right.append([mu1,mu2])
+            if plot_psd:
+                plt.subplot(3,2,idx)
+                plt.plot(freqs, psd1)
+                plt.ylim([0,25])
+                plt.xlim([6,20])
+                plt.subplot(3,2,idx+1)
+                plt.plot(freqs, psd2)
+                plt.ylim([0,25])
+                plt.xlim([6,20])
     idx = 5
-    for trial in rest_data:
+    for trial in all_data['Rest']:
         epochs = epoch_data(trial, 250 * window_s, int(shift*250))    # shape n x 500 x 2
         for epoch in epochs:
             mu1, mu2, freqs, psd1, psd2 = predict(epoch.T, threshold)
-            plt.subplot(3,2,idx)
-            plt.plot(freqs, psd1)
-            plt.ylim([0,25])
-            plt.xlim([6,20])
-            plt.subplot(3,2,idx+1)
-            plt.plot(freqs, psd2)
-            plt.ylim([0,25])
-            plt.xlim([6,20])
             rest.append([mu1,mu2])
+            if plot_psd:
+                plt.subplot(3,2,idx)
+                plt.plot(freqs, psd1)
+                plt.ylim([0,25])
+                plt.xlim([6,20])
+                plt.subplot(3,2,idx+1)
+                plt.plot(freqs, psd2)
+                plt.ylim([0,25])
+                plt.xlim([6,20])
     if cm:
         left_true = sum(left)/len(left)
         left_false = 1 - left_true
@@ -356,7 +384,10 @@ for thresh in range (6):
         overall = (sum(left) + len(rest) - sum(rest))/len(left+rest)
         print(overall)
         
-        plt.figure("cm")
+        
+        fig2 = plt.figure("cm", figsize=(10,10))
+        fig2.clf()
+        
         array = [[left_true,left_false],
              [rest_false,rest_true]]
         df_cm = pd.DataFrame(array, index = [i for i in "LR"],
@@ -365,14 +396,20 @@ for thresh in range (6):
         sn.heatmap(df_cm, cmap =colormap,annot=True)
         plt.title("Threshold: " + "{:1.1f}".format(threshold))
         plt.subplots_adjust(hspace=0.3)
-plt.figure()
-right = np.array(right).T
-plt.scatter(right[0], right[1])
-left = np.array(left).T
-plt.scatter(left[0], left[1])
-rest = np.array(rest).T
-plt.scatter(rest[0], rest[1])
+fig3 = plt.figure("scatter")
+fig3.clf()
+right = np.array(right)
+plt.scatter(right.T[0], right.T[1], s=2)
+left = np.array(left)
+plt.scatter(left.T[0], left.T[1], s=2)
+rest = np.array(rest)
+plt.scatter(rest.T[0], rest.T[1], s=2)
 plt.show()
+
+last = 0
+if last:
+    plt.scatter(r_saved[0], r_saved[1], s=2, color='blue')
+    plt.scatter(l_saved[0], l_saved[1], s=2, color='red')
     
 """
 m = [[left_true,left_false],
