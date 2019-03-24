@@ -1,7 +1,7 @@
 // Configurable
 var specHeight = 120;     // pixel height of spectrogram
 var specWidth = 450;     // pixel width of spectrogram
-var num_samples = 150;    // number of samples we want to display
+var num_samples = 100;    // number of samples we want to display
 var num_freqs = 40;       // upper frequency limit of plotting (default 40 hz)
 var sgram = [];
 var sgram2 = [];

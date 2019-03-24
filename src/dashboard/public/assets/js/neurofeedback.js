@@ -21,7 +21,7 @@ var chart = new Chart(ctx, {
       yAxes: [{
         ticks: {
           beginAtZero: true,
-          suggestedMax: 100,
+          max: 5,
         }
       }]
     }

@@ -267,7 +267,6 @@ io.on('connection', function(socket){
 
     console.log(totalTime);
 
-
     direction = collectQueue[0][0];
     setupCsvWriters();
     collecting = true;

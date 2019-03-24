@@ -49,7 +49,7 @@
 
       <!-- Nav Item - Pages Collapse Menu -->
       <li class="nav-item">
-        <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseTwo" aria-expanded="true" aria-controls="collapseTwo">
+        <a class="nav-link" href="production.html">
           <i class="fas fa-fw fa-tachometer-alt"></i>
           <span>Production</span>
         </a>
@@ -57,7 +57,7 @@
 
       <!-- Nav Item - Utilities Collapse Menu -->
       <li class="nav-item">
-        <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseUtilities" aria-expanded="true" aria-controls="collapseUtilities">
+        <a class="nav-link collapsed" href="#">
           <i class="fas fa-fw fa-wrench"></i>
           <span>Settings</span>
         </a>
@@ -78,7 +78,8 @@
           <!-- Page Heading -->
           <div class="d-sm-flex align-items-center justify-content-between mb-4">
             <h1 class="h3 mb-0 text-gray-800">Training</h1>
-            <a href="#" class="selection d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm" id="btn-collect">Collect &nbsp; <i class="fas fa-play fa-sm text-white"></i></a>
+            <a href="#" onclick="event.preventDefault()" class="selection d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm" id="btn-collect" style="position: fixed; bottom: 10px; right: 40px; z-index: 5">Collect &nbsp; <i class="fas fa-play fa-sm text-white"></i></a>
+            <!-- even.preventDefault() avoids reloading page -->
           </div>
 
           <!-- Content Row -->
@@ -139,8 +140,78 @@
           <!-- Content Row -->
           <div class="row">
 
-            <!-- Area Chart -->
-            <div class="col-xl-6 col-lg-6 col-md-4">
+            <!-- Content Column -->
+            <div class="col-xl-6 col-lg-6 col-md-6 mb-4">
+
+              <!-- Spectrograms -->
+              <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                  <h6 class="m-0 font-weight-bold text-primary">Spectrograms</h6>
+                </div>
+                <div class="card-body">
+                  <div id="spectrogram-holder">
+                    <!-- Spectrogram 1 will go here! -->
+                  </div>
+                  <div id="spectrogram2-holder">
+                    <!-- Spectrogram 2 will go here! -->
+                  </div>
+                </div>
+              </div>
+
+            </div>
+
+            <!-- Queue -->
+            <div class="col-xl-3 col-lg-3 col-md-4">
+              <div class="card shadow mb-4">
+                <!-- Card Header - Dropdown -->
+                <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                  <h6 class="m-0 font-weight-bold text-primary">Queue</h6>
+                </div>
+                <!-- Card Body -->
+                <div class="card-body">
+                  <div id="commandList" class="list-group col">
+                      <div class="list-group-item tinted" data-direction="Left" data-duration="10"><i class="fas fa-arrows-alt handle"></i> Left 10s &nbsp;<a href='#' class='remove'><i class="fas fa-times-circle"></i></a></div>
+                      <div class="list-group-item tinted" data-direction="Right" data-duration="10"><i class="fas fa-arrows-alt handle"></i> Right 10s &nbsp;<a href='#' class='remove'><i class="fas fa-times-circle"></i></a></div>
+                      <div class="list-group-item tinted" data-direction="Rest" data-duration="10"><i class="fas fa-arrows-alt handle"></i> Rest 10s &nbsp;<a href='#' class='remove'><i class="fas fa-times-circle"></i></a></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Add to Queue -->
+            <div class="col-xl-3 col-lg-3 col-md-4">
+              <div class="card shadow mb-4" style="z-index: 1">
+                <!-- Card Header - Dropdown -->
+                <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                  <h6 class="m-0 font-weight-bold text-primary">Add to Queue</h6>
+                </div>
+                <!-- Card Body -->
+                <div class="card-body">
+                  <!-- Duration -->
+                  <div class="input-group mb-3">
+                      <div class="input-group-prepend">
+                          <span class="input-group-text" id="basic-addon1">Seconds</span>
+                      </div>
+                          <input type="text" class="form-control timer" placeholder="Enter duration here..." aria-label="Enter duration here.." aria-describedby="basic-addon1" value=10>
+                  </div>
+                      <!-- Buttons to add elements to the queue -->
+                      <div class="btn-group btn-group-toggle full-button-width" data-toggle="buttons">
+                          <button class="selection btn btn-outline-secondary direction-left">Left</button>
+                          <button class="selection btn btn-outline-secondary direction-rest">Rest</button>
+                          <button class="selection btn btn-outline-secondary direction-right">Right</button>
+                      </div>
+                </div>
+              </div>
+            </div>
+
+          </div>
+          <!-- End of row -->
+
+          <!-- Content Row -->
+          <div class="row">
+
+            <!-- Movement -->
+            <div class="col-xl-6 col-lg-6 col-md-6">
               <div class="card shadow mb-4">
                 <!-- Card Header - Dropdown -->
                 <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
@@ -174,77 +245,8 @@
               </div>
             </div>
 
-            <!-- Add to Queue -->
-            <div class="col-xl-3 col-lg-3 col-md-4">
-              <div class="card shadow mb-4">
-                <!-- Card Header - Dropdown -->
-                <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-                  <h6 class="m-0 font-weight-bold text-primary">Queue</h6>
-                </div>
-                <!-- Card Body -->
-                <div class="card-body">
-                  <div id="commandList" class="list-group col">
-                      <div class="list-group-item tinted" data-direction="Left" data-duration="10"><i class="fas fa-arrows-alt handle"></i> Left 10s &nbsp;<a href='#' class='remove'><i class="fas fa-times-circle"></i></a></div>
-                      <div class="list-group-item tinted" data-direction="Right" data-duration="10"><i class="fas fa-arrows-alt handle"></i> Right 10s &nbsp;<a href='#' class='remove'><i class="fas fa-times-circle"></i></a></div>
-                      <div class="list-group-item tinted" data-direction="Rest" data-duration="10"><i class="fas fa-arrows-alt handle"></i> Rest 10s &nbsp;<a href='#' class='remove'><i class="fas fa-times-circle"></i></a></div>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div class="col-xl-3 col-lg-3 col-md-4">
-              <div class="card shadow mb-4">
-                <!-- Card Header - Dropdown -->
-                <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-                  <h6 class="m-0 font-weight-bold text-primary">Add to Queue</h6>
-                </div>
-                <!-- Card Body -->
-                <div class="card-body">
-                  <!-- Duration -->
-                  <div class="input-group mb-3">
-                      <div class="input-group-prepend">
-                          <span class="input-group-text" id="basic-addon1">Seconds</span>
-                      </div>
-                          <input type="text" class="form-control timer" placeholder="Enter duration here..." aria-label="Enter duration here.." aria-describedby="basic-addon1" value=10>
-                  </div>
-                      <!-- Buttons to add elements to the queue -->
-                      <div class="btn-group btn-group-toggle full-button-width" data-toggle="buttons">
-                          <button class="selection btn btn-outline-secondary direction-left">Left</button>
-                          <button class="selection btn btn-outline-secondary direction-rest">Rest</button>
-                          <button class="selection btn btn-outline-secondary direction-right">Right</button>
-                      </div>
-                </div>
-              </div>
-            </div>
-          <!-- End of row -->
-          </div>
-
-          <!-- Content Row -->
-          <div class="row">
-
-            <!-- Content Column -->
-            <div class="col-lg-6 col-md-6 mb-4">
-
-              <!-- Spectrograms -->
-              <div class="card shadow mb-4">
-                <div class="card-header py-3">
-                  <h6 class="m-0 font-weight-bold text-primary">Spectrograms</h6>
-                </div>
-                <div class="card-body">
-                  <div id="spectrogram-holder">
-                    <!-- Spectrogram 1 will go here! -->
-                  </div>
-                  <div id="spectrogram2-holder">
-                    <!-- Spectrogram 2 will go here! -->
-                  </div>
-                </div>
-              </div>
-
-            </div>
-
-            <div class="col-lg-6 col-md-6 mb-4">
-
-              <!-- Neurofeedback -->
+            <!-- Neurofeedback -->
+            <div class="col-xl-6 col-lg-6 col-md-6 mb-4">
               <div class="card shadow mb-4">
                 <div class="card-header py-3">
                   <h6 class="m-0 font-weight-bold text-primary">Neurofeedback</h6>
@@ -253,8 +255,9 @@
                   <canvas id="neurofeedback"></canvas>
                 </div>
               </div>
-
             </div>
+
+          <!-- End of row -->
           </div>
 
         </div>
@@ -270,15 +273,15 @@
   <!-- End of Page Wrapper -->
 
   <!-- Bootstrap core JavaScript-->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
-  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+  <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script> -->
+  <!-- <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script> -->
 
 
   <!-- Core plugin JavaScript-->
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
 
   <!-- Custom scripts for all pages-->
-  <script src="assets/js/sb-admin-2.js"></script>
+  <!-- <script src="assets/js/sb-admin-2.js"></script> -->
 
   <!-- MomentJS -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.24.0/moment.min.js"></script>
