@@ -1,10 +1,12 @@
 import numpy as np
 import matplotlib.mlab as mlab
 import socketio
-
+import pickle
 sio = socketio.Client()
 
 buffer_data = []
+with open('../offline/model.pkl', 'rb') as fid:
+    clf = pickle.load(fid)
 
 def predict(ch):
     """
@@ -17,20 +19,15 @@ def predict(ch):
     psd1,freqs = mlab.psd(np.squeeze(ch[0]),
                            NFFT=500,
                            Fs=250)
-    mu_indices = np.where(np.logical_and(freqs>=7, freqs<=12))
+    mu_indices = np.where(np.logical_and(freqs>=10, freqs<=12))
     mu1 = np.mean(psd1[mu_indices])
 
-    psd2,freqs = mlab.psd(np.squeeze(ch[1]),
+    psd2,freqs = mlab.psd(np.squeeze(ch[7]),
                            NFFT=500,
                            Fs=250)
     mu2 = np.mean(psd2[mu_indices])
 
-    if mu1 < threshold and mu2>= threshold:
-        return "L"  # left
-    elif mu1 >= threshold and mu2 < threshold:
-        return "R"  # right
-    else:
-        return "F"  # forward
+    return clf.predict_proba(np.array([mu1,mu2]).reshape(1,-1))
 
 
 @sio.on('timeseries-prediction')
