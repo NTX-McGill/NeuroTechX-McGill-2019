@@ -1,213 +1,330 @@
-<html>
+<!DOCTYPE html>
+<html lang="en">
+
 <head>
-  <title>Training Dashboard</title>
+
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta name="description" content="Dashboard for the McGill NeuroTech Club">
+  <meta name="author" content="McGill NeuroTech">
 
-  <!--bulma.min is for the navigation bar-->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.7.4/css/bulma.min.css">
-  <!-- bootstrap framework used for styling certain elements -->
-  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css" integrity="sha384-GJzZqFGwb1QTTN6wy59ffF1BuGJpLSa9DkKMp0DgiMDm4iYMj70gZWKYbI706tWS" crossorigin="anonymous">
-  <!-- Fonts! -->
+  <title>McGill NeuroTech Dashboard</title>
+
+  <!-- Custom fonts for this template-->
   <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.6.3/css/all.css" integrity="sha384-UHRtZLI+pbxtHCWp1t77Bi1L4ZtiqrqD80Kn4Z8NTSRyMA2Fd33n5dQ8lWUE00s/" crossorigin="anonymous">
+  <link href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i" rel="stylesheet">
 
-  <script src="https://use.fontawesome.com/releases/v5.3.1/js/all.js"></script>
-  <!-- jquery -->
+  <!-- Custom styles for this template-->
+  <link rel="stylesheet" href="assets/css/style-2.css">
+  <link rel="stylesheet" href="assets/css/list.css">
+  <link href="assets/css/sb-admin-2.min.css" rel="stylesheet">
+
+</head>
+
+<body id="page-top" class="sidebar-toggled">
+
+  <!-- Page Wrapper -->
+  <div id="wrapper">
+
+    <!-- Sidebar -->
+    <ul class="navbar-nav bg-gradient-primary sidebar toggled sidebar-dark accordion" id="accordionSidebar">
+
+      <!-- Sidebar - Brand -->
+      <a class="sidebar-brand d-flex align-items-center justify-content-center" href="index.html">
+        <div class="sidebar-brand-icon">
+          <img src="assets/img/mcgill-neurotech-white.png" alt="McGill Neurotech logos" width="50px">
+        </div>
+      </a>
+
+      <!-- Divider -->
+      <hr class="sidebar-divider my-0">
+
+      <!-- Nav Item - Dashboard -->
+      <li class="nav-item active">
+        <a class="nav-link" href="index.html">
+          <i class="fas fa-fw fa-brain"></i>
+          <span>Training</span></a>
+      </li>
+
+      <!-- Nav Item - Pages Collapse Menu -->
+      <li class="nav-item">
+        <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseTwo" aria-expanded="true" aria-controls="collapseTwo">
+          <i class="fas fa-fw fa-tachometer-alt"></i>
+          <span>Production</span>
+        </a>
+      </li>
+
+      <!-- Nav Item - Utilities Collapse Menu -->
+      <li class="nav-item">
+        <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseUtilities" aria-expanded="true" aria-controls="collapseUtilities">
+          <i class="fas fa-fw fa-wrench"></i>
+          <span>Settings</span>
+        </a>
+      </li>
+
+    </ul>
+    <!-- End of Sidebar -->
+
+    <!-- Content Wrapper -->
+    <div id="content-wrapper" class="d-flex flex-column">
+
+      <!-- Main Content -->
+      <div id="content">
+
+        <!-- Begin Page Content -->
+        <div class="container-fluid main-page">
+
+          <!-- Page Heading -->
+          <div class="d-sm-flex align-items-center justify-content-between mb-4">
+            <h1 class="h3 mb-0 text-gray-800">Training</h1>
+            <a href="#" class="selection d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm" id="btn-collect">Collect &nbsp; <i class="fas fa-play fa-sm text-white"></i></a>
+          </div>
+
+          <!-- Content Row -->
+          <div class="row">
+
+            <!-- Trial name field -->
+            <div class="col-xl-5 col-md-5 mb-4">
+              <!-- <div class="card border-left-primary shadow h-100 py-2"> -->
+                <!-- <div class="card-body"> -->
+                  <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                      <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">Trial Name</div>
+                      <div class="h5 mb-0 font-weight-bold text-gray-800">
+                          <input type="email" class="form-control form-control" id="trial-name" placeholder="Trial_name">
+                      </div>
+                    </div>
+                  </div>
+                <!-- </div> -->
+              <!-- </div> -->
+            </div>
+
+
+            <!-- Earnings (Monthly) Card Example -->
+            <!-- <div class="col-xl-3 col-md-3 mb-4">
+              <div class="card border-left-primary shadow h-100 py-2">
+                <div class="card-body">
+                  <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                      <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">Noise (Hz)</div>
+                      <div class="h5 mb-0 font-weight-bold text-gray-800">4,000</div>
+                    </div>
+                    <div class="col-auto">
+                      <i class="fas fa-bug fa-2x text-gray-300"></i>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="col-xl-3 col-md-4 mb-4">
+              <div class="card border-left-success shadow h-100 py-2">
+                <div class="card-body">
+                  <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                      <div class="text-xs font-weight-bold text-success text-uppercase mb-1">Sample Rate (per second)</div>
+                      <div class="h5 mb-0 font-weight-bold text-gray-800">250</div>
+                    </div>
+                    <div class="col-auto">
+                      <i class="fas fa-stopwatch fa-2x text-gray-300"></i>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div> -->
+
+          </div>
+
+          <!-- Content Row -->
+          <div class="row">
+
+            <!-- Area Chart -->
+            <div class="col-xl-6 col-lg-6">
+              <div class="card shadow mb-4">
+                <!-- Card Header - Dropdown -->
+                <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                  <h6 class="m-0 font-weight-bold text-primary">Movement</h6>
+                </div>
+                <!-- Card Body -->
+                <div class="card-body">
+                  <div style="margin-top:15px">
+                    <center>
+                    <div class="row">
+                      <div class="col">
+                        <i class="fas fa-arrow-circle-left big-arrow button-off" id="think-Left"></i>
+                      </div>
+                      <div class="col">
+                        <i class="fas fa-arrow-circle-right big-arrow button-off" id="think-Right"></i>
+                      </div>
+                    </div>
+                    <div class="row">
+                      <div class="col" style="margin: auto; margin-top: 40px">
+                        <i class="fas fa-bed big-arrow button-off" id="think-Rest"></i>
+                      </div>
+                    </div>
+                    <div class="row">
+                      <div class="col" style="margin: auto; margin-top: 40px">
+                        <span id="collectTime">&nbsp;</span>
+                      </div>
+                    </div>
+                  </center>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Add to Queue -->
+            <div class="col-xl-3 col-lg-3">
+              <div class="card shadow mb-4">
+                <!-- Card Header - Dropdown -->
+                <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                  <h6 class="m-0 font-weight-bold text-primary">Queue</h6>
+                </div>
+                <!-- Card Body -->
+                <div class="card-body">
+                  <div id="commandList" class="list-group col">
+                      <div class="list-group-item tinted" data-direction="Left" data-duration="10"><i class="fas fa-arrows-alt handle"></i> Left 10s &nbsp;<a href='#' class='remove'><i class="fas fa-times-circle"></i></a></div>
+                      <div class="list-group-item tinted" data-direction="Right" data-duration="10"><i class="fas fa-arrows-alt handle"></i> Right 10s &nbsp;<a href='#' class='remove'><i class="fas fa-times-circle"></i></a></div>
+                      <div class="list-group-item tinted" data-direction="Rest" data-duration="10"><i class="fas fa-arrows-alt handle"></i> Rest 10s &nbsp;<a href='#' class='remove'><i class="fas fa-times-circle"></i></a></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="col-xl-3 col-lg-3">
+              <div class="card shadow mb-4">
+                <!-- Card Header - Dropdown -->
+                <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                  <h6 class="m-0 font-weight-bold text-primary">Add to Queue</h6>
+                </div>
+                <!-- Card Body -->
+                <div class="card-body">
+                  <!-- Duration -->
+                  <div class="input-group mb-3">
+                      <div class="input-group-prepend">
+                          <span class="input-group-text" id="basic-addon1">Seconds</span>
+                      </div>
+                          <input type="text" class="form-control timer" placeholder="Enter duration here..." aria-label="Enter duration here.." aria-describedby="basic-addon1" value=10>
+                  </div>
+                      <!-- Buttons to add elements to the queue -->
+                      <div class="btn-group btn-group-toggle full-button-width" data-toggle="buttons">
+                          <button class="selection btn btn-outline-secondary direction-left">Left</button>
+                          <button class="selection btn btn-outline-secondary direction-rest">Rest</button>
+                          <button class="selection btn btn-outline-secondary direction-right">Right</button>
+                      </div>
+                </div>
+              </div>
+            </div>
+          <!-- End of row -->
+          </div>
+
+          <!-- Content Row -->
+          <div class="row">
+
+            <!-- Content Column -->
+            <div class="col-lg-6 mb-4">
+
+              <!-- Project Card Example -->
+              <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                  <h6 class="m-0 font-weight-bold text-primary">Spectrograms</h6>
+                </div>
+                <div class="card-body">
+                  <div id="spectrogram-holder">
+                    <!-- Spectrogram 1 will go here! -->
+                  </div>
+                  <div id="spectrogram2-holder">
+                    <!-- Spectrogram 2 will go here! -->
+                  </div>
+                </div>
+              </div>
+
+            </div>
+
+            <div class="col-lg-6 mb-4">
+
+              <!-- Illustrations -->
+              <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                  <h6 class="m-0 font-weight-bold text-primary">Neurofeedback</h6>
+                </div>
+                <div class="card-body">
+                  <canvas id="neurofeedback"></canvas>
+                </div>
+              </div>
+
+            </div>
+          </div>
+
+        </div>
+        <!-- /.container-fluid -->
+
+      </div>
+      <!-- End of Main Content -->
+
+    </div>
+    <!-- End of Content Wrapper -->
+
+  </div>
+  <!-- End of Page Wrapper -->
+
+  <!-- Bootstrap core JavaScript-->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+
+
+  <!-- Core plugin JavaScript-->
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+
+  <!-- Custom scripts for all pages-->
+  <script src="assets/js/sb-admin-2.js"></script>
+
+  <!-- MomentJS -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.24.0/moment.min.js"></script>
+
+  <!-- ChartJS -->
+  <script src="assets/js/chart.js/Chart.min.js"></script>
 
   <!-- For rearranging the queue -->
   <script src="assets/js/sortable.js"></script>
+
   <!-- Queue control -->
   <script src="assets/js/list.js"></script>
+
   <script src="assets/js/socket.io.js"></script>
   <script src="assets/js/control.js"></script>
 
-  <link rel="stylesheet" href="assets/css/list.css">
-  <link rel="stylesheet" href="assets/css/training-style.css">
+  <!-- Spectrograms. TODO: rearrange space so it doesn't fall too far down if you have a lot of trials queued -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.7.2/p5.js"></script>
 
+  <!-- P5 JS DOM -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.7.2/addons/p5.dom.js"></script>
+
+  <!-- Neurofeedback -->
+  <script src="assets/js/neurofeedback.js"></script>
+
+  <!-- Spectrogram -->
+  <script src="assets/js/spectrogram.js"></script>
+
+  <script>var socket = io();</script>
   <script>
-    var socket = io();
+
+    var left = document.getElementById('commandList');
+
+    new Sortable(left, {
+      group: {
+          name: 'shared',
+          handle: '.handle', // To clone: set pull to 'clone'
+          put: false
+      },
+      animation: 150,
+      sort: true,
+      handle: '.handle'
+  });
+
   </script>
-</head>
-<body>
 
-<!-- Navbar -->
-<!--Classes:
-"navbar": from bulma.min.css to format navigation tabs
-"is-active": class assigned to active tab upon click
-
-
-
--->
-<nav class="navbar" role="navigation" aria-label="main navigation">
-  <div class="navbar-brand">
-    <div class="navbar-item">
-      <div class="tabs is-toggle is-fullwidth" id="tabs">
-        <ul>
-          <li class="is-active" data-tab="1">
-            <a>
-              <span class="icon is-small"><i class="fas fa-brain"></i></span>
-              <span>Training</span>
-            </a>
-          </li>
-          <li data-tab = "2">
-            <a>
-              <span class="icon is-small"><i class="fas fa-code-branch"></i></span>
-              <span>Production</span>
-            </a>
-        </ul>
-      </div>
-    </div>
-    <img class="logo-image" src="assets/img/mcgill-neurotech.png" alt="McGill Neurotech">
-  </div>
-</nav>
-<section class = "section">
-    <!-- Training Dashboard -->
-    <!--
-    Classes:
-    "is-active": toggled upon tab switch to the active tab
-    "dashboard-title": used to format the titles for each dashboard
-    "container-queue": houses queue and controls
-        "list-group col": for queue list
-        "selection": class for all buttons
-            "btn-outline-secondary": formats Left/Rest/Right buttons
-            "btn-primary": formats collect button
-    "container-display": div for the current command display and timer
-        "collectTime": gets time updates
-    -->
-    <div id="tab-content">
-        <!-- "is-active" toggles upon tab switch -->
-        <div class="is-active" data-content='1'>
-                <!-- "container-queue" is for left half of dashboard that holds queue information -->
-                <div class="container-queue">
-                    <!--"header" class name is used for Queue and Display headers -->
-                        <!-- commandBank is contains the queue of commands -->
-                        <div class="left" id="commandBank">
-                            <!-- addItem contains the controls to add elements to the queue and start collecting -->
-                            <div class="addItem">
-                                <!-- "Add to queue" and "Duration (sec)" are both labels for the time input -->
-                                <label for="durationInput"><strong>Add to Queue</strong></label>
-                                <div class="form-group row">
-                                    <!-- uses bootstrap class col-sm-6 to format label -->
-                                    <div class="input-group mb-3">
-                                        <div class="input-group-prepend">
-                                            <span class="input-group-text" id="basic-addon1">Duration (sec)</span>
-                                        </div>
-                                            <input type="text" class="form-control timer" placeholder="Enter duration here..." aria-label="Enter duration here.." aria-describedby="basic-addon1" value=10>
-                                      </div>
-                                </div>
-                                <!-- These buttons are used to add elements to the queue
-                                They are formatted using bootstrap classes -->
-                                <div class="btn-group btn-group-toggle" data-toggle="buttons">
-                                    <button class="selection btn btn-outline-secondary direction-left">Left</button>
-                                    <button class="selection btn btn-outline-secondary direction-rest">Rest</button>
-                                    <button class="selection btn btn-outline-secondary direction-right">Right</button>
-                                </div><br>
-                                <!-- This is the "collect" button. Also bootstrap formatted -->
-                                <div class = "collect-form">
-                                    <div class="input-group mb-3">
-                                        <div class="input-group-prepend">
-                                            <span class="input-group-text" id="basic-addon1">Trial Name</span>
-                                        </div>
-                                        <input type="text" class="form-control" id="trial-name" placeholder="Enter trial name..." aria-label="Enter trial name..." aria-describedby="basic-addon1">
-                                    </div>
-                                    <button class="selection btn btn-primary btn collect" id='btn-collect'>Collect</button>
-                                </div>
-                            </div>
-                            <!-- "list-group col" is a flexbox that stores "list-group-items" in a list -->
-                            <div id="commandList" class="list-group col">
-                                <div class="list-group-item tinted" data-direction="Left" data-duration="10"><i class="fas fa-arrows-alt handle"></i> Left 10s <a href='#' class='remove'>REMOVE ME</a></div>
-                                <div class="list-group-item tinted" data-direction="Right" data-duration="10"><i class="fas fa-arrows-alt handle"></i> Right 10s <a href='#' class='remove'>REMOVE ME</a></div>
-                                <div class="list-group-item tinted" data-direction="Rest" data-duration="10"><i class="fas fa-arrows-alt handle"></i> Rest 10s <a href='#' class='remove'>REMOVE ME</a></div>
-                            </div>
-
-
-                        </div>
-                  <!-- <h3> Collecting now: <span id="collectDirection"> None </span></h3> -->
-                </div>
-
-                <!-- Display of commands and timer -->
-                <div class = "container-display">
-                    <div class="command-display" id="command-display">
-                        <div class = "current-command" id="current-command"> -- </div>
-                        <div class = "timer-display">
-                            <span class = "timer-display-text"> Time: </span>
-                            <!-- collecTime class actually is what gets updated -->
-                            <span class = "timer-display-text collectTime" id="collectTime">N/A</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        <div data-content="2">
-            <div class="bar-graph-container">
-              <div class="actual-bar-graph">
-                <div class = "bar-graph-axis">
-                    <div> --100%--- </div>
-                    <div> --80%--- </div>
-                    <div> --60%--- </div>
-                    <div> --40%--- </div>
-                    <div> --20%--- </div>
-                    <div> --0%--- </div>
-
-
-                  <!-- <ul class = "bar-graph-markings">
-                    <li class="percent-label">---100%---</li>
-                    <li class="percent-label">---80%---</li>
-                    <li class="percent-label">---60%---</li>
-                    <li class="percent-label">---40%---</li>
-                    <li class="percent-label">---20%---</li>
-                    <li class="percent-label bottom-label">---0%---</li>
-                  </ul> -->
-                </div>
-                <div class = "bar-container">
-                    <div class = "left-bar-container">
-                        <div class = "bar left-bar" id = "left-bar-control">
-                        </div>
-                        <span class = "bar-label-left"><strong> Left </strong></span>
-                    </div>
-                    <div class = "right-bar-container">
-                        <div class = "bar right-bar" id = "right-bar-control">
-                        </div>
-                        <span class="bar-label-right"> <strong>Right </strong> </span>
-
-                    </div>
-                </div>
-            </div>
-            <div class='production-controls'>
-                <button class="btn-primary btn production-start" id=startProduction>Start</button>
-            </div>
-        </div>
-        <div class = "container-display">
-            <div class="command-display" id="confidence-display">
-                <div class = "current-command">
-                    <span> Left: </span>
-                    <span id = 'left-confidence'> -- </span>
-                    <span> % </span>
-                 </div>
-                <div class = "current-command">
-                    <span> Right: </span>
-                    <span id='right-confidence'> -- </span>
-                    <!-- collecTime class actually is what gets updated -->
-                    <span>%</span>
-                </div>
-            </div>
-        </div>
-    </div>
-</section>
-<script>
-  var left = document.getElementById('commandList');
-
-  new Sortable(left, {
-    group: {
-        name: 'shared',
-        handle: '.handle', // To clone: set pull to 'clone'
-        put: false
-    },
-    animation: 150,
-    sort: true,
-    handle: '.handle'
-});
-
-</script>
 </body>
+
 </html>

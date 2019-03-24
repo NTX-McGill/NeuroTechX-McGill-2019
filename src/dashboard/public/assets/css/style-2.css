@@ -1,0 +1,44 @@
+.main-page {
+  padding-top: 20px;
+}
+
+.full-button-width {
+  width: 100%;
+}
+
+.list-group-item {
+  margin-left: 1px;
+  margin-right: -8px;
+
+}
+
+.list-group-item:hover {
+	z-index: 0;
+}
+
+.list-group {
+  display: flex;
+  flex-direction: column;
+
+  /* No need to set list-style: none; since .list-group-item is block level */
+  padding-left: 0; /* reset padding because ul and ol */
+  margin-bottom: 0;
+}
+
+#commandList {
+  width: 100%;
+  height: 298px;
+  overflow-y: scroll;
+}
+
+.big-arrow {
+  font-size: 90px;
+}
+
+.button-on {
+  color: #1cc88a;
+}
+
+.button-off {
+  color: #e2e2e2; /*#f8f9fc */
+}

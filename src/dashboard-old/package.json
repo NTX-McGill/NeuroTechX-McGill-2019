@@ -7,7 +7,6 @@
   "license": "ISC",
   "dependencies": {
     "@openbci/cyton": "^2.0.1",
-    "colormap": "^2.3.0",
     "csv-writer": "^1.2.0",
     "dgram": "^1.0.1",
     "events": "^3.0.0",
