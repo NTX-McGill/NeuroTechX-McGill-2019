@@ -10,24 +10,12 @@ const fs = require('fs');
 var osc = require('node-osc');
 var oscServer = new osc.Server(12345, '127.0.0.1');
 
-let colormap = require('colormap');
-
-let colors = colormap({
-  colormap: 'viridis',
-  format: 'hex',
-  alpha: 1
-});
-counter = 0;      // I use a counter for each spectrogram, there's probably a better way to do this
-counter2 = 0;
-// I didn't know how to get the colormap on the frontend so I just logged it and copy pasted the array
-// console.log(colors);
-
 const createCSVWriter = require('csv-writer').createObjectCsvWriter;
 var csvTimeWriter;
 
-const sendRate = .2; //In fraction per second
-const samplesPerSecond = 250;
-var samplesToSend = samplesPerSecond * sendRate;
+const sendRate = .2; // seconds
+const expectedSampleRate = 250; // samples per second
+var samplesToSend = expectedSampleRate * sendRate;
 var toSend = [];
 var mode = "training";
 
@@ -38,7 +26,7 @@ var duration = 0;
 var direction = "none";
 var active = [];
 var collectionTimer=null;
-const expectedSampleRate = 250; // samples per second
+
 var path = require('path');
 
 /*EXPRESS*/
@@ -54,9 +42,6 @@ app_express.get('/production', (req, res) => {
 });
 
 console.log('Listening on Port 3000!')
-
-
-/*TIME*/
 
 
 /* Gets the current time */
@@ -124,24 +109,27 @@ function setupCsvWriters(){
 var trialName=null;
 var timeTesting = getTimeValue();
 var numSamples = 0;
+var counterSpect1 = 0;
+var counterSpect2 = 0;
 oscServer.on("message", function (data) {
-    let time = getTimeValue();//Milliseconds since January 1 1970. Adjust?
-    let dataWithoutFirst = [];
+    let time = getTimeValue(); // milliseconds since January 1 1970. Adjust?
+    let dataWithoutFirst = []; // TODO
 
     let toWrite = {'time': time, 'data': data.slice(1), 'direction': direction};
-    var n = 5;       // we send the fft once for every n packets we get, can tune according to the resolution and time length you want to see
+    var numPacketsSpect = 5;       // we send the fft once for every n packets we get, can tune according to the resolution and time length you want to see
+
     if (data[0] == 'fft'){
       if (data[1] == 1) {     // channel 1
-      counter += 1;
-        if (counter % n == 0) {
-          io.sockets.emit('fft-test', {'data': data.slice(1)});
+      counterSpect1 += 1;
+        if (counterSpect1 % numPacketsSpect == 0) {
+          io.sockets.emit('fft-test', {'data': data[1]});
           // console.log(counter);
         }
       }
       if (data[1] == 8) {     // channel 2
-        counter2 += 1;
-        if (counter2 % n == 0) {
-          io.sockets.emit('fft-test2', {'data': data.slice(1)});
+        counterSpect2 += 1;
+        if (counterSpect2 % numPacketsSpect == 0) {
+          io.sockets.emit('fft-test2', {'data': data[1]});
         }
       }
     }
@@ -155,9 +143,9 @@ oscServer.on("message", function (data) {
 
         numSamples++;
         if ((time - timeTesting) > 1000) { // check every second
+          io.sockets.emit('sample rate', {'sample rate': numSamples});
           if (numSamples < expectedSampleRate*0.9 || // check for ± 10%
               numSamples > expectedSampleRate*1.1) {
-                io.sockets.emit('sample rate high', {'sample rate': numSamples});
                 console.log("\n-------- IRREGULAR SAMPLE RATE --------")
               }
           timeTesting = time;
