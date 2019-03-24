@@ -29,6 +29,8 @@ var collectionTimer=null;
 
 var path = require('path');
 
+var spawn = require("child_process").spawn; // to run
+
 /*EXPRESS*/
 // Sets static directory as public
 app_express.use(express.static(__dirname + '/public'));
@@ -112,56 +114,57 @@ var numSamples = 0;
 var counterSpect1 = 0;
 var counterSpect2 = 0;
 oscServer.on("message", function (data) {
-    let time = getTimeValue(); // milliseconds since January 1 1970. Adjust?
-    let dataWithoutFirst = []; // TODO
+  let time = getTimeValue(); // milliseconds since January 1 1970. Adjust?
+  let dataWithoutFirst = []; // TODO
 
-    let toWrite = {'time': time, 'data': data.slice(1), 'direction': direction};
-    var numPacketsSpect = 5;       // we send the fft once for every n packets we get, can tune according to the resolution and time length you want to see
+  let toWrite = {'time': time, 'data': data.slice(1), 'direction': direction};
+  var numPacketsSpect = 5;       // we send the fft once for every n packets we get, can tune according to the resolution and time length you want to see
 
-    if (data[0] == 'fft'){
-      if (data[1] == 1) {     // channel 1
-      counterSpect1 += 1;
-        if (counterSpect1 % numPacketsSpect == 0) {
-          io.sockets.emit('fft-test', {'data': data[1]});
-          // console.log(counter);
-        }
-      }
-      if (data[1] == 8) {     // channel 2
-        counterSpect2 += 1;
-        if (counterSpect2 % numPacketsSpect == 0) {
-          io.sockets.emit('fft-test2', {'data': data[1]});
-        }
+  if (data[0] == 'fft'){
+    if (data[1] == 1) {     // channel 1
+    counterSpect1 += 1;
+      if (counterSpect1 % numPacketsSpect == 0) {
+        io.sockets.emit('fft-test', {'data': data.slice(1)});
+        // console.log(counter);
       }
     }
-      // TODO: why is there fft in the /openbci address?
-      else if (data[0] == '/openbci' && data.length < 10){
-        if (collecting) {
-          appendSample(toWrite, type="time");
-        }
-        io.sockets.emit('timeseries', {'time': time, 'eeg': data.slice(1)});
-        //This data is used to make the graphs
-
-        numSamples++;
-        if ((time - timeTesting) > 1000) { // check every second
-          io.sockets.emit('sample rate', {'sample rate': numSamples});
-          if (numSamples < expectedSampleRate*0.9 || // check for ± 10%
-              numSamples > expectedSampleRate*1.1) {
-                console.log("\n-------- IRREGULAR SAMPLE RATE --------")
-              }
-          timeTesting = time;
-          console.log("Sample rate: " + numSamples);
-          numSamples = 0;
-        }
+    if (data[1] == 8) {     // channel 2
+      counterSpect2 += 1;
+      if (counterSpect2 % numPacketsSpect == 0) {
+        io.sockets.emit('fft-test2', {'data': data.slice(1)});
       }
+    }
+  }
+  // TODO: why is there fft in the /openbci address?
+  else if (data[0] == '/openbci' && data.length < 10){
+    if (collecting) {
+      appendSample(toWrite, type="time");
+    }
+    io.sockets.emit('timeseries', {'time': time, 'eeg': data.slice(1)});
+    //This data is used to make the graphs
+
+    numSamples++;
+    if ((time - timeTesting) > 1000) { // check every second
+      io.sockets.emit('sample rate', {'sample rate': numSamples});
+      if (numSamples < expectedSampleRate*0.9 || // check for ± 10%
+          numSamples > expectedSampleRate*1.1) {
+            console.log("\n-------- IRREGULAR SAMPLE RATE --------")
+          }
+      timeTesting = time;
+      console.log("Sample rate: " + numSamples);
+      numSamples = 0;
+    }
 
     if(mode == "production"){
-      toSend.push(toWrite);
-      if(toSend.length > samplesToSend){
+      toSend.push(data.slice(1));
+      console.log('hi')
+      if(toSend.length >= samplesToSend){
+        console.log(toSend)
         io.sockets.emit('timeseries-prediction', {'data': toSend});
         toSend = [];
       }
-
     }
+  }
 });
 
 /* When we're collecting data (collecing = True), this function is run for every
@@ -228,9 +231,9 @@ io.on('connection', function(socket){
   console.log('A user connected socket');
 
   if(mode == "production"){
-    console.log('data');
     socket.on("data from ML", function(data){
       io.sockets.emit('to robotics', {'response': data['response']});
+      console.log(data['response']);
     });
   }
 
@@ -292,5 +295,7 @@ io.on('connection', function(socket){
     toSend = [];
     mode = "production";
     console.log(mode);
+    // var process = spawn('python',["../real_time_ML.py"]);
+    console.log('spawned')
   });
 });

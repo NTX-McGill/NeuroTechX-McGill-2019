@@ -12,6 +12,7 @@ def predict(ch):
     ch has shape (2, 500)
     """
     threshold = 1
+    ch = np.array(ch).T
 
     psd1,freqs = mlab.psd(np.squeeze(ch[0]),
                            NFFT=500,
@@ -40,12 +41,13 @@ def on_message(data):
 
     if len(buffer_data) < 500:
         # lacking data
+        print(buffer_data)
         response = "F" # go forward otherwise
     else:
         # we have enough data to make a prediction
         to_pop = len(buffer_data) - 500
         buffer_data = buffer_data[to_pop:]
-        response = predict(data)
+        response = predict(buffer_data)
     sio.emit('data from ML', {'response': response})
 
 
