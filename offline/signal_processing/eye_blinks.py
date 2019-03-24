@@ -18,11 +18,7 @@ from scipy.signal import butter, ellip, cheby1, cheby2, lfilter, freqs,iirfilter
 import numpy.fft as fft
 
 """
-Implementation of the preprocessing as outlined in 
-"TrueNorth-enabled Real-time Classification of EEG Data for Brain- TrueNorth-enabled 
-Real-time Classification of EEG Data for Brain-"
-and
-"A Robust Low-Cost EEG Motor Imagery-Based Brain-Computer Interface:"
+Visualize eye blinks
 
 Input:
 - path: where the data is stored
@@ -32,12 +28,13 @@ Input:
 
 
 class Kiral_Korek_Preprocessing():
-    def __init__(self, path, name_channels=["C3", "C1", "Cp3", "Cp1", "Cp2", "Cp4", "C2", "C4"]):
+    def __init__(self, path, 
+                 name_channels=["C3", "C1", "Cp3", "Cp1", "Cp2", "Cp4", "C2", "C4"]):
         self.path = path
         self.sample_rate = 250 #Default sampling rate for OpenBCI
         self.name_channel = name_channels
 
-    def load_data_BCI(self,interval = (500,1000), list_channels=[1, 2, 3, 4, 5, 6, 7, 8]):
+    def load_data_BCI(self, list_channels=[1, 2, 3, 4, 5, 6, 7, 8]):
         """
         list_channels=[2, 7, 1, 8, 4, 5, 3, 6])
         name_channels=["C1", "C2", "C3", "C4", "Cp1", "Cp2", "Cp3", "Cp4"]
@@ -45,8 +42,6 @@ class Kiral_Korek_Preprocessing():
 
         Input:
             list_channel: lists of channels to use
-            2 s interval to take data from [included, not included]
-
         
         """
         self.number_channels = len(list_channels)
@@ -56,7 +51,7 @@ class Kiral_Korek_Preprocessing():
         self.raw_eeg_data = np.loadtxt(self.path, 
                                        delimiter=',',
                                        skiprows=7,
-                                       usecols=list_channels)#[interval[0]:interval[1],::]
+                                       usecols=list_channels)
 
         #expand the dimmension if only one channel             
         if self.number_channels == 1:
@@ -65,8 +60,8 @@ class Kiral_Korek_Preprocessing():
             
         
         
-    def initial_preprocessing(self, bp_lowcut =1, bp_highcut =70, bp_order=2,
-                          notch_freq_Hz  = [60.0, 120.0], notch_order =2):
+    def initial_preprocessing(self, bp_lowcut =1, bp_highcut =70, bp_order=5,
+                          notch_freq_Hz  = [60.0, 120.0], notch_order=2):
        """
        Filters the data by applying
        - An SL filter
@@ -91,25 +86,11 @@ class Kiral_Korek_Preprocessing():
        #Butter
        b_bandpass, a_bandpass = butter(bp_order, [self.low , self.high], btype='band', analog=True)
        
-       #Ellip
-       #b_bandpass, a_bandpass = ellip(bp_order, 5, 40, [self.low , self.high], 'bandpass', analog=True)
-       
-       #Cheby type 1
-       #b_bandpass, a_bandpass =cheby1(bp_order, 5, [self.low , self.high], 'bandpass', analog=True)
-       
-       #Cheby type 2
-       #b_bandpass, a_bandpass =cheby2(bp_order, 5, [self.low , self.high], 'bandpass', analog=True)
-       
-       #Firwin filter (replace b_bandpass and a_bandpass in line with coefficients)
-#       coefficients =  firwin(2**6-1, [0.5, 30], width=0.05, pass_zero=False, fs = self.sample_rate)
        
        
        self.bp_filtered_eeg_data = np.apply_along_axis(lambda l: lfilter(b_bandpass, a_bandpass ,l),0,
                                                       self.raw_eeg_data)
-       
-#       self.bp_filtered_eeg_data = np.apply_along_axis(lambda l: lfilter(coefficients ,1.0,l),0,
-#                                                      self.raw_eeg_data)
-   
+
        self.notch_filtered_eeg_data = self.bp_filtered_eeg_data
        
        for freq_Hz in notch_freq_Hz: 
@@ -165,74 +146,16 @@ class Kiral_Korek_Preprocessing():
     
             
     
-    
+
     def plots(self, num_channels=8):
         """
        
-        Plot the raw and filtered data of a channel as well as their spectrograms
+        Plot the raw and filtered data 
         
         Input:
-            - channel: channel whose data is to plot
+            - num_channels: number of channels to plot
         
         """
-        self.raw_spec_PSDperBin, self.raw_freqs, self.raw_t_spec = self.convert_to_freq_domain(self.raw_eeg_data)
-        
-        self.corrected_spec_PSDperBin, self.corrected_freqs, self.corrected_t_spec = self.convert_to_freq_domain(self.corrected_eeg_data)
-        
-        for channel in range(num_channels):  
-            fig = plt.figure()
-            fig.suptitle(self.name_channel[channel])
-    
-            t_sec = np.array(range(0, self.raw_eeg_data[:,channel].size)) / self.sample_rate
-            
-            ax1 = plt.subplot(221)
-            plt.plot(t_sec, self.raw_eeg_data[:,channel])
-            plt.ylabel('EEG (uV)')
-            plt.xlabel('Time (sec)')
-            plt.title('Raw')
-            plt.xlim(t_sec[0], t_sec[-1])
-            
-            ax2 = plt.subplot(222)
-            plt.pcolor(self.raw_t_spec[channel], self.raw_freqs[channel], 
-                       10*np.log10(self.raw_spec_PSDperBin[channel]))
-            plt.clim(25-5+np.array([-40, 0]))
-            plt.xlim(t_sec[0], t_sec[-1])
-            plt.xlabel('Time (sec)')
-            plt.ylabel('Frequency (Hz)')
-            plt.title('Spectogram of Unfiltered')
-            
-            
-            ax3 = plt.subplot(223)
-            plt.plot(t_sec, self.corrected_eeg_data[:,channel])
-            plt.ylabel('EEG (uV)')
-            plt.xlabel('Time (sec)')
-            plt.title('Filtered')
-            plt.xlim(t_sec[0], t_sec[-1])
-            
-            ax4 = plt.subplot(224)
-            plt.pcolor(self.corrected_t_spec[channel], self.corrected_freqs[channel], 
-                       10*np.log10(self.corrected_spec_PSDperBin[channel]))
-            plt.clim(25-5+np.array([-40, 0]))
-            plt.xlim(t_sec[0], t_sec[-1]) 
-            plt.xlabel('Time (sec)')
-            plt.ylabel('Frequency (Hz)')
-            plt.title('Spectogram of Filtered')
-    
-    
-    
-            plt.tight_layout()
-            plt.show()
-    
-    def plots2(self, num_channels=8):
-        """
-       
-        Plot the raw and filtered data of a channel as well as their spectrograms
-        
-        Input:
-            - channel: channel whose data is to plot
-        
-        """
-
 
         fig = plt.figure()
         for channel in range(num_channels):  
@@ -287,7 +210,7 @@ test4 = Kiral_Korek_Preprocessing(fname)
 test4.load_data_BCI()
 test4.initial_preprocessing(bp_lowcut =5, bp_highcut =20, bp_order=2)
 
-test4.plots2()            
+test4.plots()            
 
     
 
