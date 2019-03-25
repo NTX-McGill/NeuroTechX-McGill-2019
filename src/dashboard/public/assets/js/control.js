@@ -1,26 +1,14 @@
 $(document).ready(function() {
-
-  //Used for showcasing other dashboard or training dashboard
-  $('#tabs li').on('click', function() {
-    var tab = $(this).data('tab');
-
-    $('#tabs li').removeClass('is-active');
-    $(this).addClass('is-active');
-
-    $('#tab-content div').removeClass('is-active');
-    $('div[data-content="' + tab + '"]').addClass('is-active');
-    console.log(tab);
-
-  });
+  // For production dashboard
   $('#startProduction').on('click', function(){
-    socket.emit("production", {on: true});
     $('#startProduction').toggleClass('btn-danger');
     if ($('#startProduction').hasClass('btn-danger')){
-        $('#startProduction').html('Stop');
+      socket.emit("production", {on: true});
+      $('#startProduction').html("Stop &nbsp; <i class='fas fa-stop fa-sm text-white'></i>");
     }
-    else{
-        $('#startProduction').html('Start');
+    else {
+      socket.emit("production", {on: false});
+      $('#startProduction').html("Start &nbsp; <i class='fas fa-play fa-sm text-white'></i>");
     }
   });
-
-})
+});

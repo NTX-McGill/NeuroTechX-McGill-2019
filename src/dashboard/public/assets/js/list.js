@@ -21,14 +21,16 @@ $(document).ready(function() {
 
     if(clicked.is('.direction-left')){
       //Make list item with left and duration!
-      $("#commandList").append($("<div class='list-group-item tinted' data-direction='Left' data-duration='" + duration + "'><i class='fas fa-arrows-alt handle'></i> Left " + duration + "s <a href='#' class='remove'>REMOVE ME</a></div>"));
+      $("#commandList").append($("<div class='list-group-item tinted' data-direction='Left' data-duration='" + duration + "'><i class='fas fa-arrows-alt handle'></i> Left " + duration + "s &nbsp; <a href='#' class='remove'><i class='fas fa-times-circle'></i></a></div>"));
+
+
     }
     else if(clicked.is('.direction-right')){
-      $("#commandList").append($("<div class='list-group-item tinted' data-direction='Right' data-duration='" + duration + "'><i class='fas fa-arrows-alt handle'></i> Right " + duration + "s <a href='#' class='remove'>REMOVE ME</a></div>"));
+      $("#commandList").append($("<div class='list-group-item tinted' data-direction='Right' data-duration='" + duration + "'><i class='fas fa-arrows-alt handle'></i> Right " + duration + "s &nbsp; <a href='#' class='remove'><i class='fas fa-times-circle'></i></a></div>"));
 
     }
     else if(clicked.is('.direction-rest')){
-      $("#commandList").append($("<div class='list-group-item tinted' data-direction='Rest' data-duration='" + duration + "'><i class='fas fa-arrows-alt handle'></i> Rest " + duration + "s <a href='#' class='remove'>REMOVE ME</a></div>"));
+      $("#commandList").append($("<div class='list-group-item tinted' data-direction='Rest' data-duration='" + duration + "'><i class='fas fa-arrows-alt handle'></i> Rest " + duration + "s &nbsp; <a href='#' class='remove'><i class='fas fa-times-circle'></i></a></div>"));
     }
     else{
 
@@ -43,8 +45,7 @@ $(document).ready(function() {
           var count = $("#commandList div").length;
           trialName = $('#trial-name').val();
           $('#btn-collect').toggleClass('btn-danger');
-          $('#btn-collect').html("Stop");
-          $('#command-display').toggleClass('command-display-flash');
+          $('#btn-collect').html("Stop &nbsp;<i class='fas fa-stop fa-sm text-white'></i>");
           //For each element in the queue, push their direction and duration
           $('#commandList').children('div').each(function () {
               var itemDuration = $(this).data("duration");
@@ -81,40 +82,39 @@ $(document).ready(function() {
         let durationLeft = times[0] - 0;//Do we need - 0?
 
         //Sets display to first elements command/time
-        $('#current-command').html(direction);
-        $('#collectTime').html(durationLeft);
+        console.log('think-' + direction)
+        $('#think-' + direction).removeClass('button-off');
+        $('#think-' + direction).addClass('button-on');
+        $('#collectTime').html(durationLeft + ' s');
         let j = 0;
         let time = 1;
-        // $('#command-display').addClass('command-display-use');
 
         //Controlling the timer.
         collectionTimer = setInterval(function(){
             if (time < totalTime) {
-                $('#command-display').addClass('command-display-use')
-                if($('#command-display').hasClass('command-display-flash')){
-                  $('#command-display').removeClass('command-display-flash')
-                }
 
               if (time >= times[j]){
               //This means we've gotten to the end of element j's duration
                 console.log("next command");
-                $('#command-display').addClass('command-display-flash');
                 j += 1;
+                $('#think-' + direction).removeClass('button-on');
+                $('#think-' + direction).addClass('button-off');
                 direction = queue[j][0];
-                $('#current-command').html(direction); //Setup direction again
+                $('#think-' + direction).removeClass('button-off');
+                $('#think-' + direction).addClass('button-on'); //Setup direction again
               }
               //If we're not at end of duration, decrement time
               durationLeft = times[j] - time;
 
-              $('#collectTime').html(durationLeft);
+              $('#collectTime').html(durationLeft + ' s');
               time++;
             }
             else {
-                $('#command-display').removeClass('command-display-use');
                 $('#btn-collect').toggleClass('btn-danger');
-                $('#btn-collect').html('Collect');
-                $('#current-command').html("--");
-                $('#collectTime').html("N/A");
+                $('#btn-collect').html("Collect &nbsp; <i class='fas fa-play fa-sm text-white'></i>");
+                $('#think-' + direction).removeClass('button-on');
+                $('#think-' + direction).addClass('button-off');
+                $('#collectTime').html("&nbsp;");
                 clearInterval(collectionTimer);
             }
         }, 1000);
@@ -125,10 +125,10 @@ $(document).ready(function() {
           clearInterval(collectionTimer);
           socket.emit("stop");
           $('#btn-collect').toggleClass('btn-danger');
-          $('#btn-collect').html("Collect");
-          $('#current-command').html("--");
-          $('#collectTime').html("N/A");
-          $('#command-display').removeClass('command-display-use');
+          $('#btn-collect').html("Collect &nbsp; <i class='fas fa-play fa-sm text-white'></i>");
+          $('#think-' + direction).removeClass('button-on');
+          $('#think-' + direction).addClass('button-off');
+          $('#collectTime').html("&nbsp");
 
       }
       else{
