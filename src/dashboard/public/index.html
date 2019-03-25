@@ -78,6 +78,7 @@
           <!-- Page Heading -->
           <div class="d-sm-flex align-items-center justify-content-between mb-4">
             <h1 class="h3 mb-0 text-gray-800">Training</h1>
+            <a href="#" onclick="event.preventDefault()" class="selection d-none d-sm-inline-block btn btn-sm btn-secondary shadow-sm" id="sampleRate" style="position: fixed; bottom: 10px; right: 140px; z-index: 5">0 hz</i></a>
             <a href="#" onclick="event.preventDefault()" class="selection d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm" id="btn-collect" style="position: fixed; bottom: 10px; right: 40px; z-index: 5">Collect &nbsp; <i class="fas fa-play fa-sm text-white"></i></a>
             <!-- even.preventDefault() avoids reloading page -->
           </div>
@@ -200,6 +201,11 @@
                           <button class="selection btn btn-outline-secondary direction-rest">Rest</button>
                           <button class="selection btn btn-outline-secondary direction-right">Right</button>
                       </div>
+                      <div class="custom-control custom-checkbox mb-3">
+                          <input type="checkbox" class="custom-control-input" id="customControlValidation1" required>
+                          <label class="custom-control-label" for="customControlValidation1">Loop</label>
+                          <div class="invalid-feedback">Example invalid feedback text</div>
+                        </div>
                 </div>
               </div>
             </div>
