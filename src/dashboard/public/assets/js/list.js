@@ -6,6 +6,18 @@ $(document).ready(function() {
   var active = [1,1,1,1,1,1,1,1];
   //Made global so stop button can clear it
   var collectionTimer = null;
+  var loop = false;
+
+  $('#customControlValidation1').change(function() {
+      if(this.checked) {
+          $(this).prop('checked', true);
+          loop = true;
+      }
+      else{
+          $(this).prop('checked', false);
+          loop = false;
+      }
+  });
 
   //To remove an element from the queue
   $("#commandList").on("click",".remove",function(){
@@ -60,7 +72,7 @@ $(document).ready(function() {
         //Finally emits a collectQueue!
 
         //Gives the queue array with the direcions/durations and active sensors
-        socket.emit("collectQueue", {queue: queue, sensors: active, trialName: trialName});
+        socket.emit("collectQueue", {queue: queue, sensors: active, trialName: trialName, loop: loop});
 
         let totalTime = 0;
         let times = [];

@@ -26,6 +26,7 @@ var duration = 0;
 var direction = "none";
 var active = [];
 var collectionTimer=null;
+var loop = false;
 
 var path = require('path');
 
@@ -245,7 +246,8 @@ io.on('connection', function(socket){
     mode = "training";
     timeSamples = [timeHeaderToWrite];
     collectQueue = clientRequest['queue'];
-    trialName = clientRequest['trialName']
+    trialName = clientRequest['trialName'];
+    loop = clientRequest['loop'];
     console.log(collectQueue);
     console.log("This is trial: " + trialName);
 
@@ -279,8 +281,17 @@ io.on('connection', function(socket){
         else {
           collecting = false;
           endTest(true, true);
-          clearInterval(collectionTimer);
+
           console.log("Trial over.");
+          if(loop == true){
+              time = 0;
+              collecting = true;
+              j = 0;
+              direction = collectQueue[0][0];
+          }
+          else{
+              clearInterval(collectionTimer);
+          }
         }
         time++;
     }, 1000);
