@@ -59,7 +59,7 @@ def plot_confusion_matrix(y_true, y_pred, classes,
     else:
         print('Confusion matrix, without normalization')
 
-    print(cm)
+    #print(cm)
 
     fig, ax = plt.subplots()
     im = ax.imshow(cm, interpolation='nearest', cmap=cmap)
@@ -235,6 +235,23 @@ def get_data(csvs):
         all_data = merge_dols(all_data, data)
     return all_data
 
+csvs = ["data/March22_008/10_008-2019-3-22-15-8-55.csv",
+        "data/March22_008/9_008-2019-3-22-14-59-0.csv",
+        "data/March22_008/8_008-2019-3-22-14-45-53.csv",
+        "data/March22_008/7_008-2019-3-22-14-27-46.csv",    #actual
+        "data/March22_008/6_008-2019-3-22-14-19-52.csv",    #actual
+        "data/March22_008/5_008-2019-3-22-14-10-26.csv",    #actual
+        "data/March22_001/4-001-rest25s_left15s_right15s_MI-2019-3-22-16-27-44.csv",
+        "data/March22_001/5-001-rest25s_left10s_right10s_MI-2019-3-22-16-35-57.csv",
+        "data/March22_001/6-001-rest25s_left15s_right15s_MI-2019-3-22-16-46-17.csv",    #actual
+        "data/March22_001/7-001-rest25s_left20s_right20s_MI-2019-3-22-16-54-17.csv",
+        "data/March20/time-test-JingMingImagined_10s-2019-3-20-10-28-35.csv",   #10
+        "data/March20/time-test-JingMingImagined_10s-2019-3-20-10-30-26.csv",
+        "data/March20/time-test-JingMingImagined_10s-2019-3-20-10-35-31.csv"
+        ]
+
+
+
 csv_map = {"10_008-2019-3-22-15-8-55.csv": "10_008_OpenBCI-RAW-2019-03-22_15-07-58.txt",
            "9_008-2019-3-22-14-59-0.csv": "8to9_008_OpenBCI-RAW-2019-03-22_13-49-24.txt",
            "8_008-2019-3-22-14-45-53.csv": "8to9_008_OpenBCI-RAW-2019-03-22_13-49-24.txt",
@@ -264,6 +281,9 @@ tmin, tmax = 0,0
 
 left_data = []
 rest_data = []
+
+
+
 
 if Viet:
     fname = 'data/March 4/5_SUCCESS_Rest_RightAndJawClench_10secs.txt' 
@@ -332,16 +352,21 @@ if Andy:
         end = int(min(start_indices[i+1] + tmax * sampling_freq, start_indices[-1]))
         left_data.append(data[start:end])
 else:
-    load_data = 0
+    load_data = 1
+    data_dict = {}
     if load_data:
-        data_dict = {}
-        for csv in csv_map.keys():
+        for csv in csvs:
             data_dict[csv] = get_data([csv])
+        #for csv in csv_map.keys():
+            #data_dict[csv] = get_data([csv])
     
 def get_features(arr):
     # ch has shape (2, 500)
     channels=[0,1,6,7]
     channels=[0,7]
+    freqs, _ = mlab.psd(np.squeeze(arr[0]),
+                           NFFT=500,
+                           Fs=250)
     psds_per_channel = np.array([mlab.psd(np.squeeze(ch),
                            NFFT=500,
                            Fs=250)[0] for ch in arr[channels]])
@@ -352,25 +377,12 @@ def get_features(arr):
     #features = psds_per_channel[:,mu_indices].flatten()
     return features, freqs, psds_per_channel[0], psds_per_channel[-1]
 
-csvs = ["data/March22_008/10_008-2019-3-22-15-8-55.csv",
-        "data/March22_008/9_008-2019-3-22-14-59-0.csv",
-        "data/March22_008/8_008-2019-3-22-14-45-53.csv",
-        "data/March22_008/7_008-2019-3-22-14-27-46.csv",    #actual
-        "data/March22_008/6_008-2019-3-22-14-19-52.csv",    #actual
-        "data/March22_008/5_008-2019-3-22-14-10-26.csv",    #actual
-        "data/March22_001/4-001-rest25s_left15s_right15s_MI-2019-3-22-16-27-44.csv",
-        "data/March22_001/5-001-rest25s_left10s_right10s_MI-2019-3-22-16-35-57.csv",
-        "data/March22_001/6-001-rest25s_left15s_right15s_MI-2019-3-22-16-46-17.csv",    #actual
-        "data/March22_001/7-001-rest25s_left20s_right20s_MI-2019-3-22-16-54-17.csv",
-        "data/March20/time-test-JingMingImagined_10s-2019-3-20-10-28-35.csv",   #10
-        "data/March20/time-test-JingMingImagined_10s-2019-3-20-10-30-26.csv",
-        "data/March20/time-test-JingMingImagined_10s-2019-3-20-10-35-31.csv"
-        ]
+
+
 train_csvs = [0,1]
 test_csvs = [2]
 train_csvs = [csvs[i] for i in train_csvs]
 test_csvs = [csvs[i] for i in test_csvs]
-
 all_data = merge_all_dols([data_dict[csv] for csv in train_csvs])
 for window_s in [2]:
     #for csv in csvs:
@@ -406,7 +418,7 @@ for window_s in [2]:
     	results.append(cv_results)
     	names.append(name)
     	msg = "%s: %f (%f)" % (name, cv_results.mean(), cv_results.std())
-    	print(msg)
+    	#print(msg)
     print("average accuracy: " + "{:2.1f}".format(np.array(results).mean() * 100))
     
     test_dict = data_dict[test_csvs[0]]
