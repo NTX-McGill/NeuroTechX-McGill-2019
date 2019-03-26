@@ -1,10 +1,14 @@
 import numpy as np
 import matplotlib.mlab as mlab
 import socketio
+import pickle
+from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
 
 sio = socketio.Client()
 
 buffer_data = []
+with open('../offline/model.pkl', 'rb') as fid:
+    clf = pickle.load(fid)
 
 def predict(ch):
     """
@@ -12,31 +16,33 @@ def predict(ch):
     ch has shape (2, 500)
     """
     threshold = 1
+    ch = np.array(ch).T
 
     psd1,freqs = mlab.psd(np.squeeze(ch[0]),
                            NFFT=500,
                            Fs=250)
-    mu_indices = np.where(np.logical_and(freqs>=7, freqs<=12))
+    mu_indices = np.where(np.logical_and(freqs>=10, freqs<=12))
     mu1 = np.mean(psd1[mu_indices])
 
-    psd2,freqs = mlab.psd(np.squeeze(ch[1]),
+    psd2,freqs = mlab.psd(np.squeeze(ch[7]),
                            NFFT=500,
                            Fs=250)
     mu2 = np.mean(psd2[mu_indices])
 
-    if mu1 < threshold and mu2>= threshold:
-        return "L"  # left
-    elif mu1 >= threshold and mu2 < threshold:
-        return "R"  # right
+    result = list(clf.predict_proba(np.array([mu1,mu2]).reshape(1,-1))[0])
+
+    if result[0] > 0.6:
+        return "L"
+    elif result[1] > 0.6:
+        return "R"
     else:
-        return "F"  # forward
+        return "F"
 
 
 @sio.on('timeseries-prediction')
 def on_message(data):
     global buffer_data
     buffer_data += data['data'] # concatenate lists
-    print(len(buffer_data))
 
     if len(buffer_data) < 500:
         # lacking data
@@ -45,7 +51,7 @@ def on_message(data):
         # we have enough data to make a prediction
         to_pop = len(buffer_data) - 500
         buffer_data = buffer_data[to_pop:]
-        response = predict(data)
+        response = predict(buffer_data)
     sio.emit('data from ML', {'response': response})
 
 
