@@ -64,7 +64,11 @@ csv_map = {"10_008-2019-3-22-15-8-55.csv": "10_008_OpenBCI-RAW-2019-03-22_15-07-
 #csv_name = "data/March22_008/10_008-2019-3-22-15-8-55.csv"
 csv_name = "data/March22_008/8_008-2019-3-22-14-45-53.csv"
 train_data = get_data(csv_name)
-plt.figure()
+fig1 = plt.figure("psds")
+fig1.clf()
+fig2 = plt.figure("separate psds")
+fig2.clf()
+idx = 1
 for direction, data in train_data.items():
     l = np.hstack([trial[:,0] for trial in data])
     r = np.hstack([trial[:,-1] for trial in data])
@@ -76,6 +80,7 @@ for direction, data in train_data.items():
                               NFFT=2048,
                               noverlap=250,
                               Fs=250)
+    plt.figure("psds")
     plt.subplot(211)
     plt.title("electrode 1")
     plt.plot(freqs,psd1,label=direction,linewidth=0.5)
@@ -89,7 +94,8 @@ for direction, data in train_data.items():
     plt.xlim([0,20])
     plt.legend()
     plt.subplots_adjust(hspace=0.5)
-    """
+    
+    plt.figure("separate psds")
     plt.subplot(3,2,idx)
     plt.title(direction)
     plt.plot(freqs, psd1,linewidth=0.5)
@@ -100,5 +106,5 @@ for direction, data in train_data.items():
     plt.ylim([0,25])
     plt.xlim([6,20])
     idx += 2
-    """
+    
 plt.show()
