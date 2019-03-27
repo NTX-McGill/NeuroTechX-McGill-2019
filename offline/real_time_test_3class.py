@@ -453,8 +453,9 @@ last = 0
 if last:
     plt.scatter(r_saved[0], r_saved[1], s=2, color='blue')
     plt.scatter(l_saved[0], l_saved[1], s=2, color='red')
-    
-fig, ax = plt.subplots(121)
+
+plt.figure()   
+ax = plt.subplot(121)
 plt.title("Mean")
 for direction, psd in all_psds.items():
     psd = np.array(psd).T
@@ -464,11 +465,11 @@ for direction, psd in all_psds.items():
         mu = np.log10(mu)
     if direction != 'Rest':
         sn.kdeplot(mu[0], mu[1], ax=ax, shade_lowest=False, alpha=0.6)
-ax.collections[0].set_alpha(0)
-ax.collections[10].set_alpha(0)
 ax.set(aspect="equal")
+ymin, ymax = plt.gca().get_ylim()
 
-fig, ax = plt.subplots(122)
+ax = plt.subplot(122, sharex=ax, sharey=ax)
+plt.title("Max")
 for direction, psd in all_psds.items():
     psd = np.array(psd).T
     #mu = np.mean(psd[mu_indices],axis=0)
@@ -477,10 +478,6 @@ for direction, psd in all_psds.items():
         mu = np.log10(mu)
     if direction != 'Rest':
         sn.kdeplot(mu[0], mu[1], ax=ax, shade_lowest=False, alpha=0.6)
-ax.collections[0].set_alpha(0)
-ax.collections[10].set_alpha(0)
-ax.set(aspect="equal")
-
 """
 m = [[left_true,left_false],
      [rest_false,rest_true]]
