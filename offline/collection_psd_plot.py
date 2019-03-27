@@ -60,7 +60,9 @@ csv_map = {"10_008-2019-3-22-15-8-55.csv": "10_008_OpenBCI-RAW-2019-03-22_15-07-
            }
 
 # specify csv name below
-csv_name = "data/March24_011/5_011_Rest20LeftRight20_MI-2019-3-24-17-3-17.csv"
+#csv_name = "data/March24_011/5_011_Rest20LeftRight20_MI-2019-3-24-17-3-17.csv"
+#csv_name = "data/March22_008/10_008-2019-3-22-15-8-55.csv"
+csv_name = "data/March22_008/8_008-2019-3-22-14-45-53.csv"
 train_data = get_data(csv_name)
 plt.figure()
 for direction, data in train_data.items():
@@ -75,15 +77,18 @@ for direction, data in train_data.items():
                               noverlap=250,
                               Fs=250)
     plt.subplot(211)
+    plt.title("electrode 1")
     plt.plot(freqs,psd1,label=direction,linewidth=0.5)
     plt.ylim([0,25])
     plt.xlim([0,20])
     plt.legend()
     plt.subplot(212)
+    plt.title("electrode 8")
     plt.plot(freqs,psd2,label=direction,linewidth=0.5)
     plt.ylim([0,25])
     plt.xlim([0,20])
     plt.legend()
+    plt.subplots_adjust(hspace=0.5)
     """
     plt.subplot(3,2,idx)
     plt.title(direction)
