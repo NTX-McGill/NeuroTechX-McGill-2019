@@ -42,4 +42,4 @@ test subject: 008
 
 10 - same as 8
 
-
+NOTE: Delete the last row of 8to9_008_OpenBCI-RAW-2019-03-22_13-49-24.txt
