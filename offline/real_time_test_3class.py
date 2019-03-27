@@ -239,18 +239,18 @@ def get_data(csvs):
 
 csvs = ["data/March22_008/10_008-2019-3-22-15-8-55.csv",
         "data/March22_008/9_008-2019-3-22-14-59-0.csv",
-        "data/March22_008/8_008-2019-3-22-14-45-53.csv",
-        "data/March22_008/7_008-2019-3-22-14-27-46.csv",    #actual
-        "data/March22_008/6_008-2019-3-22-14-19-52.csv",    #actual
-        "data/March22_008/5_008-2019-3-22-14-10-26.csv",    #actual
+        "data/March22_008/8_008-2019-3-22-14-45-53.csv",    # 
+        #"data/March22_008/7_008-2019-3-22-14-27-46.csv",    #actual
+        #"data/March22_008/6_008-2019-3-22-14-19-52.csv",    #actual
+        #"data/March22_008/5_008-2019-3-22-14-10-26.csv",    #actual
         "data/March22_001/4-001-rest25s_left15s_right15s_MI-2019-3-22-16-27-44.csv",
         "data/March22_001/5-001-rest25s_left10s_right10s_MI-2019-3-22-16-35-57.csv",
-        "data/March22_001/6-001-rest25s_left15s_right15s_MI-2019-3-22-16-46-17.csv",    #actual
+        #"data/March22_001/6-001-rest25s_left15s_right15s_MI-2019-3-22-16-46-17.csv",    #actual
         "data/March22_001/7-001-rest25s_left20s_right20s_MI-2019-3-22-16-54-17.csv",
-        "data/March20/time-test-JingMingImagined_10s-2019-3-20-10-28-35.csv",   #10
+        "data/March20/time-test-JingMingImagined_10s-2019-3-20-10-28-35.csv",   #6
         "data/March20/time-test-JingMingImagined_10s-2019-3-20-10-30-26.csv",
         "data/March20/time-test-JingMingImagined_10s-2019-3-20-10-35-31.csv",
-        "data/March24_011/1_011_Rest20LeftRight20_MI-2019-3-24-16-25-41.csv",
+        "data/March24_011/1_011_Rest20LeftRight20_MI-2019-3-24-16-25-41.csv",   #9 to 13
         "data/March24_011/2_011_Rest20LeftRight20_MI-2019-3-24-16-38-10.csv",
         "data/March24_011/3_011_Rest20LeftRight10_MI-2019-3-24-16-49-23.csv",
         "data/March24_011/4_011_Rest20LeftRight10_MI-2019-3-24-16-57-8.csv",
@@ -262,12 +262,12 @@ csvs = ["data/March22_008/10_008-2019-3-22-15-8-55.csv",
 csv_map = {"10_008-2019-3-22-15-8-55.csv": "10_008_OpenBCI-RAW-2019-03-22_15-07-58.txt",
            "9_008-2019-3-22-14-59-0.csv": "8to9_008_OpenBCI-RAW-2019-03-22_13-49-24.txt",
            "8_008-2019-3-22-14-45-53.csv": "8to9_008_OpenBCI-RAW-2019-03-22_13-49-24.txt",
-           "7_008-2019-3-22-14-27-46.csv": "4to7_008_OpenBCI-RAW-2019-03-22_13-49-24.txt",  # actual
-           "6_008-2019-3-22-14-19-52.csv": "4to7_008_OpenBCI-RAW-2019-03-22_13-49-24.txt",  # actual
-           "5_008-2019-3-22-14-10-26.csv": "4to7_008_OpenBCI-RAW-2019-03-22_13-49-24.txt",  # actual
+           #"7_008-2019-3-22-14-27-46.csv": "4to7_008_OpenBCI-RAW-2019-03-22_13-49-24.txt",  # actual
+           #"6_008-2019-3-22-14-19-52.csv": "4to7_008_OpenBCI-RAW-2019-03-22_13-49-24.txt",  # actual
+           #"5_008-2019-3-22-14-10-26.csv": "4to7_008_OpenBCI-RAW-2019-03-22_13-49-24.txt",  # actual
            "5-001-rest25s_left10s_right10s_MI-2019-3-22-16-35-57.csv": "1to5_001_OpenBCI-RAW-2019-03-22_15-56-26.txt",
            "4-001-rest25s_left15s_right15s_MI-2019-3-22-16-27-44.csv": "1to5_001_OpenBCI-RAW-2019-03-22_15-56-26.txt",
-           "6-001-rest25s_left15s_right15s_MI-2019-3-22-16-46-17.csv": "6to7_001_OpenBCI-RAW-2019-03-22_16-44-46.txt",  # actual
+           #"6-001-rest25s_left15s_right15s_MI-2019-3-22-16-46-17.csv": "6to7_001_OpenBCI-RAW-2019-03-22_16-44-46.txt",  # actual
            "7-001-rest25s_left20s_right20s_MI-2019-3-22-16-54-17.csv": "6to7_001_OpenBCI-RAW-2019-03-22_16-44-46.txt",
            "time-test-JingMingImagined_10s-2019-3-20-10-28-35.csv": 'OpenBCI-RAW-2019-03-20_10-04-29.txt',
            "time-test-JingMingImagined_10s-2019-3-20-10-30-26.csv": 'OpenBCI-RAW-2019-03-20_10-04-29.txt',
@@ -281,7 +281,7 @@ csv_map = {"10_008-2019-3-22-15-8-55.csv": "10_008_OpenBCI-RAW-2019-03-22_15-07-
 fs_Hz = 250
 sampling_freq = 250
 window_s = 2
-shift = 0.5
+shift = 0.1
 channel_name = 'C4'
 Viet = 0
 Marley = 0
@@ -318,12 +318,16 @@ def get_features(arr):
 """ end """
 
 # * use this to select which files you want to test/train on
-train_csvs = [-4]          # index of the training files we want to use
+train_csvs = [1]          # index of the training files we want to use
 test_csvs = [2]             # index of the test files we want to use
 train_csvs = [csvs[i] for i in train_csvs]
 test_csvs = [csvs[i] for i in test_csvs]
 train_data = merge_all_dols([data_dict[csv] for csv in train_csvs])
-for window_s in [2]:
+all_results = []
+all_test_results = []
+window_lengths = [1,2,4,6,8]
+#window_lengths = [2]
+for window_s in window_lengths:
     train_psds, train_features, freqs = extract(train_data, window_s, shift, plot_psd)
     data = to_feature_vec(train_features)
     
@@ -358,6 +362,7 @@ for window_s in [2]:
     	msg = "%s: %f (%f)" % (name, cv_results.mean(), cv_results.std())
     	print(msg)
     print("average accuracy: " + "{:2.1f}".format(np.array(results).mean() * 100))
+    all_results.append(np.array(results).mean()* 100)
     
     print("TEST")
     test_dict = data_dict[test_csvs[0]]
@@ -374,6 +379,7 @@ for window_s in [2]:
         test_results.append(score)
     print("test accuracy:")
     print("{:2.1f}".format(np.array(test_results).mean() * 100))
+    all_test_results.append(np.array(test_results).mean() * 100)
 
     
 
@@ -389,7 +395,8 @@ for direction, psd in train_psds.items():
     #mu = np.amax(psd[mu_indices], axis=0)
     if log:
         mu = np.log10(mu)
-    plt.scatter(mu[0], mu[1], s=2)
+    if direction != 'Rest':
+        plt.scatter(mu[0], mu[1], s=2)
 plt.axis('scaled')
 plt.show()
 
@@ -432,8 +439,11 @@ for direction, psd in train_psds.items():
     if direction != 'Rest':
         sn.kdeplot(mu[0], mu[1], ax=ax, shade_lowest=False, alpha=0.6)
 
-fig1 = plt.figure("All psds")
+fig1 = plt.figure("psds")
 fig1.clf()
+fig2 = plt.figure("separate psds")
+fig2.clf()
+idx = 1
 for direction, data in train_data.items():
     l = np.hstack([trial[:,0] for trial in data])
     r = np.hstack([trial[:,-1] for trial in data])
@@ -445,15 +455,22 @@ for direction, data in train_data.items():
                               NFFT=2048,
                               noverlap=250,
                               Fs=250)
+    plt.figure("psds")
     plt.subplot(211)
+    plt.title("electrode 1")
     plt.plot(freqs,psd1,label=direction,linewidth=0.5)
     plt.ylim([0,25])
     plt.xlim([0,20])
+    plt.legend()
     plt.subplot(212)
+    plt.title("electrode 8")
     plt.plot(freqs,psd2,label=direction,linewidth=0.5)
     plt.ylim([0,25])
     plt.xlim([0,20])
-    """
+    plt.legend()
+    plt.subplots_adjust(hspace=0.5)
+    
+    plt.figure("separate psds")
     plt.subplot(3,2,idx)
     plt.title(direction)
     plt.plot(freqs, psd1,linewidth=0.5)
@@ -464,5 +481,3 @@ for direction, data in train_data.items():
     plt.ylim([0,25])
     plt.xlim([6,20])
     idx += 2
-    """
-plt.legend()
