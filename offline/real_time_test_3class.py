@@ -184,7 +184,7 @@ def extract(all_data, window_s, shift, plot_psd=False):
                     plt.plot(freqs, psd2)
                     plt.ylim([0,25])
                     plt.xlim([6,20])
-    return all_psds, all_features
+    return all_psds, all_features, freqs
 def to_feature_vec(all_features, rest=False):
     classes = ['Left', 'Right', 'Rest']
     feature_arr = []
@@ -267,7 +267,7 @@ csv_map = {"10_008-2019-3-22-15-8-55.csv": "10_008_OpenBCI-RAW-2019-03-22_15-07-
            "time-test-JingMingImagined_10s-2019-3-20-10-35-31.csv": 'OpenBCI-RAW-2019-03-20_10-04-29.txt'}
 fs_Hz = 250
 sampling_freq = 250
-window_s = 4
+window_s = 2
 shift = 0.1
 channel = (1,2)
 channel_name = 'C4'
@@ -352,42 +352,42 @@ if Andy:
         end = int(min(start_indices[i+1] + tmax * sampling_freq, start_indices[-1]))
         left_data.append(data[start:end])
 else:
-    load_data = 1
-    data_dict = {}
+    # * set load_data to true the first time you run the script
+    load_data = 0
     if load_data:
+        data_dict = {}
         for csv in csvs:
             data_dict[csv] = get_data([csv])
-        #for csv in csv_map.keys():
-            #data_dict[csv] = get_data([csv])
-    
+""" * modify this to test filtering and new features """    
 def get_features(arr):
     # ch has shape (2, 500)
     channels=[0,1,6,7]
     channels=[0,7]
-    freqs, _ = mlab.psd(np.squeeze(arr[0]),
-                           NFFT=500,
-                           Fs=250)
-    psds_per_channel = np.array([mlab.psd(np.squeeze(ch),
-                           NFFT=500,
-                           Fs=250)[0] for ch in arr[channels]])
+    psds_per_channel = []
+    for ch in arr[channels]:
+        psd, freqs = mlab.psd(np.squeeze(ch),
+                              NFFT=500,
+                              Fs=250)
+        psds_per_channel.append(psd)
+    psds_per_channel = np.array(psds_per_channel)
     mu_indices = np.where(np.logical_and(freqs>=10, freqs<=12))
     
-    #features = np.amax(psds_per_channel[:,mu_indices], axis=-1).flatten()
-    features = np.mean(psds_per_channel[:,mu_indices], axis=-1).flatten()
-    #features = psds_per_channel[:,mu_indices].flatten()
+    #features = np.amax(psds_per_channel[:,mu_indices], axis=-1).flatten()   # max of 10-12hz as feature
+    features = np.mean(psds_per_channel[:,mu_indices], axis=-1).flatten()   # mean of 10-12hz as feature
+    #features = psds_per_channel[:,mu_indices].flatten()                     # all of 10-12hz as feature
     return features, freqs, psds_per_channel[0], psds_per_channel[-1]
+""" end """
 
-
-
-train_csvs = [0,1]
-test_csvs = [2]
+# * use this to select which files you want to test/train on
+train_csvs = [0,1]          # index of the training files we want to use
+test_csvs = [2]             # index of the test files we want to use
 train_csvs = [csvs[i] for i in train_csvs]
 test_csvs = [csvs[i] for i in test_csvs]
 all_data = merge_all_dols([data_dict[csv] for csv in train_csvs])
 for window_s in [2]:
     #for csv in csvs:
     #all_data = get_data([csv])
-    all_psds, all_features = extract(all_data, window_s, shift, plot_psd)
+    all_psds, all_features, freqs = extract(all_data, window_s, shift, plot_psd)
     data = to_feature_vec(all_features)
     
     X = data[:,:-1]
@@ -418,11 +418,11 @@ for window_s in [2]:
     	results.append(cv_results)
     	names.append(name)
     	msg = "%s: %f (%f)" % (name, cv_results.mean(), cv_results.std())
-    	#print(msg)
+    	print(msg)
     print("average accuracy: " + "{:2.1f}".format(np.array(results).mean() * 100))
     
     test_dict = data_dict[test_csvs[0]]
-    _, test_features = extract(test_dict, window_s, shift, plot_psd)
+    _, test_features, _ = extract(test_dict, window_s, shift, plot_psd)
     test_data = to_feature_vec(test_features)
     X_test = test_data[:,:-1]
     Y_test = test_data[:,-1]
@@ -437,6 +437,7 @@ for window_s in [2]:
     
 
 # Plots
+mu_indices = np.where(np.logical_and(freqs>=10, freqs<=12))
 fig3 = plt.figure("scatter")
 fig3.clf()
 log = 0
@@ -461,10 +462,6 @@ if mean_plt:
             mu = np.log10(mu)
         plt.scatter(np.mean(mu[0]), np.mean(mu[1]), s=2)
     plt.axis('scaled')
-last = 0
-if last:
-    plt.scatter(r_saved[0], r_saved[1], s=2, color='blue')
-    plt.scatter(l_saved[0], l_saved[1], s=2, color='red')
 
 plt.figure()   
 ax = plt.subplot(121)
@@ -490,74 +487,3 @@ for direction, psd in all_psds.items():
         mu = np.log10(mu)
     if direction != 'Rest':
         sn.kdeplot(mu[0], mu[1], ax=ax, shade_lowest=False, alpha=0.6)
-"""
-m = [[left_true,left_false],
-     [rest_false,rest_true]]
-plt.matshow(m, cmap='Greys')
-left_specgram = []
-rest_specgram = []
-
-t,f,all_spectra = get_spectral_content(ch, sampling_freq, shift)
-fig = plt.figure()
-plot_specgram(f, all_spectra, "entire session", shift, 1)
-
-
-if continuous:
-    for i in range(len(start_indices) - 1):
-        start = int(start_indices[i]/(sampling_freq * shift))
-        end = int(start_indices[i+1]/(sampling_freq * shift))
-        d = all_spectra[:,start:end]
-        # this trial alternates between rest and left motor imagery
-        if i % 2:
-            left_specgram.append(d)
-        else:
-            rest_specgram.append(d)
-elif psd:
-    #tmin, tmax = -1, 1
-    tmin, tmax = 0, 0
-    plt.figure()
-    for i in range(len(start_indices) - 1):
-        start = int(max(start_indices[i] + tmin * sampling_freq, 0))
-        end = int(min(start_indices[i+1] + tmax * sampling_freq, start_indices[-1]))
-        psd, f = get_psd(ch[start:end], sampling_freq)
-        if i < 2:
-            print(i)
-            # plot two sample epochs for fun
-            #plot_specgram(f, d, 'a', shift, i + 1)
-        if i % 2:
-            plt.subplot(2,1,2)
-            plt.plot(f, psd)
-            #left_specgram.append(d)
-        else:
-            plt.subplot(2,1,1)
-            plt.plot(f, psd)
-            #rest_specgram.append(d)
-else:
-    #tmin, tmax = -1, 1
-    tmin, tmax = 0, 0
-    plt.figure()
-    for i in range(len(start_indices) - 1):
-        start = int(max(start_indices[i] + tmin * sampling_freq, 0))
-        end = int(min(start_indices[i+1] + tmax * sampling_freq, start_indices[-1]))
-        t, f, d = get_spectral_content(ch[start:end], sampling_freq)
-        if i < 2:
-            # plot two sample epochs for fun
-            plot_specgram(f, d, 'a', shift, i + 1)
-        if i % 2:
-            left_specgram.append(d)
-        else:
-            rest_specgram.append(d)
-    #resize the blocks so that they're the same length as either the minimum or maximum length block
-    '''rest_specgram = resize_min(rest_specgram)
-    left_specgram = resize_min(left_specgram)
-    '''
-    rest_specgram = resize_max(rest_specgram)
-    left_specgram = resize_max(left_specgram)
-    
-    # plot average spectrogram of both classes
-    plt.figure()
-    rest_av = np.nanmean(np.array(rest_specgram), axis=0)
-    plot_specgram(f, rest_av,channel_name + ' rest',shift, 1)
-    left_av = np.nanmean(np.array(left_specgram), axis=0)
-    plot_specgram(f, left_av,channel_name + ' left',shift, 2)
-"""
