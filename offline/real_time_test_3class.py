@@ -33,7 +33,8 @@ from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
 from sklearn.naive_bayes import GaussianNB
 from sklearn.svm import SVC
 from sklearn.utils import shuffle
-
+import warnings
+warnings.filterwarnings("ignore")
 
 def plot_confusion_matrix(y_true, y_pred, classes,
                           normalize=False,
@@ -317,7 +318,7 @@ def get_features(arr):
 """ end """
 
 # * use this to select which files you want to test/train on
-train_csvs = [1]          # index of the training files we want to use
+train_csvs = [-4]          # index of the training files we want to use
 test_csvs = [2]             # index of the test files we want to use
 train_csvs = [csvs[i] for i in train_csvs]
 test_csvs = [csvs[i] for i in test_csvs]
@@ -377,7 +378,8 @@ for window_s in [2]:
     
 
 # Plots
-mu_indices = np.where(np.logical_and(freqs>=14, freqs<=20))
+
+mu_indices = np.where(np.logical_and(freqs>=10, freqs<=12))
 fig3 = plt.figure("scatter")
 fig3.clf()
 log = 0
@@ -418,7 +420,8 @@ for direction, psd in train_psds.items():
 ax.set(aspect="equal")
 ymin, ymax = plt.gca().get_ylim()
 
-ax = plt.subplot(122, sharex=ax, sharey=ax)
+#ax = plt.subplot(122, sharex=ax, sharey=ax)
+ax = plt.subplot(122)
 plt.title("Max")
 for direction, psd in train_psds.items():
     psd = np.array(psd).T
@@ -428,3 +431,38 @@ for direction, psd in train_psds.items():
         mu = np.log10(mu)
     if direction != 'Rest':
         sn.kdeplot(mu[0], mu[1], ax=ax, shade_lowest=False, alpha=0.6)
+
+fig1 = plt.figure("All psds")
+fig1.clf()
+for direction, data in train_data.items():
+    l = np.hstack([trial[:,0] for trial in data])
+    r = np.hstack([trial[:,-1] for trial in data])
+    psd1, freqs = mlab.psd(np.squeeze(l),
+                              NFFT=2048,
+                              noverlap=250,
+                              Fs=250)
+    psd2, freqs = mlab.psd(np.squeeze(r),
+                              NFFT=2048,
+                              noverlap=250,
+                              Fs=250)
+    plt.subplot(211)
+    plt.plot(freqs,psd1,label=direction,linewidth=0.5)
+    plt.ylim([0,25])
+    plt.xlim([0,20])
+    plt.subplot(212)
+    plt.plot(freqs,psd2,label=direction,linewidth=0.5)
+    plt.ylim([0,25])
+    plt.xlim([0,20])
+    """
+    plt.subplot(3,2,idx)
+    plt.title(direction)
+    plt.plot(freqs, psd1,linewidth=0.5)
+    plt.ylim([0,25])
+    plt.xlim([6,20])
+    plt.subplot(3,2,idx+1)
+    plt.plot(freqs, psd2, linewidth=0.5)
+    plt.ylim([0,25])
+    plt.xlim([6,20])
+    idx += 2
+    """
+plt.legend()
