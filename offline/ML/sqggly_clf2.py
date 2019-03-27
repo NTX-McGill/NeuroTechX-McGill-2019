@@ -17,6 +17,8 @@ from sklearn.decomposition import PCA
 from sklearn.model_selection import KFold, StratifiedKFold
 from sklearn.feature_selection import SelectKBest, chi2
 from nbsvm import NBSVM
+from keras.models import Sequential
+from keras.layers import Dense, LSTM
 from sklearn.svm import SVC
 from xgboost import XGBClassifier
 from mlxtend.classifier import StackingCVClassifier
@@ -135,60 +137,16 @@ ML
 '''
 
 X_train, X_test, y_train, y_test = train_test_split(X, y, shuffle=True, random_state=2, test_size=0.2)
-'''
+
 model = Sequential()
 model.add(LSTM(256, input_shape=X.shape))
 model.add(Dense(1, activation='sigmoid'))
 model.compile(loss='binary_crossentropy', optimizer='nadam', metrics=['accuracy'])
 
 model.fit(X_train, y_train)
-'''
 
-clf1 = MLPClassifier(hidden_layer_sizes=(90,), solver='adam', learning_rate='adaptive', max_iter=2000)
-clf2 = AdaBoostClassifier(base_estimator=ExtraTreesClassifier(n_estimators=1000), n_estimators=5000)
-clf3 = SVC(C=100, probability=True)
-clf4 = RandomForestClassifier(n_estimators=5000, max_depth=10, min_samples_split=10)
-clf5 = ExtraTreesClassifier(n_estimators=5000, max_depth=7, min_samples_split=10)
-clf6 = MLPClassifier(hidden_layer_sizes=(90,60,), solver='sgd', learning_rate='adaptive',
-                        learning_rate_init=0.035, max_iter=2000, momentum=0.87)
-#clf7 = NBSVM(alpha=1, C=15, beta=0.8) 
-clf8 = KNeighborsClassifier(n_neighbors=3, weights='distance')
-clf9 = KNeighborsClassifier(n_neighbors=5)
-clfA = KNeighborsClassifier(n_neighbors=7)
-clfB = KNeighborsClassifier(n_neighbors=9)
-clfC = SVC(C=10, probability=True, gamma='scale')
-clfD = SVC(C=5, probability=True, gamma='scale')
-clfE = XGBClassifier(n_estimators=1000, learning_rate=0.3, max_depth=1,
-        objective='binary:logistic',gamma=7)
-clfF = XGBClassifier(n_estimators=1000, objective='binary:logistic', gamma=7)
-#clfF = MLPClassifier(hidden_layer_sizes=(20,), max_iter=2000, learning_rate='adaptive')
-#clfF = RandomForestClassifier(n_estimators=500)
-sclf = StackingCVClassifier(classifiers=[clf1, clf2, clf3, clf4, clf5, clf6, clf8, clf9,
-   clfA, clfB, clfC, clfD, clfE], cv=5, meta_classifier=clfF, use_probas=True, verbose=True)
 
 '''
 TUNA
 '''
-#clf = AdaBoostClassifier(base_estimator=ExtraTreesClassifier(n_estimators=1000), n_estimators=5000)
-#train_clf(clf, 'adaboost', X_train, X_test, y_train, y_test)
-#exit() 
 
-# Final stacking
-'''
-sclf.fit(X_train, y_train)
-pred = sclf.predict(X_test)
-scr = accuracy_score(y_test, pred)
-print('Meta classifier score: {:.4f}'.format(scr))
-'''
-
-n_fold=3
-new_X_train, new_X_test, new_y_train = construct_metafeatures(
-    [clf2, clf3, clfA, clfC, clfD, clfE], 
-    X_train, X_test, y_train, y_test, n_fold)
-
-print(new_X_train.shape, new_X_test.shape)
-#print(new_y_train)
-clfF.fit(new_X_train, new_y_train)
-pred = clfF.predict(new_X_test)
-scr = accuracy_score(y_test, pred)
-print('Meta classifier score: {:.4f}'.format(scr))
