@@ -184,6 +184,7 @@ def extract(all_data, window_s, shift, plot_psd=False):
                     plt.plot(freqs, psd2)
                     plt.ylim([0,25])
                     plt.xlim([6,20])
+        idx += 2
     return all_psds, all_features, freqs
 def to_feature_vec(all_features, rest=False):
     classes = ['Left', 'Right', 'Rest']
@@ -247,7 +248,12 @@ csvs = ["data/March22_008/10_008-2019-3-22-15-8-55.csv",
         "data/March22_001/7-001-rest25s_left20s_right20s_MI-2019-3-22-16-54-17.csv",
         "data/March20/time-test-JingMingImagined_10s-2019-3-20-10-28-35.csv",   #10
         "data/March20/time-test-JingMingImagined_10s-2019-3-20-10-30-26.csv",
-        "data/March20/time-test-JingMingImagined_10s-2019-3-20-10-35-31.csv"
+        "data/March20/time-test-JingMingImagined_10s-2019-3-20-10-35-31.csv",
+        "data/March24_011/1_011_Rest20LeftRight20_MI-2019-3-24-16-25-41.csv",
+        "data/March24_011/2_011_Rest20LeftRight20_MI-2019-3-24-16-38-10.csv",
+        "data/March24_011/3_011_Rest20LeftRight10_MI-2019-3-24-16-49-23.csv",
+        "data/March24_011/4_011_Rest20LeftRight10_MI-2019-3-24-16-57-8.csv",
+        "data/March24_011/5_011_Rest20LeftRight20_MI-2019-3-24-17-3-17.csv",
         ]
 
 
@@ -264,100 +270,32 @@ csv_map = {"10_008-2019-3-22-15-8-55.csv": "10_008_OpenBCI-RAW-2019-03-22_15-07-
            "7-001-rest25s_left20s_right20s_MI-2019-3-22-16-54-17.csv": "6to7_001_OpenBCI-RAW-2019-03-22_16-44-46.txt",
            "time-test-JingMingImagined_10s-2019-3-20-10-28-35.csv": 'OpenBCI-RAW-2019-03-20_10-04-29.txt',
            "time-test-JingMingImagined_10s-2019-3-20-10-30-26.csv": 'OpenBCI-RAW-2019-03-20_10-04-29.txt',
-           "time-test-JingMingImagined_10s-2019-3-20-10-35-31.csv": 'OpenBCI-RAW-2019-03-20_10-04-29.txt'}
+           "time-test-JingMingImagined_10s-2019-3-20-10-35-31.csv": 'OpenBCI-RAW-2019-03-20_10-04-29.txt',
+           "1_011_Rest20LeftRight20_MI-2019-3-24-16-25-41.csv" : '011_1to3_OpenBCI-RAW-2019-03-24_16-21-59.txt',
+           "2_011_Rest20LeftRight20_MI-2019-3-24-16-38-10.csv" : '011_1to3_OpenBCI-RAW-2019-03-24_16-21-59.txt',
+           "3_011_Rest20LeftRight10_MI-2019-3-24-16-49-23.csv" : '011_1to3_OpenBCI-RAW-2019-03-24_16-21-59.txt',
+           "4_011_Rest20LeftRight10_MI-2019-3-24-16-57-8.csv" : '011_4to6_OpenBCI-RAW-2019-03-24_16-54-15.txt',
+           "5_011_Rest20LeftRight20_MI-2019-3-24-17-3-17.csv" : '011_4to6_OpenBCI-RAW-2019-03-24_16-54-15.txt'
+           }
 fs_Hz = 250
 sampling_freq = 250
 window_s = 2
-shift = 0.1
-channel = (1,2)
+shift = 0.5
 channel_name = 'C4'
 Viet = 0
 Marley = 0
 Andy = 0
 cm = 0
-plot_psd = 0
+plot_psd = 0            # set this to 1 if you want to plot the psds per window
 colormap = sn.cubehelix_palette(as_cmap=True)
 tmin, tmax = 0,0
 
-left_data = []
-rest_data = []
-
-
-
-
-if Viet:
-    fname = 'data/March 4/5_SUCCESS_Rest_RightAndJawClench_10secs.txt' 
-    #fname = 'data/March 4/6_SUCCESS_Rest_RightClench_JawClench_ImagineClench_10secs.txt' 
-    fname = 'data/March 4/7_SUCCESS_Rest_RightClenchImagineJaw_10secs.txt'
-    data = np.loadtxt(fname,
-                      delimiter=',',
-                      skiprows=7,
-                      usecols=channel)
-    data_ = filter_(data, sampling_freq, 1, 40, 1)
-    ch = data_.T[0]     
-    start_indices = get_start_indices(ch)
-    for i in range(len(start_indices) - 1):
-        start = int(max(start_indices[i] + tmin * sampling_freq, 0))
-        end = int(min(start_indices[i+1] + tmax * sampling_freq, start_indices[-1]))
-        if i % 2:
-            left_data.append(data[start:end])
-        else:
-            rest_data.append(data[start:end])
-if Marley:
-    fname = 'data/March11_Marley/Marley_prolonged_trial.txt'
-    data = np.loadtxt(fname,
-                      delimiter=',',
-                      skiprows=7,
-                      usecols=channel)
-    data = filter_(data, sampling_freq, 1, 40, 1)
-    rest_indices = [i * 10 * fs_Hz for i in range(7)]
-    left_indices = [(i+6) * 10 * fs_Hz for i in range(7)]
-    start_indices = rest_indices
-    for i in range(len(start_indices) - 1):
-        start = int(max(start_indices[i] + tmin * sampling_freq, 0))
-        end = int(min(start_indices[i+1] + tmax * sampling_freq, start_indices[-1]))
-        rest_data.append(data[start:end])
-    start_indices = left_indices
-    for i in range(len(start_indices) - 1):
-        start = int(max(start_indices[i] + tmin * sampling_freq, 0))
-        end = int(min(start_indices[i+1] + tmax * sampling_freq, start_indices[-1]))
-        left_data.append(data[start:end])
-if Andy:
-    fname = 'OpenBCI-RAW-2019-03-18_18-46-51.txt'
-    markers = 'time-stamp-67-2019-2-18-18-47-12.csv'
-    fname = 'data/March18/OpenBCI-RAW-2019-03-18_19-35-36.txt'
-    markers = 'data/March18/time-stamp-68-2019-2-18-19-36-0.csv'
-    df = pd.read_csv(markers)
-    start = df['START TIME'].iloc[0]
-    end = df['START TIME'].iloc[-1] + 60000
-    channel = (1,2,13)
-    data = np.loadtxt(fname,
-                      delimiter=',',
-                      skiprows=7,
-                      usecols=channel)
-    eeg = data[:,:-1]
-    timestamps = data[:,-1]
-    indices = np.where(np.logical_and(timestamps>=start, timestamps<=end))
-    a = eeg[indices]
-    rest_indices = [i * 10 * fs_Hz for i in range(7)]
-    left_indices = [(i+6) * 10 * fs_Hz for i in range(7)]
-    start_indices = rest_indices
-    for i in range(len(start_indices) - 1):
-        start = int(max(start_indices[i] + tmin * sampling_freq, 0))
-        end = int(min(start_indices[i+1] + tmax * sampling_freq, start_indices[-1]))
-        rest_data.append(data[start:end])
-    start_indices = left_indices
-    for i in range(len(start_indices) - 1):
-        start = int(max(start_indices[i] + tmin * sampling_freq, 0))
-        end = int(min(start_indices[i+1] + tmax * sampling_freq, start_indices[-1]))
-        left_data.append(data[start:end])
-else:
-    # * set load_data to true the first time you run the script
-    load_data = 0
-    if load_data:
-        data_dict = {}
-        for csv in csvs:
-            data_dict[csv] = get_data([csv])
+# * set load_data to true the first time you run the script
+load_data = 0
+if load_data:
+    data_dict = {}
+    for csv in csvs:
+        data_dict[csv] = get_data([csv])
 """ * modify this to test filtering and new features """    
 def get_features(arr):
     # ch has shape (2, 500)
@@ -379,15 +317,13 @@ def get_features(arr):
 """ end """
 
 # * use this to select which files you want to test/train on
-train_csvs = [0,1]          # index of the training files we want to use
-test_csvs = [2]             # index of the test files we want to use
+train_csvs = [-5]          # index of the training files we want to use
+test_csvs = [-1]             # index of the test files we want to use
 train_csvs = [csvs[i] for i in train_csvs]
 test_csvs = [csvs[i] for i in test_csvs]
 all_data = merge_all_dols([data_dict[csv] for csv in train_csvs])
 for window_s in [2]:
-    #for csv in csvs:
-    #all_data = get_data([csv])
-    all_psds, all_features, freqs = extract(all_data, window_s, shift, plot_psd)
+    train_psds, train_features, freqs = extract(all_data, window_s, shift, plot_psd)
     data = to_feature_vec(all_features)
     
     X = data[:,:-1]
@@ -430,6 +366,8 @@ for window_s in [2]:
     for name, model in models:
         model.fit(X, Y)
         score = model.score(X_test, Y_test)
+        msg = "%s: %f" % (name, score)
+        print(msg)
         test_results.append(score)
     print("test accuracy:")
     print("{:2.1f}".format(np.array(test_results).mean() * 100))
@@ -437,14 +375,14 @@ for window_s in [2]:
     
 
 # Plots
-mu_indices = np.where(np.logical_and(freqs>=10, freqs<=12))
+mu_indices = np.where(np.logical_and(freqs>=14, freqs<=20))
 fig3 = plt.figure("scatter")
 fig3.clf()
 log = 0
-for direction, psd in all_psds.items():
+for direction, psd in train_psds.items():
     psd = np.array(psd).T
-    #mu = np.mean(psd[mu_indices],axis=0)
-    mu = np.amax(psd[mu_indices], axis=0)
+    mu = np.mean(psd[mu_indices],axis=0)
+    #mu = np.amax(psd[mu_indices], axis=0)
     if log:
         mu = np.log10(mu)
     plt.scatter(mu[0], mu[1], s=2)
@@ -454,8 +392,8 @@ plt.show()
 
 mean_plt = 1
 if mean_plt:
-    plt.figure()
-    for direction, psd in all_psds.items():
+    plt.figure('mean')
+    for direction, psd in train_psds.items():
         psd = np.array(psd).T
         mu = np.mean(psd[mu_indices],axis=0)
         if log:
@@ -466,7 +404,7 @@ if mean_plt:
 plt.figure()   
 ax = plt.subplot(121)
 plt.title("Mean")
-for direction, psd in all_psds.items():
+for direction, psd in train_psds.items():
     psd = np.array(psd).T
     mu = np.mean(psd[mu_indices],axis=0)
     #mu = np.amax(psd[mu_indices], axis=0)
@@ -479,7 +417,7 @@ ymin, ymax = plt.gca().get_ylim()
 
 ax = plt.subplot(122, sharex=ax, sharey=ax)
 plt.title("Max")
-for direction, psd in all_psds.items():
+for direction, psd in train_psds.items():
     psd = np.array(psd).T
     #mu = np.mean(psd[mu_indices],axis=0)
     mu = np.amax(psd[mu_indices], axis=0)
