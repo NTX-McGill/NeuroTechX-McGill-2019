@@ -317,20 +317,20 @@ def get_features(arr):
 """ end """
 
 # * use this to select which files you want to test/train on
-train_csvs = [-5]          # index of the training files we want to use
-test_csvs = [-1]             # index of the test files we want to use
+train_csvs = [1]          # index of the training files we want to use
+test_csvs = [2]             # index of the test files we want to use
 train_csvs = [csvs[i] for i in train_csvs]
 test_csvs = [csvs[i] for i in test_csvs]
-all_data = merge_all_dols([data_dict[csv] for csv in train_csvs])
+train_data = merge_all_dols([data_dict[csv] for csv in train_csvs])
 for window_s in [2]:
-    train_psds, train_features, freqs = extract(all_data, window_s, shift, plot_psd)
-    data = to_feature_vec(all_features)
+    train_psds, train_features, freqs = extract(train_data, window_s, shift, plot_psd)
+    data = to_feature_vec(train_features)
     
     X = data[:,:-1]
     Y = data[:,-1]
     validation_size = 0.20
     seed = 7
-    X_train, X_validation, Y_train, Y_validation = model_selection.train_test_split(X, Y, test_size=validation_size, random_state=seed)
+    #X_train, X_validation, Y_train, Y_validation = model_selection.train_test_split(X, Y, test_size=validation_size, random_state=seed)
     
     # Test options and evaluation metric
     scoring = 'accuracy'
@@ -348,6 +348,7 @@ for window_s in [2]:
     names = []
     
     X, Y = shuffle(X, Y, random_state=seed)
+    print("VALIDATION")
     for name, model in models:
     	kfold = model_selection.KFold(n_splits=10, shuffle=True, random_state=seed)
     	cv_results = model_selection.cross_val_score(model, X, Y, cv=kfold, scoring=scoring)
@@ -357,6 +358,7 @@ for window_s in [2]:
     	print(msg)
     print("average accuracy: " + "{:2.1f}".format(np.array(results).mean() * 100))
     
+    print("TEST")
     test_dict = data_dict[test_csvs[0]]
     _, test_features, _ = extract(test_dict, window_s, shift, plot_psd)
     test_data = to_feature_vec(test_features)
@@ -392,7 +394,8 @@ plt.show()
 
 mean_plt = 1
 if mean_plt:
-    plt.figure('mean')
+    fig4 = plt.figure('mean')
+    fig4.clf()
     for direction, psd in train_psds.items():
         psd = np.array(psd).T
         mu = np.mean(psd[mu_indices],axis=0)
