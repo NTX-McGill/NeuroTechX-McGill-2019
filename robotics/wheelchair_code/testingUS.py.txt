@@ -1,0 +1,8 @@
+import PySerial
+ser = serial.Serial('/dev/ttyACM0', 9600, timeout=0.050)
+while 1:
+	input()
+	while ser.in_waiting:  # Or: while ser.inWaiting():
+    		print ser.readline()
+
+	

@@ -7,7 +7,7 @@ One side pin of the potentiometer (either one) to ground; the other side pin to 
 Connection to the IBT-2 board:
 IBT-2 pins 5 (R_IS) and 6 (L_IS) not connected
 */
- 
+#include <NewPing.h>
 int SENSOR_PIN = 0; // center pin of the potentiometer
  
 int LPWM_Output_L = 5; // Arduino PWM output pin 5; connect to IBT-2 pin 1 (RPWM)
@@ -16,6 +16,18 @@ int RPWM_Output_L = 6; // Arduino PWM output pin 6; connect to IBT-2 pin 2 (LPWM
 
 int LPWM_Output_R = 10; // Arduino PWM output pin 5; connect to IBT-2 pin 1 (RPWM)
 int RPWM_Output_R = 9; // Arduino PWM output pin 6; connect to IBT-2 pin 2 (LPWM)
+
+// Setup US SENSORS
+int USLeft = 7;
+int USRight = 2;
+int USCenter = 4;
+int USDown = 3;
+#define MAXDIST 200
+NewPing sonarL(USLeft,USLeft,MAXDIST);
+NewPing sonarR(USRight,USRight,MAXDIST);
+NewPing sonarC(USCenter,USCenter,MAXDIST);
+NewPing sonarD(USDown,USDown,MAXDIST);
+
  
 void setup()
 {
@@ -68,7 +80,7 @@ void right(int sensorValue){
 //Declare the global var
 byte state = 'S';
 float timeout = 250; //number of milliseconds for ramping up. 
-signed int maxMotorSpeed = 200;//OUT O 256
+signed int maxMotorSpeed = 85;//OUT O 256
 signed int lMotorSpeed = 0,rMotorSpeed = 0;
 
 
@@ -82,6 +94,13 @@ void loop() {
     //READ DATA FROM SERIAL PORT
     //====================================================
     state = Serial.read();
+    // Send immediately the US sensor data
+    Serial.write(sonarL.ping_cm());
+    Serial.write(sonarR.ping_cm());
+    Serial.write(sonarC.ping_cm());
+    Serial.write(sonarD.ping_cm());
+    
+    
     //Serial.write(state); //Send back data for debugging. 
   
     //====================================================
@@ -151,8 +170,10 @@ void loop() {
 
     //CASE 5: DEBUG
     case('D'):
-      Serial.write(rMotorSpeed);
-      Serial.write(lMotorSpeed);
+      //SEND "D" TO GET SENSOR DATA WHILE NOT MOVING
+      
+      //Serial.write(rMotorSpeed);
+      //Serial.write(lMotorSpeed);
       break;
     }
     right(rMotorSpeed);
