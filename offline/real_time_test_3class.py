@@ -32,9 +32,10 @@ from sklearn.neighbors import KNeighborsClassifier
 from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
 from sklearn.naive_bayes import GaussianNB
 from sklearn.svm import SVC
+from sklearn.preprocessing import RobustScaler
 from sklearn.utils import shuffle
 import warnings
-warnings.filterwarnings("ignore")
+warnings.filterwarnings("ignore")   
 
 def plot_confusion_matrix(y_true, y_pred, classes,
                           normalize=False,
@@ -318,14 +319,14 @@ def get_features(arr):
 """ end """
 
 # * use this to select which files you want to test/train on
-train_csvs = [1]          # index of the training files we want to use
+train_csvs = [0,1]          # index of the training files we want to use
 test_csvs = [2]             # index of the test files we want to use
 train_csvs = [csvs[i] for i in train_csvs]
 test_csvs = [csvs[i] for i in test_csvs]
 train_data = merge_all_dols([data_dict[csv] for csv in train_csvs])
 all_results = []
 all_test_results = []
-window_lengths = [1,2,4,6,8]
+window_lengths = [8]
 #window_lengths = [2]
 for window_s in window_lengths:
     train_psds, train_features, freqs = extract(train_data, window_s, shift, plot_psd)
@@ -354,6 +355,7 @@ for window_s in window_lengths:
     
     X, Y = shuffle(X, Y, random_state=seed)
     print("VALIDATION")
+    
     for name, model in models:
     	kfold = model_selection.KFold(n_splits=10, shuffle=True, random_state=seed)
     	cv_results = model_selection.cross_val_score(model, X, Y, cv=kfold, scoring=scoring)
@@ -363,6 +365,7 @@ for window_s in window_lengths:
     	print(msg)
     print("average accuracy: " + "{:2.1f}".format(np.array(results).mean() * 100))
     all_results.append(np.array(results).mean()* 100)
+    print()
     
     print("TEST")
     test_dict = data_dict[test_csvs[0]]
@@ -380,9 +383,20 @@ for window_s in window_lengths:
     print("test accuracy:")
     print("{:2.1f}".format(np.array(test_results).mean() * 100))
     all_test_results.append(np.array(test_results).mean() * 100)
+    print()
+    
+    # Stuff are: X, Y for training
+    # For testing: X_test, Y_test
+    ''' EDA '''
+    print(X.shape, X_test.shape)
+    mctr, mcte = np.mean(X, axis=0), np.mean(X_test, axis=0)
+    vartr, varte = np.var(X, axis=0), np.var(X_test, axis=0)
+    
+    # Check some stuff
+    for i in range(2):
+        print("Column {}: mean train: {:.2f} +- {:.2f} \t mean test: {:.2f} +- {:.2f}".format(i+1, mctr[i], vartr[i], mcte[i], varte[i]))
 
     
-
 # Plots
 
 mu_indices = np.where(np.logical_and(freqs>=10, freqs<=12))
