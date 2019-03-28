@@ -144,8 +144,8 @@ def plot_specgram(spec_freqs, spec_PSDperBin,title,shift,i=1):
     plt.subplots_adjust(hspace=1)
 
 def resize_min(specgram, i=1):
-    min_length = min([len(el[0]) for el in specgram])
-    specgram = np.array([el[:, :min_length] for el in specgram])
+    min_length = min([el.shape[0] for el in specgram])
+    specgram = np.array([el[:min_length] for el in specgram])
     return specgram
 def resize_max(specgram, fillval=np.nan):
     max_length = max([len(el[0]) for el in specgram])
@@ -160,7 +160,7 @@ def epoch_data(data, window_length, shift):
         arr.append(data[i:i+window_length])
         i += shift
     return np.array(arr)
-def extract(all_data, window_s, shift, plot_psd=False):
+def extract(all_data, window_s, shift, plot_psd=False, keep_trials=False):
     all_psds = {'Right': [], 'Left': [], 'Rest': []}
     all_features = {'Right': [], 'Left': [], 'Rest': []}
     
@@ -172,10 +172,11 @@ def extract(all_data, window_s, shift, plot_psd=False):
             if direction == 'Rest':
                 trial = trial[int(len(trial)/2):]
             epochs = epoch_data(trial, 250 * window_s, int(shift*250))    # shape n x 500 x 2
+            trial_features = []
             for epoch in epochs:
                 features, freqs, psd1, psd2 = get_features(epoch.T)
                 all_psds[direction].append([psd1,psd2])
-                all_features[direction].append(features)
+                trial_features.append(features)
                 if plot_psd:
                     plt.subplot(3,2,idx)
                     plt.plot(freqs, psd1)
@@ -185,6 +186,10 @@ def extract(all_data, window_s, shift, plot_psd=False):
                     plt.plot(freqs, psd2)
                     plt.ylim([0,25])
                     plt.xlim([6,20])
+            if keep_trials:
+                all_features[direction].append(np.array(trial_features))
+            else:
+                all_features[direction].extend(trial_features)
         idx += 2
     return all_psds, all_features, freqs
 def to_feature_vec(all_features, rest=False):
@@ -206,7 +211,7 @@ def merge_dols(dol1, dol2):
     keys = set(dol1).union(dol2)
     no = []
     return dict((k, dol1.get(k, no) + dol2.get(k, no)) for k in keys)
-def get_data(csvs):
+def get_data(csvs, tmin=0):
     all_data = {'Right': [], 'Left': [], 'Rest': []}
     for csv in csvs:
         print("loading " + csv)
@@ -228,7 +233,8 @@ def get_data(csvs):
                 start = df['Time'][prev]
                 end = df['Time'][idx]
                 indices = np.where(np.logical_and(timestamps>=start, timestamps<=end))
-                trial = eeg[indices]
+                start, end = indices[0][0] - tmin, indices[0][-1]
+                trial = eeg[start:end]
                 all_data[prev_direction].append(trial)
                 #print(idx - prev, prev_direction)
                 #print(len(trial))
@@ -302,6 +308,7 @@ def get_features(arr):
     # ch has shape (2, 500)
     channels=[0,1,6,7]
     channels=[0,7]
+    
     psds_per_channel = []
     for ch in arr[channels]:
         psd, freqs = mlab.psd(np.squeeze(ch),
@@ -326,7 +333,7 @@ train_data = merge_all_dols([data_dict[csv] for csv in train_csvs])
 all_results = []
 all_test_results = []
 window_lengths = [1,2,4,6,8]
-#window_lengths = [2]
+window_lengths = [2]
 for window_s in window_lengths:
     train_psds, train_features, freqs = extract(train_data, window_s, shift, plot_psd)
     data = to_feature_vec(train_features)
@@ -365,7 +372,7 @@ for window_s in window_lengths:
     all_results.append(np.array(results).mean()* 100)
     
     print("TEST")
-    test_dict = data_dict[test_csvs[0]]
+    #test_dict = data_dict[test_csvs[0]]
     _, test_features, _ = extract(test_dict, window_s, shift, plot_psd)
     test_data = to_feature_vec(test_features)
     X_test = test_data[:,:-1]
@@ -381,11 +388,32 @@ for window_s in window_lengths:
     print("{:2.1f}".format(np.array(test_results).mean() * 100))
     all_test_results.append(np.array(test_results).mean() * 100)
 
-    
+####################### PLOTS ########################
+test_csvs = [0,1,2]
+test_csvs = [csvs[i] for i in test_csvs]
+t_before = 2
+test_dict = get_data(test_csvs, tmin=int(t_before * sampling_freq))
+_, test_features, _ = extract(test_dict, window_s, shift, plot_psd, keep_trials=True)
+model = models[0][-1]
+fig1 = plt.figure("accuracy over trace")
+fig1.clf()
+all_pred = []
+for trial in test_features['Left']:
+    a = model.predict_proba(trial)
+    all_pred.append(a.T[0])
+    #plt.plot([i * shift for i in range(a.shape[0])], a.T[0])
+tf = np.mean(resize_min(all_pred), axis=0)
+plt.plot([i * shift for i in range(tf.shape[0])], tf, label='Left')
+for trial in test_features['Right']:
+    a = model.predict_proba(trial)
+    all_pred.append(a.T[1])
+    #plt.plot([i * shift for i in range(a.shape[0])], a.T[0])
+tf = np.mean(resize_min(all_pred), axis=0)
+plt.plot([i * shift for i in range(tf.shape[0])], tf, label='Right')
+plt.ylim([0,1])
+plt.axvline(x=t_before, linestyle=':', linewidth=0.7)
 
-# Plots
-
-mu_indices = np.where(np.logical_and(freqs>=10, freqs<=12))
+mu_indices = np.where(np.logical_and(freqs>=10,freqs<=12))
 fig3 = plt.figure("scatter")
 fig3.clf()
 log = 0
