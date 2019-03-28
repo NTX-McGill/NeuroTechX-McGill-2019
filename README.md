@@ -6,7 +6,7 @@ We're a multidisciplinary group of students with a shared passion for neurotechn
 
 ## 2. What do we do?
 
-We build things with Neurotech! Mostly with the OpenBCI Cyton headest.
+We build things with Neurotech! Mostly with the OpenBCI Cyton headset.
 
 ## 3. What is our project
 
