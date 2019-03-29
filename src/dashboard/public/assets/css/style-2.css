@@ -42,3 +42,22 @@
 .button-off {
   color: #e2e2e2; /*#f8f9fc */
 }
+
+#sampleRate {
+  margin-bottom: 20px;
+}
+
+#sampleRate:hover {
+  background-color: #858796;
+  border-radius: .2rem;
+  border-top-left-radius: 0.2rem;
+  border-top-right-radius: 0.2rem;
+  border-bottom-right-radius: 0.2rem;
+  border-bottom-left-radius: 0.2rem;
+
+  border-color: #858796;
+  border-top-color: rgb(133, 135, 150);
+  border-right-color: rgb(133, 135, 150);
+  border-bottom-color: rgb(133, 135, 150);
+  border-left-color: rgb(133, 135, 150);
+}
