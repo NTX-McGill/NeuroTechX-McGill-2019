@@ -333,13 +333,8 @@ test_csvs = [csvs[i] for i in test_csvs]
 train_data = merge_all_dols([data_dict[csv] for csv in train_csvs])
 all_results = []
 all_test_results = []
-<<<<<<< HEAD
 window_lengths = [1,2,4,6,8]
 window_lengths = [2]
-=======
-window_lengths = [8]
-#window_lengths = [2]
->>>>>>> 369321ad81c4dc6306420d63de6d0e2d73a7ea79
 for window_s in window_lengths:
     train_psds, train_features, freqs = extract(train_data, window_s, shift, plot_psd)
     data = to_feature_vec(train_features)
