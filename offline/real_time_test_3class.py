@@ -460,8 +460,8 @@ for direction, features in train_features.items():
     plt.scatter(f[0], f[1], s=2)
 plt.axis('scaled')
 plt.title("Title")
-plt.xlabel("X?")
-plt.ylabel("Y?")
+plt.xlabel("Mean mu freq of left electrodes?")
+plt.ylabel("Mean mu freq of right electrodes?")
 plt.show()
 
 ############## MEAN ################
