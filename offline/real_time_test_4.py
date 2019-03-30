@@ -86,15 +86,15 @@ csv_map = {"10_008-2019-3-22-15-8-55.csv": "10_008_OpenBCI-RAW-2019-03-22_15-07-
 
 
 # Load data
-load_data = 1
+load_data = 0
 if load_data:
     data_dict = {}
     for csv in csvs:
         data_dict[csv] = get_data([csv], csv_map)
 
 
-train_csvs = [-1]          # index of the training files we want to use
-test_csvs = [2]             # index of the test files we want to use
+train_csvs = [3,4]          # index of the training files we want to use
+test_csvs = [9]             # index of the test files we want to use
 train_csvs = [csvs[i] for i in train_csvs]
 test_csvs = [csvs[i] for i in test_csvs]
 print("Training sets: \n" + str(train_csvs))
@@ -103,8 +103,9 @@ train_data = merge_all_dols([data_dict[csv] for csv in train_csvs])
 all_results = []
 all_test_results = []
 window_lengths = [1,2,4,6,8]
-window_lengths = [5]
+#window_lengths = [8]
 for window_s in window_lengths:
+    print('Window size of length {}'.format(window_s))
     train_psds, train_features, freqs = extract(train_data, window_s, shift, plot_psd)
     data = to_feature_vec(train_features, rest=False)
     
@@ -125,7 +126,7 @@ for window_s in window_lengths:
     models.append(('KNN', KNeighborsClassifier()))
     models.append(('CART', DecisionTreeClassifier()))
     models.append(('NB', GaussianNB(var_smoothing=0.001)))
-    models.append(('SVM', SVC(gamma='scale', C=100)))
+    models.append(('SVM', SVC(gamma='scale', C=100, probability=True)))
     results = []
     names = []
     
@@ -137,11 +138,13 @@ for window_s in window_lengths:
     X_test = test_data[:,:-1]
     Y_test = test_data[:,-1]
     test_results = []
-    
+    '''
     # Scaling
     scaler = RobustScaler()
     scaler.fit(np.concatenate([X, X_test], axis=0))    
     X, X_test = scaler.transform(X), scaler.transform(X_test)
+    '''
+    
     
     print("VALIDATION")
     for name, model in models:
@@ -157,11 +160,12 @@ for window_s in window_lengths:
     
     print("TEST")
     #test_dict = data_dict[test_csvs[0]]
+    '''
     _, test_features, _ = extract(test_dict, window_s, shift, plot_psd)
     test_data = to_feature_vec(test_features)
     X_test = test_data[:,:-1]
     Y_test = test_data[:,-1]
-    test_results = []
+    test_results = []'''
     for name, model in models:
         model.fit(X, Y)
         score = model.score(X_test, Y_test)
@@ -183,3 +187,61 @@ for window_s in window_lengths:
     # Check some stuff
     for i in range(2):
         print("Column {}: mean train: {:.2f} +- {:.2f} \t mean test: {:.2f} +- {:.2f}".format(i+1, mctr[i], vartr[i], mcte[i], varte[i]))
+        
+        
+        
+lmao = 1
+if lmao:
+    window_s = 8
+    test_csvs = [0,1,2]
+    test_csvs = [csvs[i] for i in test_csvs]    
+    t_before = 2
+    test_data = merge_all_dols(data_dict[csv] for csv in test_csvs)
+    _, test_features, _ = extract(test_data, window_s, shift, plot_psd)
+    data = to_feature_vec(test_features, rest=False)
+    X = data[:, :-1]
+    y = data[:, -1]
+    a = model.predict_proba(X)
+    probas = a
+    
+    one = probas[:, 0]
+    zero = probas [:, 1]
+    
+    plt.figure()
+    plt.plot([i for i in range(len(X))], one, label='One')
+    plt.plot([i for i in range(len(X))], zero, label='Zero')
+    plt.show()
+    
+    
+    
+plot_trace = 1
+if plot_trace:
+    test_csvs = [0,1,2]
+    test_csvs = [csvs[i] for i in test_csvs]
+    t_before = 5
+    #test_dict = get_data(test_csvs, csv_map, tmin=int(t_before * sampling_freq))
+    _, test_features, _ = extract(test_dict, window_s, shift, plot_psd, keep_trials=True)
+    model = models[-1][-1]
+    fig1 = plt.figure("accuracy over trace")
+    fig1.clf()
+    all_pred = []
+    for trial in test_features['Left']:
+        a = model.predict_proba(trial)
+        all_pred.append(a.T[0])
+        #plt.plot([i * shift for i in range(a.shape[0])], a.T[0])
+    tf = np.mean(resize_min(all_pred), axis=0)
+    plt.plot([i * shift - window_s for i in range(tf.shape[0])], tf, label='Left')
+    for trial in test_features['Right']:
+        a = model.predict_proba(trial)
+        all_pred.append(a.T[1])
+        #plt.plot([i * shift for i in range(a.shape[0])], a.T[0])
+    tf = np.mean(resize_min(all_pred), axis=0)
+    plt.plot([i * shift - window_s for i in range(tf.shape[0])], tf, label='Right')
+    plt.ylim([0,1])
+    #plt.axvline(x=t_before-window_s, linestyle=':', linewidth=0.7)
+
+mu_indices = np.where(np.logical_and(freqs>=10,freqs<=12))
+#fig3 = plt.figure("scatter")
+#fig3.clf()
+#log = 0
+

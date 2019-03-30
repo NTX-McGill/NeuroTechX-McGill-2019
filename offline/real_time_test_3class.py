@@ -313,7 +313,7 @@ colormap = sn.cubehelix_palette(as_cmap=True)
 tmin, tmax = 0,0
 
 # * set load_data to true the first time you run the script
-load_data = 0
+load_data = 1
 if load_data:
     data_dict = {}
     for csv in csvs:
@@ -422,12 +422,12 @@ for window_s in window_lengths:
         print("Column {}: mean train: {:.2f} +- {:.2f} \t mean test: {:.2f} +- {:.2f}".format(i+1, mctr[i], vartr[i], mcte[i], varte[i]))
 
 ####################### PLOTS ########################
-#window_s = 1
-plot_trace = 0
+window_s = 4
+plot_trace = 1
 if plot_trace:
     test_csvs = [0,1,2]
     test_csvs = [csvs[i] for i in test_csvs]
-    t_before = 2
+    t_before = 5
     test_dict = get_data(test_csvs, tmin=int(t_before * sampling_freq))
     _, test_features, _ = extract(test_dict, window_s, shift, plot_psd, keep_trials=True)
     model = models[0][-1]

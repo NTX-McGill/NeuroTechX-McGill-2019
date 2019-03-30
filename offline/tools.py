@@ -144,8 +144,8 @@ def extract(all_data, window_s, shift, plot_psd=False, keep_trials=False):
     all_features = {'Right': [], 'Left': [], 'Rest': []}
     
     idx = 1
-    fig1 = plt.figure("psd")
-    fig1.clf()
+    #fig1 = plt.figure("psd")
+    #fig1.clf()
     for direction, data in all_data.items():
         for trial in data:
             if direction == 'Rest':
@@ -153,7 +153,7 @@ def extract(all_data, window_s, shift, plot_psd=False, keep_trials=False):
             epochs = epoch_data(trial, 250 * window_s, int(shift*250))    # shape n x 500 x 2
             trial_features = []
             for epoch in epochs:
-                features, freqs, psd1, psd2 = get_features(epoch.T)
+                features, freqs, psd1, psd2, lol = get_features(epoch.T)
                 all_psds[direction].append([psd1,psd2])
                 trial_features.append(features)
                 if plot_psd:
@@ -202,8 +202,25 @@ def get_data(csvs, csv_map, tmin=0):
                       delimiter=',',
                       skiprows=7,
                       usecols=channel)
+        
         eeg = data[:,:-1]
         timestamps = data[:,-1]
+        
+        '''meme stuff'''
+        '''
+        eeg = eeg.transpose()
+        new_eeg = []
+        
+        for channel in eeg:
+            plft = np.polyfit(timestamps, channel, deg=1)
+            new_channel = [plft[0]*i + plft[1] for i in timestamps]
+            new_eeg.append(new_channel)
+            
+        eeg = np.array(new_eeg).transpose()'''
+            
+        '''end of meme stuff'''
+        
+            
         prev = 0
         prev_direction = df['Direction'][prev]
         data = {'Right': [], 'Left': [], 'Rest': []}
@@ -233,11 +250,51 @@ def get_features(arr):
                               NFFT=500,
                               Fs=250)
         psds_per_channel.append(psd)
+
+    '''
+    Jack's stuff
+    '''
     psds_per_channel = np.array(psds_per_channel)
-    mu_indices = np.where(np.logical_and(freqs>=10, freqs<=12))
+    freq_lower = 6
+    search_range = 2
+    scale_value = [0,0,0,0]
+    frequencies = np.arange(0, 125.5, 0.5)
+    max_index = 0
+    assert len(frequencies) == 251
+    '''
+    for channel_idx in range(len(psds_per_channel)):
+        for frequency in range(len(frequencies)):
+            if frequencies[frequency] >= freq_lower and frequencies[frequency] <= (freq_lower + search_range):
+                if scale_value[channel_idx] < psds_per_channel[channel_idx][frequency]:
+                    scale_value[channel_idx] = psds_per_channel[channel_idx][frequency]
+                    max_index = frequency
+                    
+    new_psds_per_channel = psds_per_channel
+    for channel_idx in range(len(psds_per_channel)): # 0 1 2 3
+        new_psds_per_channel[channel_idx] /= scale_value[channel_idx]
     
-    #features = np.amax(psds_per_channel[:,mu_indices], axis=-1).flatten()   # max of 10-12hz as feature
+    new_psds_per_channel = np.array(new_psds_per_channel)'''
+    
+    mu_indices = np.where(np.logical_and(freqs>=10, freqs<=12)) # used to be 10 to 12, these are arbitrary
+    
+    #mn = np.amax(psds_per_channel[:,mu_indices], axis=-1).flatten()   # max of 10-12hz as feature
     features = np.mean(psds_per_channel[:,mu_indices], axis=-1).flatten()   # mean of 10-12hz as feature
     features = np.array([features[:2].mean(), features[2:].mean()])
+    #features = psds_per_channel[:,mu_indices]a.flatten()                     # all of 10-12hz as feature
+    return features, freqs, psds_per_channel[0], psds_per_channel[-1], psds_per_channel
+    
+    '''
+    mu_indices = np.where(np.logical_and(freqs>=6, freqs<=8)) # used to be 10 to 12, these are arbitrary
+    
+    # = np.amax(psds_per_channel[:,mu_indices], axis=-1).flatten()   # max of 10-12hz as feature
+    features = np.mean(new_psds_per_channel[:,mu_indices], axis=-1).flatten()   # mean of 10-12hz as feature
+    features = np.array([features[:2].mean(), features[2:].mean()])
     #features = psds_per_channel[:,mu_indices].flatten()                     # all of 10-12hz as feature
-    return features, freqs, psds_per_channel[0], psds_per_channel[-1]
+    return features, freqs, new_psds_per_channel[0], new_psds_per_channel[-1], new_psds_per_channel
+'''
+
+
+
+
+
+
