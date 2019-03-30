@@ -5,7 +5,7 @@ import socketio
 
 sio = socketio.Client()
 
-ser = serial.Serial('/dev/cu.usbmodem14201',baudrate = 9600, timeout = 1)
+ser = serial.Serial('/dev/cu.usbmodem14201',baudrate = 9600, timeout = 1) # or COM5
 
 #define the FSM states
 
@@ -17,14 +17,17 @@ def on_message(data):
     except:
         print("Not a recognized command")
 
+    time.sleep(WAITBEFOREREADING)
+    while ser.in_waiting:
+        print(int.from_bytes(ser.read(),byteorder='little'))
+    print()
+
 
 """Need to do async stuff to allow reading while waitin"""
 # #Display any information sent back.
 # time.sleep(WAITBEFOREREADING)
 # while ser.in_waiting:
 #     print(ser.read())
-
-
 
 sio.connect('http://localhost:3000')
 sio.wait()
