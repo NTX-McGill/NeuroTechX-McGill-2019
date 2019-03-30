@@ -233,6 +233,18 @@ io.on('connection', function(socket){
     socket.on("data from ML", function(data){
       io.sockets.emit('to robotics', {'response': data['response']});
       console.log(data['response']);
+      if (data['response']=='B'){
+          let date = new Date();
+          console.log("Blink: " + date.getFullYear() + '-' + (date.getMonth()+1) + '-' +
+                         date.getDate() + '-' + date.getHours() + '-' +
+                         date.getMinutes() + '-' + date.getSeconds());
+      }
+      if (data['response']=="FULL STOP"){
+          let date = new Date();
+          console.log("Full Stop: " + date.getFullYear() + '-' + (date.getMonth()+1) + '-' +
+                         date.getDate() + '-' + date.getHours() + '-' +
+                         date.getMinutes() + '-' + date.getSeconds());
+      }
     });
   }
 
