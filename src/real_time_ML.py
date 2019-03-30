@@ -73,7 +73,9 @@ def predict(ch):
 
 @sio.on('to ML (state)')
 def change_state(received_state):
+
     global state
+    print(state);
     state = received_state # forward, stop, turning, intermediate
 
 @sio.on('timeseries-prediction')
@@ -90,7 +92,7 @@ def on_message(data):
         buffer_data = buffer_data[to_pop:]
         response = predict(buffer_data)
     print('hi')
-    sio.emit('data from ML', {'response': response,
+    sio.emit('data from ML', {'response': 'BLINK',
                               'left-prob': random.uniform(0, 1),
                               'right-prob': random.uniform(0, 1),
                               'blink-prob': -1})
