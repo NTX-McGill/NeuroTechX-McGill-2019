@@ -4,7 +4,7 @@ import socketio
 import pickle
 from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
 from scipy.signal import butter, lfilter, find_peaks, peak_widths,iirfilter, detrend,correlate,periodogram,welch
-
+import random
 
 sio = socketio.Client()
 
@@ -85,8 +85,8 @@ def on_message(data):
         response = predict(buffer_data)
     print('hi')
     sio.emit('data from ML', {'response': response,
-                              'left-prob': 0.4,
-                              'right-prob': 0.6,
+                              'left-prob': random.uniform(0, 1),
+                              'right-prob': random.uniform(0, 1),
                               'blink-prob': -1})
 
 
