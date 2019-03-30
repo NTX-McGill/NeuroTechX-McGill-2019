@@ -52,7 +52,11 @@ def on_message(data):
         to_pop = len(buffer_data) - 500
         buffer_data = buffer_data[to_pop:]
         response = predict(buffer_data)
-    sio.emit('data from ML', {'response': response})
+    print('hi')
+    sio.emit('data from ML', {'response': response,
+                              'left-prob': 0.4,
+                              'right-prob': 0.6,
+                              'blink-prob': -1})
 
 
 sio.connect('http://localhost:3000')
