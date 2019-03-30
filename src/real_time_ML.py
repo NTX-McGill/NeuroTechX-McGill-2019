@@ -13,6 +13,8 @@ with open('../offline/model.pkl', 'rb') as fid:
     clf = pickle.load(fid)
 print("STARTING")
 
+state = "stop"
+
 def filter_(raw_eeg_data,bp_lowcut =1, bp_highcut =60, bp_order=5,
             notch_freq_Hz  = [60, 120], notch_order =5):
    nyq = 0.5 * 250 #Nyquist frequency
@@ -69,6 +71,10 @@ def predict(ch):
     else:
         return "F"
 
+@sio.on('to ML (state)')
+def change_state(received_state):
+    global state
+    state = received_state # forward, stop, turning, intermediate
 
 @sio.on('timeseries-prediction')
 def on_message(data):
