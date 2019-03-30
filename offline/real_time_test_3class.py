@@ -352,6 +352,7 @@ all_results = []
 all_test_results = []
 window_lengths = [1,2,4,6,8]
 window_lengths = [5]
+
 for window_s in window_lengths:
     train_psds, train_features, freqs = extract(train_data, window_s, shift, plot_psd)
     data = to_feature_vec(train_features, rest=False)
@@ -392,7 +393,7 @@ for window_s in window_lengths:
     print()
     
     print("TEST")
-    #test_dict = data_dict[test_csvs[0]]
+    test_dict = data_dict[test_csvs[0]]
     _, test_features, _ = extract(test_dict, window_s, shift, plot_psd)
     test_data = to_feature_vec(test_features)
     X_test = test_data[:,:-1]
