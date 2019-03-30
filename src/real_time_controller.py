@@ -5,13 +5,14 @@ import socketio
 
 sio = socketio.Client()
 
-ser = serial.Serial('/dev/cu.usbmodem14201',baudrate = 9600, timeout = 1) # or COM5
+# ser = serial.Serial('/dev/cu.usbmodem14201',baudrate = 9600, timeout = 1) # or COM5
 
 #define the FSM states
 
 @sio.on('to robotics')
 def on_message(data):
     instruction = data['response']  # type of motion
+    print(instruction); # ADDED
     try:
         ser.write(instruction.encode('utf-8')) #send instruction
     except:
