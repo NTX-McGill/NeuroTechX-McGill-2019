@@ -1,17 +1,11 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Created on Sun Mar 17 09:03:30 2019
-
-@author: marley
-"""
-
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-"""
 Created on Mon Mar  4 18:25:05 2019
 
 @author: marley
+
+Note: On first run remember to load data (skip to line 309)
 """
 import numpy as np
 import numpy.fft as fft
@@ -312,8 +306,9 @@ plot_psd = 0            # set this to 1 if you want to plot the psds per window
 colormap = sn.cubehelix_palette(as_cmap=True)
 tmin, tmax = 0,0
 
-# * set load_data to true the first time you run the script
+######### * set load_data to true the first time you run the script
 load_data = 0
+
 if load_data:
     data_dict = {}
     for csv in csvs:
@@ -392,7 +387,7 @@ for window_s in window_lengths:
     print()
     
     print("TEST")
-    #test_dict = data_dict[test_csvs[0]]
+    test_dict = data_dict[test_csvs[0]]
     _, test_features, _ = extract(test_dict, window_s, shift, plot_psd)
     test_data = to_feature_vec(test_features)
     X_test = test_data[:,:-1]
@@ -420,7 +415,10 @@ for window_s in window_lengths:
     for i in range(2):
         print("Column {}: mean train: {:.2f} +- {:.2f} \t mean test: {:.2f} +- {:.2f}".format(i+1, mctr[i], vartr[i], mcte[i], varte[i]))
 
+######################################################
 ####################### PLOTS ########################
+######################################################
+        
 #window_s = 1
 plot_trace = 0
 if plot_trace:
@@ -448,6 +446,8 @@ if plot_trace:
     plt.ylim([0,1])
     plt.axvline(x=t_before, linestyle=':', linewidth=0.7)
 
+
+############# SCATTER ##############
 mu_indices = np.where(np.logical_and(freqs>=10,freqs<=12))
 fig3 = plt.figure("scatter")
 fig3.clf()
@@ -455,12 +455,16 @@ log = 0
     
 for direction, features in train_features.items():
     f = np.array(features).T
-    print(a.shape)
+    print(f.shape)
     #if direction != 'Rest':
     plt.scatter(f[0], f[1], s=2)
 plt.axis('scaled')
+plt.title("Title")
+plt.xlabel("X?")
+plt.ylabel("Y?")
 plt.show()
 
+############## MEAN ################
 
 mean_plt = 1
 if mean_plt:
@@ -473,11 +477,18 @@ if mean_plt:
             mu = np.log10(mu)
         plt.scatter(np.mean(mu[0]), np.mean(mu[1]), s=2)
     plt.axis('scaled')
+    plt.title("Mean")
+    plt.xlabel("X?")
+    plt.ylabel("Y?")
 
+############### KDE ################
 fig = plt.figure("kde")   
 fig.clf()
 ax = plt.subplot(121)
 plt.title("Mean")
+plt.xlabel("XLABEL1")
+plt.ylabel("YLABEL1")
+    
 for direction, features in train_features.items():
     features = np.array(features).T
     if log:
@@ -490,6 +501,8 @@ ymin, ymax = plt.gca().get_ylim()
 #ax = plt.subplot(122, sharex=ax, sharey=ax)
 ax = plt.subplot(122)
 plt.title("Max")
+plt.xlabel("XLABEL2")
+plt.ylabel("YLABEL2")
 for direction, features in train_features.items():
     features = np.array(features).T
     if log:
@@ -498,6 +511,7 @@ for direction, features in train_features.items():
         sn.kdeplot(features[0], features[1], ax=ax, shade_lowest=False, alpha=0.6)
 ax.set(aspect="equal")
 
+############## PSDs ###############
 fig1 = plt.figure("psds")
 fig1.clf()
 fig2 = plt.figure("separate psds")
@@ -517,12 +531,18 @@ for direction, data in train_data.items():
     plt.figure("psds")
     plt.subplot(211)
     plt.title("electrode 1")
+    plt.xlabel("Frequency (Hz)")
+    plt.ylabel("Scale Power")
+    
     plt.plot(freqs,psd1,label=direction,linewidth=0.5)
     plt.ylim([0,25])
     plt.xlim([0,20])
     plt.legend()
     plt.subplot(212)
+    
     plt.title("electrode 8")
+    plt.xlabel("Frequency (Hz)")
+    plt.ylabel("Scale Power")
     plt.plot(freqs,psd2,label=direction,linewidth=0.5)
     plt.ylim([0,25])
     plt.xlim([0,20])
@@ -532,10 +552,14 @@ for direction, data in train_data.items():
     plt.figure("separate psds")
     plt.subplot(3,2,idx)
     plt.title(direction)
+    plt.xlabel("Frequency (Hz)")
+    plt.ylabel("Scale Power")
     plt.plot(freqs, psd1,linewidth=0.5)
     plt.ylim([0,25])
     plt.xlim([6,20])
     plt.subplot(3,2,idx+1)
+    plt.xlabel("Frequency (Hz)")
+    plt.ylabel("Scale Power")
     plt.plot(freqs, psd2, linewidth=0.5)
     plt.ylim([0,25])
     plt.xlim([6,20])
