@@ -229,28 +229,13 @@ function endTest(saved){
 io.on('connection', function(socket){
   console.log('A user connected socket');
 
-<<<<<<< HEAD
   if(mode == "production"){
     socket.on("data from ML", function(data){
       io.sockets.emit('to robotics', {'response': data['response']});
       console.log(data['response']);
-      if (data['response']=='B'){
-          let date = new Date();
-          console.log("Blink: " + date.getFullYear() + '-' + (date.getMonth()+1) + '-' +
-                         date.getDate() + '-' + date.getHours() + '-' +
-                         date.getMinutes() + '-' + date.getSeconds());
-      }
-      if (data['response']=="FULL STOP"){
-          let date = new Date();
-          console.log("Full Stop: " + date.getFullYear() + '-' + (date.getMonth()+1) + '-' +
-                         date.getDate() + '-' + date.getHours() + '-' +
-                         date.getMinutes() + '-' + date.getSeconds());
-      }
     });
   }
 
-=======
->>>>>>> 4a05dddd27fa4bdbcf9a3bbde8526c8221b3eae1
   socket.on('stop', function(){
       clearInterval(collectionTimer);
       collecting = false;

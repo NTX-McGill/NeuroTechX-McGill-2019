@@ -29,7 +29,7 @@ $(document).ready(function() {
       console.log('SAMPLE RATE RECEIVED OF : ' + data['sample rate']);
     });
 socket.on('to robotics', function(data){
-    if (date['response']=="BLINK"){
+    if (data['response']=="BLINK"){
         soundDetection.play();
     }
     if (data['response']=="FULL STOP"){
