@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 // const { app, BrowserWindow } = require('electron');
 const dgram = require('dgram');
 // const events = require('events');
@@ -698,4 +697,3 @@ io.on('connection', function(socket){
     // console.log('spawned')
   });
 });
->>>>>>> 3dd6fb49329aa78b6bd8f8d517328880fd55ec9d

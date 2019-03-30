@@ -1,7 +1,7 @@
 $(document).ready(function() {
   // For production dashboard
-  var soundDetection = new Audio('assets/sound/detection-stop.mp3');
-  var soundFullStop = new Audio('assets/sound/full-stop.mp3');
+  var soundStop = new Audio('assets/sound/detection-stop.mp3');
+  var soundForward = new Audio('assets/sound/full-stop.mp3');
 
   $('#startProduction').on('click', function(){
     $('#startProduction').toggleClass('btn-danger');
@@ -29,11 +29,11 @@ $(document).ready(function() {
       console.log('SAMPLE RATE RECEIVED OF : ' + data['sample rate']);
     });
 socket.on('to robotics', function(data){
-    if (data['response']=="BLINK"){
-        soundDetection.play();
+    if (data['response']=="S"){
+        soundStop.play();
     }
-    if (data['response']=="FULL STOP"){
-        soundFullStop.play();
+    if (data['response']=="F"){
+        soundForward.play();
     }
 
     });
