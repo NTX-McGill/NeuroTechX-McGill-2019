@@ -262,6 +262,13 @@ csvs = ["data/March22_008/10_008-2019-3-22-15-8-55.csv",
         "data/March24_011/3_011_Rest20LeftRight10_MI-2019-3-24-16-49-23.csv",
         "data/March24_011/4_011_Rest20LeftRight10_MI-2019-3-24-16-57-8.csv",
         "data/March24_011/5_011_Rest20LeftRight20_MI-2019-3-24-17-3-17.csv",
+        "data/March29_014/1_014_rest_left_right_20s-2019-3-29-16-44-32.csv",   # 14
+        "data/March29_014/2_014_rest_left_right_20s-2019-3-29-16-54-36.csv",
+        "data/March29_014/3_014_AWESOME_rest_left_right_20s-2019-3-29-16-54-36.csv",
+        "data/March29_014/4_014_final_run-2019-3-29-17-38-45.csv",
+        #"data/March29_014/5_014_eye_blink-2019-3-29-17-44-33.csv",
+        #"data/March29_014/6_014_eye_blink-2019-3-29-17-46-14.csv",
+        #"data/March29_014/7_014_eye_blink-2019-3-29-17-47-56.csv",
         ]
 
 
@@ -283,7 +290,14 @@ csv_map = {"10_008-2019-3-22-15-8-55.csv": "10_008_OpenBCI-RAW-2019-03-22_15-07-
            "2_011_Rest20LeftRight20_MI-2019-3-24-16-38-10.csv" : '011_1to3_OpenBCI-RAW-2019-03-24_16-21-59.txt',
            "3_011_Rest20LeftRight10_MI-2019-3-24-16-49-23.csv" : '011_1to3_OpenBCI-RAW-2019-03-24_16-21-59.txt',
            "4_011_Rest20LeftRight10_MI-2019-3-24-16-57-8.csv" : '011_4to6_OpenBCI-RAW-2019-03-24_16-54-15.txt',
-           "5_011_Rest20LeftRight20_MI-2019-3-24-17-3-17.csv" : '011_4to6_OpenBCI-RAW-2019-03-24_16-54-15.txt'
+           "5_011_Rest20LeftRight20_MI-2019-3-24-17-3-17.csv" : '011_4to6_OpenBCI-RAW-2019-03-24_16-54-15.txt',
+           "1_014_rest_left_right_20s-2019-3-29-16-44-32.csv": "1_014_OpenBCI-RAW-2019-03-29_16-40-55.txt",
+           "2_014_rest_left_right_20s-2019-3-29-16-54-36.csv": "2_014_OpenBCI-RAW-2019-03-29_16-52-46.txt",
+           "3_014_AWESOME_rest_left_right_20s-2019-3-29-16-54-36.csv": "3_014_AWESOME_OpenBCI-RAW-2019-03-29_17-08-21.txt",
+           "4_014_final_run-2019-3-29-17-38-45.csv": "4_014_OpenBCI-RAW-2019-03-29_17-28-26.txt",
+           #"5_014_eye_blink-2019-3-29-17-44-33.csv": "5-7_014_OpenBCI-RAW-2019-03-29_17-41-53.txt",
+           #"6_014_eye_blink-2019-3-29-17-46-14.csv": "5-7_014_OpenBCI-RAW-2019-03-29_17-41-53.txt",
+           #"7_014_eye_blink-2019-3-29-17-47-56.csv": "5-7_014_OpenBCI-RAW-2019-03-29_17-41-53.txt",
            }
 fs_Hz = 250
 sampling_freq = 250
@@ -308,7 +322,7 @@ if load_data:
 def get_features(arr):
     # ch has shape (2, 500)
     channels=[0,1,6,7]
-    channels=[0,7]
+    #channels=[0,7]
     
     psds_per_channel = []
     for ch in arr[channels]:
@@ -321,23 +335,26 @@ def get_features(arr):
     
     #features = np.amax(psds_per_channel[:,mu_indices], axis=-1).flatten()   # max of 10-12hz as feature
     features = np.mean(psds_per_channel[:,mu_indices], axis=-1).flatten()   # mean of 10-12hz as feature
+    features = np.array([features[:2].mean(), features[2:].mean()])
     #features = psds_per_channel[:,mu_indices].flatten()                     # all of 10-12hz as feature
     return features, freqs, psds_per_channel[0], psds_per_channel[-1]
 """ end """
 
 # * use this to select which files you want to test/train on
-train_csvs = [0,1]          # index of the training files we want to use
+train_csvs = [-1]          # index of the training files we want to use
 test_csvs = [2]             # index of the test files we want to use
 train_csvs = [csvs[i] for i in train_csvs]
 test_csvs = [csvs[i] for i in test_csvs]
+print("Training sets: \n" + str(train_csvs))
+print("Test sets: \n" + str(test_csvs))
 train_data = merge_all_dols([data_dict[csv] for csv in train_csvs])
 all_results = []
 all_test_results = []
 window_lengths = [1,2,4,6,8]
-window_lengths = [2]
+window_lengths = [5]
 for window_s in window_lengths:
     train_psds, train_features, freqs = extract(train_data, window_s, shift, plot_psd)
-    data = to_feature_vec(train_features)
+    data = to_feature_vec(train_features, rest=False)
     
     X = data[:,:-1]
     Y = data[:,-1]
@@ -404,42 +421,43 @@ for window_s in window_lengths:
         print("Column {}: mean train: {:.2f} +- {:.2f} \t mean test: {:.2f} +- {:.2f}".format(i+1, mctr[i], vartr[i], mcte[i], varte[i]))
 
 ####################### PLOTS ########################
-test_csvs = [0,1,2]
-test_csvs = [csvs[i] for i in test_csvs]
-t_before = 2
-test_dict = get_data(test_csvs, tmin=int(t_before * sampling_freq))
-_, test_features, _ = extract(test_dict, window_s, shift, plot_psd, keep_trials=True)
-model = models[0][-1]
-fig1 = plt.figure("accuracy over trace")
-fig1.clf()
-all_pred = []
-for trial in test_features['Left']:
-    a = model.predict_proba(trial)
-    all_pred.append(a.T[0])
-    #plt.plot([i * shift for i in range(a.shape[0])], a.T[0])
-tf = np.mean(resize_min(all_pred), axis=0)
-plt.plot([i * shift for i in range(tf.shape[0])], tf, label='Left')
-for trial in test_features['Right']:
-    a = model.predict_proba(trial)
-    all_pred.append(a.T[1])
-    #plt.plot([i * shift for i in range(a.shape[0])], a.T[0])
-tf = np.mean(resize_min(all_pred), axis=0)
-plt.plot([i * shift for i in range(tf.shape[0])], tf, label='Right')
-plt.ylim([0,1])
-plt.axvline(x=t_before, linestyle=':', linewidth=0.7)
+#window_s = 1
+plot_trace = 0
+if plot_trace:
+    test_csvs = [0,1,2]
+    test_csvs = [csvs[i] for i in test_csvs]
+    t_before = 2
+    test_dict = get_data(test_csvs, tmin=int(t_before * sampling_freq))
+    _, test_features, _ = extract(test_dict, window_s, shift, plot_psd, keep_trials=True)
+    model = models[0][-1]
+    fig1 = plt.figure("accuracy over trace")
+    #fig1.clf()
+    all_pred = []
+    for trial in test_features['Left']:
+        a = model.predict_proba(trial)
+        all_pred.append(a.T[0])
+        #plt.plot([i * shift for i in range(a.shape[0])], a.T[0])
+    tf = np.mean(resize_min(all_pred), axis=0)
+    plt.plot([i * shift - window_s for i in range(tf.shape[0])], tf, label='Left')
+    for trial in test_features['Right']:
+        a = model.predict_proba(trial)
+        all_pred.append(a.T[1])
+        #plt.plot([i * shift for i in range(a.shape[0])], a.T[0])
+    tf = np.mean(resize_min(all_pred), axis=0)
+    plt.plot([i * shift - window_s for i in range(tf.shape[0])], tf, label='Right')
+    plt.ylim([0,1])
+    plt.axvline(x=t_before, linestyle=':', linewidth=0.7)
 
 mu_indices = np.where(np.logical_and(freqs>=10,freqs<=12))
 fig3 = plt.figure("scatter")
 fig3.clf()
 log = 0
-for direction, psd in train_psds.items():
-    psd = np.array(psd).T
-    mu = np.mean(psd[mu_indices],axis=0)
-    #mu = np.amax(psd[mu_indices], axis=0)
-    if log:
-        mu = np.log10(mu)
-    if direction != 'Rest':
-        plt.scatter(mu[0], mu[1], s=2)
+    
+for direction, features in train_features.items():
+    f = np.array(features).T
+    print(a.shape)
+    #if direction != 'Rest':
+    plt.scatter(f[0], f[1], s=2)
 plt.axis('scaled')
 plt.show()
 
@@ -456,31 +474,29 @@ if mean_plt:
         plt.scatter(np.mean(mu[0]), np.mean(mu[1]), s=2)
     plt.axis('scaled')
 
-plt.figure()   
+fig = plt.figure("kde")   
+fig.clf()
 ax = plt.subplot(121)
 plt.title("Mean")
-for direction, psd in train_psds.items():
-    psd = np.array(psd).T
-    mu = np.mean(psd[mu_indices],axis=0)
-    #mu = np.amax(psd[mu_indices], axis=0)
+for direction, features in train_features.items():
+    features = np.array(features).T
     if log:
         mu = np.log10(mu)
     if direction != 'Rest':
-        sn.kdeplot(mu[0], mu[1], ax=ax, shade_lowest=False, alpha=0.6)
+        sn.kdeplot(features[0], features[1], ax=ax, shade_lowest=False, alpha=0.6)
 ax.set(aspect="equal")
 ymin, ymax = plt.gca().get_ylim()
 
 #ax = plt.subplot(122, sharex=ax, sharey=ax)
 ax = plt.subplot(122)
 plt.title("Max")
-for direction, psd in train_psds.items():
-    psd = np.array(psd).T
-    #mu = np.mean(psd[mu_indices],axis=0)
-    mu = np.amax(psd[mu_indices], axis=0)
+for direction, features in train_features.items():
+    features = np.array(features).T
     if log:
         mu = np.log10(mu)
     if direction != 'Rest':
-        sn.kdeplot(mu[0], mu[1], ax=ax, shade_lowest=False, alpha=0.6)
+        sn.kdeplot(features[0], features[1], ax=ax, shade_lowest=False, alpha=0.6)
+ax.set(aspect="equal")
 
 fig1 = plt.figure("psds")
 fig1.clf()
