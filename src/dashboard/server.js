@@ -149,10 +149,10 @@ oscServer.on("message", function (data) {
       io.sockets.emit('sample rate', {'sample rate': numSamples});
       if (numSamples < expectedSampleRate*0.9 || // check for ± 10%
           numSamples > expectedSampleRate*1.1) {
-            console.log("\n-------- IRREGULAR SAMPLE RATE --------")
+            // console.log("\n-------- IRREGULAR SAMPLE RATE --------")
           }
       timeTesting = time;
-      console.log("Sample rate: " + numSamples);
+      // console.log("Sample rate: " + numSamples);
       numSamples = 0;
     }
 
@@ -229,6 +229,7 @@ function endTest(saved){
 io.on('connection', function(socket){
   console.log('A user connected socket');
 
+<<<<<<< HEAD
   if(mode == "production"){
     socket.on("data from ML", function(data){
       io.sockets.emit('to robotics', {'response': data['response']});
@@ -248,6 +249,8 @@ io.on('connection', function(socket){
     });
   }
 
+=======
+>>>>>>> 4a05dddd27fa4bdbcf9a3bbde8526c8221b3eae1
   socket.on('stop', function(){
       clearInterval(collectionTimer);
       collecting = false;
@@ -273,7 +276,7 @@ io.on('connection', function(socket){
       times.push(totalTime);
     });
 
-    console.log(totalTime);
+    // console.log(totalTime);
 
     direction = collectQueue[0][0];
     setupCsvWriters();
@@ -312,6 +315,13 @@ io.on('connection', function(socket){
 
   });
   //Production
+
+  socket.on("data from ML", function(data){
+    io.sockets.emit('to robotics', {'response': data['response']});
+    io.sockets.emit('ML graphs', data);
+    console.log(data['response']);
+  });
+
   socket.on('production', function(data){
     toSend = [];
     if (data['on'] == true) {
