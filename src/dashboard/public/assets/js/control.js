@@ -38,6 +38,7 @@ socket.on('to robotics', function(data){
     }
     $('#think-' + oldClass).removeClass('button-on');
     $('#think-' + oldClass).addClass('button-off');
+    oldClass = data['response']
     $('#think-' + data['response']).removeClass('button-off');
     $('#think-' + data['response']).addClass('button-on'); //Setup
 
