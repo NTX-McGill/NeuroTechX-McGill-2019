@@ -9,6 +9,8 @@ sio = socketio.Client()
 
 #define the FSM states
 
+sensor_count = 0
+
 @sio.on('to robotics')
 def on_message(data):
     instruction = data['response']  # type of motion
@@ -19,8 +21,10 @@ def on_message(data):
         print("Not a recognized command")
 
     time.sleep(WAITBEFOREREADING)
+
     while ser.in_waiting:
         sensor_data = int.from_bytes(ser.read(),byteorder='little')
+        print(sensor_data)
         sio.emit('from sensors', {'left': sensor_data,
                                   'right': sensor_data,
                                   'front': sensor_data,

@@ -1,4 +1,8 @@
-import numpy as np
+"""
+Makes sure we can move forward/left/right. Checks for clifs/steep drops too.
+"""
+
+import math
 import socketio
 
 sio = socketio.Client()
@@ -8,11 +12,11 @@ buffer = 0.1   # to allow for error/stopping before we actually hit something
 
 collisionThreshold = 0.5 + buffer # chair has a 0.5m braking distance
 sensorHeight = .2  # final height = 20 cm
-sensorAngle = np.deg2rad(60)    # ALSO CHANGE THIS
-rampAngle = np.deg2rad(7.5)
+sensorAngle = math.radians(60)    # ALSO CHANGE THIS
+rampAngle = math.radians(7.5)
 
-mathvalue = (sensorHeight*np.tan(sensorAngle) - collisionThreshold)*np.sin(rampAngle) # see diagram
-stopThreshold = slowThreshold + mathvalue/np.cos(rampAngle + sensorAngle) + buffer # stop if not a ramp
+mathvalue = (sensorHeight*math.tan(sensorAngle) - collisionThreshold)*math.sin(rampAngle) # see diagram
+stopThreshold = slowThreshold + mathvalue/math.cos(rampAngle + sensorAngle) + buffer # stop if not a ramp
 
 def collisionDetection(left_forw, right_forw, front_forw, front_tilt): # assume these are distances
     l_out, r_out, f_out = 0,0,0

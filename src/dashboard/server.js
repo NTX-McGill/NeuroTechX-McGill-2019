@@ -78,7 +78,8 @@ const turnTime = 1000; // milliseconds
 var canGo = {left: 1,
              right: 1,
              forward: 1};
-var stopTime = null;
+var stopTime = 0;
+const MAX_STOP_TIME = 20;
 
 /*
 Express
@@ -321,9 +322,39 @@ io.on('connection', function(socket){
   }, 200); // 5 times/sec
 
   socket.on("from sensors", function(data){
-    // see what security says 🚨
-    io.sockets.emit("to safety", data);
+    if (state == "forward") {
+      // Let's roll 🚘
+      io.sockets.emit("to self-driving", data);
+    }
+    else {
+      // see what security says 🚨
+      io.sockets.emit("to safety", data);
+    }
   });
+
+  if (state == "forward") {
+    socket.on("from self-driving", function(data){
+      // data: {response, turntime, stop-permanent}
+
+      io.sockets.emit('to robotics', {'response': data['response']});
+      if (data['response'] == "L" | data['response'] == "R") {
+        // turn for data['turntime'] milliseconds
+        setTimeout(function(){
+          io.sockets.emit('to robotics', {'response': "F"});
+        }, data['turntime']);
+      }
+      else {
+        stopTime++;
+        if (stopTime > MAX_STOP_TIME) {
+          state = "stop"
+
+          console.log("BACK TO STOP MODE")
+          stopTime = 0;
+          io.sockets.emit('to ML (state)', {'state': state});
+        }
+      }
+    });
+  }
 
   socket.on("from safety", function(data){
     canGo = {left: data['left'],
@@ -351,27 +382,6 @@ io.on('connection', function(socket){
         state = "stop";
         console.log("CAN'T TURN RIGHT. CAN'T GO FORWARD. STOPPING");
         io.sockets.emit('to robotics', {'response': "S"});
-      }
-    }
-    else if (canGo.forward == 0 && state=="forward") {
-      state = "stop-temporary";
-      stopTime = getTimeValue();
-      console.log("CAN'T GO FORWARD. STOPPING TEMPORARILY");
-      io.sockets.emit('to robotics', {'response': "S"});
-    }
-    else if (state == "stop-temporarily") {
-      // wait 2 sec before committing to stop
-      if (getTimeValue() < stopTime + 2000) {
-        if (canGo.forward == 1) {
-          state = "forward";
-          console.log("CHANGING FROM TEMPORARY STOP TO FORWARD");
-          io.sockets.emit('to robotics', {'response': "F"});
-        }
-      }
-      else {
-        // stop permanently
-        state = "stop";
-        io.sockets.emit('to robotics', {'response': "F"});
       }
     }
     io.sockets.emit('to ML (state)', {'state': state});
