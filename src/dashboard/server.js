@@ -75,7 +75,10 @@ var samplesToSend = expectedSampleRate * sendRate;
 var toSend = [];
 var state = "stop" // forward, turning, stop
 const turnTime = 1000; // milliseconds
-
+var canGo = {left: 1,
+             right: 1,
+             forward: 1};
+var stopTime = null;
 
 /*
 Express
@@ -300,9 +303,7 @@ io.on('connection', function(socket){
 
   // Production
 
-  // collectionTimer = setInterval(function(){
-  //   io.sockets.emit('to robotics', {response: 'D'}) // request data
-  // }, 200); // 5 times/sec
+
   //
   // socket.on("from sensors", function(data){
   //   // data: {front, left, right, front-tilt}
@@ -314,16 +315,79 @@ io.on('connection', function(socket){
   //
   // });
 
+  // request data every 200 ms
+  collectionTimer = setInterval(function(){
+    io.sockets.emit('to robotics', {response: 'D'}) // request data
+  }, 200); // 5 times/sec
 
+  socket.on("from sensors", function(data){
+    // see what security says 🚨
+    io.sockets.emit("to safety", data);
+  });
 
-
+  socket.on("from safety", function(data){
+    canGo = {left: data['left'],
+             right: data['right'],
+             forward: data['forward']};
+    if (canGo.left == 0 && state=="turning-L") {
+      if (canGo.forward == 1) {
+        state = "forward";
+        console.log("CAN'T TURN LEFT. GOING FORWARD");
+        io.sockets.emit('to robotics', {'response': "F"});
+      }
+      else {
+        state = "stop";
+        console.log("CAN'T TURN LEFT. CAN'T GO FORWARD. STOPPING")
+        io.sockets.emit('to robotics', {'response': "S"});
+      }
+    }
+    else if (canGo.right == 0 && state=="turning-R") {
+      if (canGo.forward == 1) {
+        state = "forward";
+        console.log("CAN'T TURN RIGHT. GOING FORWARD");
+        io.sockets.emit('to robotics', {'response': "F"});
+      }
+      else {
+        state = "stop";
+        console.log("CAN'T TURN RIGHT. CAN'T GO FORWARD. STOPPING");
+        io.sockets.emit('to robotics', {'response': "S"});
+      }
+    }
+    else if (canGo.forward == 0 && state=="forward") {
+      state = "stop-temporary";
+      stopTime = getTimeValue();
+      console.log("CAN'T GO FORWARD. STOPPING TEMPORARILY");
+      io.sockets.emit('to robotics', {'response': "S"});
+    }
+    else if (state == "stop-temporarily") {
+      // wait 2 sec before committing to stop
+      if (getTimeValue() < stopTime + 2000) {
+        if (canGo.forward == 1) {
+          state = "forward";
+          console.log("CHANGING FROM TEMPORARY STOP TO FORWARD");
+          io.sockets.emit('to robotics', {'response': "F"});
+        }
+      }
+      else {
+        // stop permanently
+        state = "stop";
+        io.sockets.emit('to robotics', {'response': "F"});
+      }
+    }
+    io.sockets.emit('to ML (state)', {'state': state});
+  });
 
   socket.on("data from ML", function(data){
     if (state == "stop") {
       if (data['response'] == "BLINK") {
         // go forward
-        io.sockets.emit('to robotics', {'response': "F"});
-        state = "forward"
+        if (canGo.forward == 1) {
+          io.sockets.emit('to robotics', {'response': "F"});
+          state = "forward";
+        }
+        else {
+          console.log("CAN'T GO FORWARD");
+        }
       }
     } else if (state == "forward") {
       if (data['response'] == "BLINK") {
@@ -334,14 +398,26 @@ io.on('connection', function(socket){
     } else if (state == "intermediate") {
       if (data['response'] == "BLINK") {
         state = "stop"
-      } else if (data['response'] == "L" || data['response'] =="R") {
-        io.sockets.emit('to robotics', {'response': data['response']});
-        state="turning"
-        setTimeout(function(){
-          state="forward";
-          io.sockets.emit('to ML (state)', {'state': state});
-          io.sockets.emit('to robotics', {'response': "F"});
-        }, turnTime)
+      } else if (data['response'] == "L") {
+        if (canGo.left == 1) {
+          io.sockets.emit('to robotics', {'response': "L"});
+          state="turning-" + data['response']
+          setTimeout(function(){
+            state="forward";
+            io.sockets.emit('to ML (state)', {'state': state});
+            io.sockets.emit('to robotics', {'response': "F"});
+          }, turnTime);
+        }
+      } else if (data['response'] == "R") {
+        if (canGo.right == 1) {
+          io.sockets.emit('to robotics', {'response': "R"});
+          state="turning-" + data['response']
+          setTimeout(function(){
+            state="forward";
+            io.sockets.emit('to ML (state)', {'state': state});
+            io.sockets.emit('to robotics', {'response': "F"});
+          }, turnTime);
+        }
       }
     }
 

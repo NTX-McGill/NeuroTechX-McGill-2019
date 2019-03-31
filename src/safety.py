@@ -28,7 +28,7 @@ def stairDetection(front_tilt):
     if front_tilt >= stopThreshold:
         return 1;
 
-@sio.on('for safety')
+@sio.on('to safety')
 def on_message(sensor_data):
     l = sensor_data['left']
     r = sensor_data['right']
@@ -37,9 +37,9 @@ def on_message(sensor_data):
 
     l_out, r_out, f_out = collisionDetection(l, r, f, f_t)
 
-    sio.emit('from obstacle avoidance', {'left': l_out,
-                                        'right': r_out,
-                                        'front': f_out})
+    sio.emit('from safety', {'left': l_out,
+                             'right': r_out,
+                             'forward': f_out})
 
-    sio.connect('http://localhost:3000')
-    sio.wait()
+sio.connect('http://localhost:3000')
+sio.wait()
