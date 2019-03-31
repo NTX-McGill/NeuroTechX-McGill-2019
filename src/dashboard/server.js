@@ -74,7 +74,7 @@ const expectedSampleRate = 250; // samples per second
 var samplesToSend = expectedSampleRate * sendRate;
 var toSend = [];
 var state = "forward" // forward, turning, stop
-const turnTime = 1000; // milliseconds
+const turnTime = 3000; // milliseconds
 var canGo = {left: 1,
              right: 1,
              forward: 1};
