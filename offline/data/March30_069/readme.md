@@ -9,3 +9,6 @@ Datafile 1 + 2:
 
 Notes: 
 - signals a bit weak, possibly due to interference/noise in the main room
+
+- *LEFT = BLINKING* 
+- *RIGHT = jaw clenching*
