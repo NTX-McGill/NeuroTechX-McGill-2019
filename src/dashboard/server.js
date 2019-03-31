@@ -325,7 +325,7 @@ io.on('connection', function(socket){
     io.sockets.emit("to safety", data);
   });
 
-  socket.on("from security", function(data){
+  socket.on("from safety", function(data){
     canGo = {left: data['left'],
              right: data['right'],
              forward: data['forward']};

@@ -20,8 +20,11 @@ def on_message(data):
 
     time.sleep(WAITBEFOREREADING)
     while ser.in_waiting:
-        print(int.from_bytes(ser.read(),byteorder='little'))
-    print()
+        sensor_data = int.from_bytes(ser.read(),byteorder='little')
+        sio.emit('from sensors', {'left': sensor_data,
+                                  'right': sensor_data,
+                                  'front': sensor_data,
+                                  'front-tilt': sensor_data})
 
 
 """Need to do async stuff to allow reading while waitin"""
