@@ -73,7 +73,7 @@ const sendRate = .2; // seconds
 const expectedSampleRate = 250; // samples per second
 var samplesToSend = expectedSampleRate * sendRate;
 var toSend = [];
-var state = "stop" // forward, turning, stop
+var state = "forward" // forward, turning, stop
 const turnTime = 1000; // milliseconds
 var canGo = {left: 1,
              right: 1,
@@ -317,13 +317,14 @@ io.on('connection', function(socket){
   // });
 
   // request data every 200 ms
-  collectionTimer = setInterval(function(){
-    io.sockets.emit('to robotics', {response: 'D'}) // request data
-  }, 200); // 5 times/sec
+  // collectionTimer = setInterval(function(){
+  //   io.sockets.emit('to robotics', {response: 'D'}) // request data
+  // }, 200); // 5 times/sec
 
   socket.on("from sensors", function(data){
     if (state == "forward") {
       // Let's roll 🚘
+      console.log(data)
       io.sockets.emit("to self-driving", data);
     }
     else {
@@ -338,28 +339,33 @@ io.on('connection', function(socket){
 
       io.sockets.emit('to robotics', {'response': data['response']});
       if (data['response'] == "L" | data['response'] == "R") {
+        // stopTime = 0;
         // turn for data['turntime'] milliseconds
         setTimeout(function(){
           io.sockets.emit('to robotics', {'response': "F"});
         }, data['turntime']);
       }
-      else {
-        stopTime++;
-        if (stopTime > MAX_STOP_TIME) {
-          state = "stop"
-
-          console.log("BACK TO STOP MODE")
-          stopTime = 0;
-          io.sockets.emit('to ML (state)', {'state': state});
-        }
+      else if (data['response'] == "S") {
+        // stopTime++;
+        // if (stopTime > MAX_STOP_TIME) {
+        //   state = "stop"
+        //
+        //   console.log("BACK TO STOP MODE")
+        //   // stopTime = 0;
+        io.sockets.emit('to ML (state)', {'state': state});
+        state = "stop"
+        // }
       }
+      // else {
+      //   stopTime = 0;
+      // }
     });
   }
 
   socket.on("from safety", function(data){
-    canGo = {left: data['left'],
-             right: data['right'],
-             forward: data['forward']};
+    canGo = {left: 1,//data['left'],
+             right: 1,//data['right'],
+             forward: 1};//data['forward']};
     if (canGo.left == 0 && state=="turning-L") {
       if (canGo.forward == 1) {
         state = "forward";
