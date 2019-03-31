@@ -4,8 +4,8 @@ import time
 import socketio
 
 sio = socketio.Client()
-
-# ser = serial.Serial('/dev/cu.usbmodem14201',baudrate = 9600, timeout = 1) # or COM5
+WAITBEFOREREADING = 0.1
+ser = serial.Serial('/dev/cu.usbmodem14201',baudrate = 9600, timeout = 1) # or COM5
 
 #define the FSM states
 
@@ -19,12 +19,13 @@ def on_message(data):
         print("Not a recognized command")
 
     time.sleep(WAITBEFOREREADING)
+    """
     while ser.in_waiting:
         sensor_data = int.from_bytes(ser.read(),byteorder='little')
         sio.emit('from sensors', {'left': sensor_data,
                                   'right': sensor_data,
                                   'front': sensor_data,
-                                  'front-tilt': sensor_data})
+                                  'front-tilt': sensor_data})"""
 
 
 """Need to do async stuff to allow reading while waitin"""
