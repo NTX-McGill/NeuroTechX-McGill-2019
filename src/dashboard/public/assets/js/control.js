@@ -1,7 +1,7 @@
 $(document).ready(function() {
   // For production dashboard
-  var soundStop = new Audio('assets/sound/detection-stop.mp3');
-  var soundForward = new Audio('assets/sound/full-stop.mp3');
+  var soundStop = new Audio('assets/sound/stop.wav');
+  var soundForward = new Audio('assets/sound/forward.wav');
 
   $('#startProduction').on('click', function(){
     $('#startProduction').toggleClass('btn-danger');
