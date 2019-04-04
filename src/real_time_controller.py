@@ -8,9 +8,9 @@ sio = socketio.Client()
 WAITBEFOREREADING = 0.1
 ser = serial.Serial('/dev/cu.usbmodem14201',baudrate = 9600, timeout = 1) # or COM5
 
-# get rid of old data
-if ser.in_waiting > 0:
-    _ = ser.read(ser.in_waiting)
+# # get rid of old data
+# if ser.in_waiting > 0:
+#     _ = ser.read(ser.in_waiting)
 
 def get_sensor_data():
     sensor_value = int.from_bytes(ser.read(1),byteorder='little')
@@ -25,11 +25,12 @@ def on_message(data):
     # print(instruction); # ADDED
     try:
         ser.write(instruction.encode('utf-8')) #send instruction
+        print(instruction)
     except:
         print("Not a recognized command")
 
     time.sleep(WAITBEFOREREADING)
-
+    
     # print(ser.in_waiting)
     while ser.in_waiting > 3: # wait until all 4 bytes
         sensor_data1 = get_sensor_data()
