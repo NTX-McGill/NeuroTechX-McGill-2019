@@ -319,15 +319,16 @@ io.on('connection', function(socket){
   // });
 
   // request data every 200 ms
+  io.sockets.emit('to self-driving (clear)', {}) // request data
 
   collectionTimer = setInterval(function(){
     currentTime = getTimeValue();
-    if (currentTime - roboticsTime > 200) {
+    if (currentTime - roboticsTime > 500) {
       roboticsTime = currentTime;
       io.sockets.emit('to robotics', {response: 'D'}) // request data
-      console.log('hi')
+      // console.log('hi')
     }
-  }, 200); // 5 times/sec
+  }, 500); // 5 times/sec
 
   socket.on("from sensors", function(data){
     // if (state == "forward") {
@@ -345,12 +346,19 @@ io.on('connection', function(socket){
   socket.on("from self-driving (forward)", function(data){
     // data: {response, TURN_TIME, stop-permanent}
     if (state == "forward") {
-      io.sockets.emit('to robotics', {'response': data['response']});
+      console.log('response from SD: ' + data['response'])
+      if (data['response'] != null) {
+          io.sockets.emit('to robotics', {'response': data['response']});
+      }
       if (data['response'] == "L" | data['response'] == "R") {
         // stopTime = 0;
         // turn for data['TURN_TIME'] milliseconds
         setTimeout(function(){
-          io.sockets.emit('to robotics', {'response': "F"});
+          if (canGo.forward) {
+              io.sockets.emit('to robotics', {'response': "F"});
+          } else {
+            io.sockets.emit('to robotics', {'response': "S"});
+          }
         }, data['duration']);
       }
       else if (data['response'] == "S") {
@@ -370,6 +378,7 @@ io.on('connection', function(socket){
     // }
   });
   socket.on("from self-driving (safety)", function(data) {
+
     canGo = {left: data['left'],
              right: data['right'],
              forward: data['forward']};
