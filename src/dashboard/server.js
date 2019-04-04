@@ -69,17 +69,19 @@ var timeSamples = [timeHeaderToWrite];
 /*
 Production Parameters
 */
-const sendRate = .2; // seconds
-const expectedSampleRate = 250; // samples per second
-var samplesToSend = expectedSampleRate * sendRate;
+const SEND_RATE = .2; // seconds
+const EXPECTED_SAMPLE_RATE = 250; // samples per second
+const SAMPLES_TO_SEND = EXPECTED_SAMPLE_RATE * SEND_RATE;
 var toSend = [];
 var state = "forward" // forward, turning, stop
-const turnTime = 3000; // milliseconds
+const TURN_TIME = 3000; // milliseconds
 var canGo = {left: 1,
              right: 1,
              forward: 1};
 var stopTime = 0;
 const MAX_STOP_TIME = 20;
+var roboticsTime = getTimeValue()
+var roboticsCurrentTime;
 
 /*
 Express
@@ -157,8 +159,8 @@ oscServer.on("message", function (data) {
     numSamples++;
     if ((time - timeTesting) > 1000) { // check every second
       io.sockets.emit('sample rate', {'sample rate': numSamples});
-      if (numSamples < expectedSampleRate*0.9 || // check for ± 10%
-          numSamples > expectedSampleRate*1.1) {
+      if (numSamples < EXPECTED_SAMPLE_RATE*0.9 || // check for ± 10%
+          numSamples > EXPECTED_SAMPLE_RATE*1.1) {
             // console.log("\n-------- IRREGULAR SAMPLE RATE --------")
           }
       timeTesting = time;
@@ -168,7 +170,7 @@ oscServer.on("message", function (data) {
 
     if(mode == "production"){
       toSend.push(data.slice(1));
-      if(toSend.length >= samplesToSend){
+      if(toSend.length >= SAMPLES_TO_SEND){
         io.sockets.emit('timeseries-prediction', {'data': toSend});
         toSend = [];
       }
@@ -317,33 +319,39 @@ io.on('connection', function(socket){
   // });
 
   // request data every 200 ms
-  // collectionTimer = setInterval(function(){
-  //   io.sockets.emit('to robotics', {response: 'D'}) // request data
-  // }, 200); // 5 times/sec
+
+  collectionTimer = setInterval(function(){
+    currentTime = getTimeValue();
+    if (currentTime - roboticsTime > 200) {
+      roboticsTime = currentTime;
+      io.sockets.emit('to robotics', {response: 'D'}) // request data
+      console.log('hi')
+    }
+  }, 200); // 5 times/sec
 
   socket.on("from sensors", function(data){
-    if (state == "forward") {
-      // Let's roll 🚘
+    // if (state == "forward") {
+      // Let's roll 🚘 and see what security says 🚨
       console.log(data)
+      data.state = state
       io.sockets.emit("to self-driving", data);
-    }
-    else {
-      // see what security says 🚨
-      io.sockets.emit("to safety", data);
-    }
+    // }
+    // else {
+      //
+      // io.sockets.emit("to safety", data);
+    // }
   });
 
-  if (state == "forward") {
-    socket.on("from self-driving", function(data){
-      // data: {response, turntime, stop-permanent}
-
+  socket.on("from self-driving (forward)", function(data){
+    // data: {response, TURN_TIME, stop-permanent}
+    if (state == "forward") {
       io.sockets.emit('to robotics', {'response': data['response']});
       if (data['response'] == "L" | data['response'] == "R") {
         // stopTime = 0;
-        // turn for data['turntime'] milliseconds
+        // turn for data['TURN_TIME'] milliseconds
         setTimeout(function(){
           io.sockets.emit('to robotics', {'response': "F"});
-        }, data['turntime']);
+        }, data['duration']);
       }
       else if (data['response'] == "S") {
         // stopTime++;
@@ -356,16 +364,15 @@ io.on('connection', function(socket){
         state = "stop"
         // }
       }
-      // else {
-      //   stopTime = 0;
-      // }
-    });
-  }
-
-  socket.on("from safety", function(data){
-    canGo = {left: 1,//data['left'],
-             right: 1,//data['right'],
-             forward: 1};//data['forward']};
+    }
+    // else {
+    //   stopTime = 0;
+    // }
+  });
+  socket.on("from self-driving (safety)", function(data) {
+    canGo = {left: data['left'],
+             right: data['right'],
+             forward: data['forward']};
     if (canGo.left == 0 && state=="turning-L") {
       if (canGo.forward == 1) {
         state = "forward";
@@ -422,7 +429,7 @@ io.on('connection', function(socket){
             state="forward";
             io.sockets.emit('to ML (state)', {'state': state});
             io.sockets.emit('to robotics', {'response': "F"});
-          }, turnTime);
+          }, TURN_TIME);
         }
       } else if (data['response'] == "R") {
         if (canGo.right == 1) {
@@ -432,7 +439,7 @@ io.on('connection', function(socket){
             state="forward";
             io.sockets.emit('to ML (state)', {'state': state});
             io.sockets.emit('to robotics', {'response': "F"});
-          }, turnTime);
+          }, TURN_TIME);
         }
       }
     }
