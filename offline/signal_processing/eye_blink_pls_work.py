@@ -107,15 +107,18 @@ Testing
 """
 sample_rate = 250
 
-csv_hasnain = ["../data/March29_014/5_014_eye_blink-2019-3-29-17-44-33.csv",
-               "../data/March29_014/6_014_eye_blink-2019-3-29-17-46-14.csv", 
-               "../data/March29_014/7_014_eye_blink-2019-3-29-17-47-56.csv"]
+csv_hasnain = [#"../data/March29_014/5_014_eye_blink-2019-3-29-17-44-33.csv",
+               #"../data/March29_014/6_014_eye_blink-2019-3-29-17-46-14.csv", 
+               #"../data/March29_014/7_014_eye_blink-2019-3-29-17-47-56.csv",
+               "../data/March30_420/1_420_rest_20s_blink3s_jawclenchA3s_rest20s-2019-3-30-18-0-3.csv"]
 
 csv_map = {"5_014_eye_blink-2019-3-29-17-44-33.csv":"5-7_014_OpenBCI-RAW-2019-03-29_17-41-53.txt",
            "6_014_eye_blink-2019-3-29-17-46-14.csv": "5-7_014_OpenBCI-RAW-2019-03-29_17-41-53.txt",
-           "7_014_eye_blink-2019-3-29-17-47-56.csv": "5-7_014_OpenBCI-RAW-2019-03-29_17-41-53.txt"}
+           "7_014_eye_blink-2019-3-29-17-47-56.csv": "5-7_014_OpenBCI-RAW-2019-03-29_17-41-53.txt",
+           "1_420_rest_20s_blink3s_jawclenchA3s_rest20s-2019-3-30-18-0-3.csv": "1_2COMBINED_420_rest_20s_blink3s_jawclenchA3s_rest20s-2019-3-30-18-0-3.txt",
+           "2_420_rest_20s_blink3s_jawclenchA3s_rest20s-2019-3-30-18-2-6.csv": "1_2COMBINED_420_rest_20s_blink3s_jawclenchA3s_rest20s-2019-3-30-18-0-3.txt"}
 
-#hasnain_data= get_data(csv_hasnain )
+hasnain_data= get_data(csv_hasnain )
 raw_data_hasnain_blink = np.concatenate(hasnain_data['Right'])[:,[0,1,6,7]]
 raw_data_hasnain_rest = np.concatenate(hasnain_data['Rest'])[:,[0,1,6,7]]
 
@@ -172,7 +175,7 @@ ax4.set_title("PSD of filetered rest")
 ax5.set_title("PSD of detrended and filtered blinking")
 ax6.set_title("PSD of detrended and filered rest")
 
-indices = np.where(np.logical_and(f1>=5, f2<=15))
+indices = np.where(np.logical_and(f1_raw>=5, f2_raw<=15))
 for i in range(4):
     print(i)
     print(np.max(psd_blink[i][indices]))

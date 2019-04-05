@@ -18,8 +18,8 @@ wheelchair_state = "stop"
 # configs
 pred_frequency = 0.2
 distance_from_artifact_s = 2    # number of seconds away from artifact we require to consider a window a blink
-blink_threshold_s = 1           # number of seconds of blink state required before we send 'BLINK', also the number of seconds of blink state before we send 'BLINK' again in intermediate state **must tune
-change_threshold_s = 2          # number of seconds after a recent state change we require before changing the state again
+blink_threshold_s = .8           # number of seconds of blink state required before we send 'BLINK', also the number of seconds of blink state before we send 'BLINK' again in intermediate state **must tune
+change_threshold_s = 4          # number of seconds after a recent state change we require before changing the state again
 decision_s = 3                  # number of seconds in intermediate before we force a decision
 
 # thresholds
@@ -69,26 +69,35 @@ def predict(ch):
     indices = np.where(np.logical_and(freqs>=15, freqs<=45))
     high_psd = psd1[indices].mean() + psd2[indices].mean()
     
+    x_indices = np.where(np.logical_and(freqs>= 5, freqs <= 20))
+    psd_ = psd1[x_indices]
+    freqs_ = freqs[x_indices]
+    peak = freqs_[np.argmax(psd_)]
+    
+    """Testing new thresholds """
+    
+    blink_index2 = np.where(np.logical_and(freqs>= 5, freqs <= 7))
+    
+    
+    
+    """ End """
+    
+    
     """ compute the brain state and stateful counters here """
-    if (high_psd > 30):
-        last_artifact = 0   # the most recent artifact was 0 seconds ago
-        state = 'artifact'
+    if (high_psd > 50):
+        state = 'blink'
+    elif (high_psd > 20):
+        state = 'soft_artifact'
     else:
-        last_artifact = min(100, last_artifact + 1)          # increment distance from artifact
-        if (blink_psd > 20):
-            if last_artifact >= distance_from_artifact:
-                state = 'blink'
-            else:
-                state = 'fake_blink'
-        else:
-            state = 'clear'
+        state = 'clear'
             
     if (state == 'blink'):  # if we have a blink
         num_blinks += 1
     else:
         num_blinks = 0      # reset num consecutive blinks to 0
     
-    print(state, wheelchair_state)
+    #print(peak, high_psd, state)
+    print(high_psd, state, wheelchair_state)
     
     """ now use the brain state and wheelchair state to make decisions """
     if wheelchair_state == "stop" or wheelchair_state == "forward":
@@ -122,32 +131,11 @@ def predict(ch):
             prev_predictions = []
             prev_states = []
             return 'BLINK'
-        if state == 'clear' and last_change * pred_frequency >= 1:  # we're at least 1 second away from when we stopped
-            if last_change * pred_frequency <= 2:                   # we're between 1 and 2 seconds away from when we stopped
-                psd1, freqs = mlab.psd(np.squeeze(ch[0,250:]),      # so we use a 1 second window
-                                   NFFT=250,
-                                   window=mlab.window_hanning,
-                                   Fs=250,
-                                   noverlap=0
-                                   ) 
-                psd2, freqs = mlab.psd(np.squeeze(ch[7,250:]),
-                                   NFFT=250,
-                                   window=mlab.window_hanning,
-                                   Fs=250,
-                                   noverlap=0
-                                   )
+        if state == 'clear' and last_change * pred_frequency >= 2:  # we're at least 1 second away from when we stopped
             mu_indices = np.where(np.logical_and(freqs>=10, freqs<=12))
             mu1 = psd1[mu_indices].mean()
             mu2 = psd2[mu_indices].mean()
             l, r = list(clf.predict_proba(np.array([mu1,mu2]).reshape(1,-1))[0])
-            if l > 0.8:     # only return if we are very confident; otherwise, delay decision
-                prev_predictions = []
-                prev_states = []
-                return 'L'
-            if r > 0.8:
-                prev_predictions = []
-                prev_states = []
-                return 'R'
             prev_predictions.append(l)  # append prediction for voting
             
 

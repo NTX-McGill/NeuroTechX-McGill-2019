@@ -28,6 +28,7 @@ $(document).ready(function() {
       $('#sampleRate').html(data['sample rate'] + " hz");
       console.log('SAMPLE RATE RECEIVED OF : ' + data['sample rate']);
     });
+  var oldClass = "L"
 socket.on('to robotics', function(data){
     if (data['response']=="S"){
         soundStop.play();
@@ -35,6 +36,11 @@ socket.on('to robotics', function(data){
     if (data['response']=="F"){
         soundForward.play();
     }
+    $('#think-' + oldClass).removeClass('button-on');
+    $('#think-' + oldClass).addClass('button-off');
+    oldClass = data['response']
+    $('#think-' + data['response']).removeClass('button-off');
+    $('#think-' + data['response']).addClass('button-on'); //Setup
 
     });
 
