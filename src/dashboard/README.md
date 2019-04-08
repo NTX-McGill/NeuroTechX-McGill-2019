@@ -20,7 +20,7 @@ Dependencies:
 * "socket.io": "^2.2.0"
 
 
-The server gets EEG data from the [OpenBCI_GUI](https://openbci.com/index.php/downloads) using its networking function. To use the OpenBCI's networking, open the GUI and, under networking set stream 1 to FFT with port 12345 and address ____. Set stream 2 to TimeSeries with port 12345 and address _____.
+The server gets EEG data from the [OpenBCI_GUI](https://openbci.com/index.php/downloads) using its networking function. To use the OpenBCI's networking, open the GUI and, under networking set stream 1 to FFT with port 12345 and address fft. Set stream 2 to TimeSeries with port 12345 and address /openbci.
 
 
 ### Training
@@ -33,7 +33,11 @@ The training dashboard can be used to collect customized, labelled EEG data from
 * **Movement**: During a trial, this panel displays what the current command is.
 * **Neurofeedback**: This gives real time feedback for the power of the Mu frequency band. 
 
-To use the training dashboard, ensure that server.js and the OpenBCI_GUI are running and communicating. In a web browser, go to localhost:3000. Title the trial and customize the desired queue. When ready, press start; the data from the OpenBCI will be recorded into a CSV file. At the end of the trial, it will be saved under ..offline\data with the current date and time. You can cancel the run at anytime by pressing "Stop". The CSV file will contain a spreadsheet of labelled data (Left, Right, or Rest).
+1. Ensure that server.js and the OpenBCI_GUI are running and communicating
+2. In a web browser, go to localhost:3000
+3. Title the trial and customize the desired queue
+4. When ready, press start; the data from the OpenBCI will be recorded into a CSV file saved under ..offline\data with the current date and time. You can cancel the run at anytime by pressing "Stop". 
+5. The CSV file will contain a spreadsheet of labelled data (Left, Right, or Rest).
 
 ### Production
 
