@@ -91,7 +91,18 @@ def plot_confusion_matrix(y_true, y_pred, classes,
     return ax
 
 
-def filter_(arr, fs_Hz, lowcut, highcut, order):
+def notch_mains_interference(data):
+    notch_freq_Hz = np.array([60.0])  # main + harmonic frequencies
+    for freq_Hz in np.nditer(notch_freq_Hz):  # loop over each target freq
+        bp_stop_Hz = freq_Hz + 3.0*np.array([-1, 1])  # set the stop band
+        b, a = signal.butter(3, bp_stop_Hz/(250 / 2.0), 'bandstop')
+        data = signal.lfilter(b, a, data, axis=0)
+        print("Notch filter removing: " + str(bp_stop_Hz[0]) + "-" + str(bp_stop_Hz[1]) + " Hz")
+    return data
+
+def filter_(arr, fs_Hz, lowcut, highcut, order, notch=True):
+    if notch:
+        arr = notch_mains_interference(arr)
     nyq = 0.5 * fs_Hz
     b, a = signal.butter(1, [lowcut/nyq, highcut/nyq], btype='band')
     for i in range(0, order):
@@ -275,22 +286,22 @@ csvs = ["data/March22_008/10_008-2019-3-22-15-8-55.csv",
         # "data/March22_008/7_008-2019-3-22-14-27-46.csv",    #actual
         # "data/March22_008/6_008-2019-3-22-14-19-52.csv",    #actual
         # "data/March22_008/5_008-2019-3-22-14-10-26.csv",    #actual
-        "data/March22_001/4-001-rest25s_left15s_right15s_MI-2019-3-22-16-27-44.csv",
-        "data/March22_001/5-001-rest25s_left10s_right10s_MI-2019-3-22-16-35-57.csv",
+        #"data/March22_001/4-001-rest25s_left15s_right15s_MI-2019-3-22-16-27-44.csv",
+        #"data/March22_001/5-001-rest25s_left10s_right10s_MI-2019-3-22-16-35-57.csv",
         # "data/March22_001/6-001-rest25s_left15s_right15s_MI-2019-3-22-16-46-17.csv",    #actual
-        "data/March22_001/7-001-rest25s_left20s_right20s_MI-2019-3-22-16-54-17.csv",
-        "data/March20/time-test-JingMingImagined_10s-2019-3-20-10-28-35.csv",  # 6
-        "data/March20/time-test-JingMingImagined_10s-2019-3-20-10-30-26.csv",
-        "data/March20/time-test-JingMingImagined_10s-2019-3-20-10-35-31.csv",
-        "data/March24_011/1_011_Rest20LeftRight20_MI-2019-3-24-16-25-41.csv",  # 9 to 13
-        "data/March24_011/2_011_Rest20LeftRight20_MI-2019-3-24-16-38-10.csv",
-        "data/March24_011/3_011_Rest20LeftRight10_MI-2019-3-24-16-49-23.csv",
-        "data/March24_011/4_011_Rest20LeftRight10_MI-2019-3-24-16-57-8.csv",
-        "data/March24_011/5_011_Rest20LeftRight20_MI-2019-3-24-17-3-17.csv",
-        "data/March29_014/1_014_rest_left_right_20s-2019-3-29-16-44-32.csv",   # 14
-        "data/March29_014/2_014_rest_left_right_20s-2019-3-29-16-54-36.csv",
-        "data/March29_014/3_014_AWESOME_rest_left_right_20s-2019-3-29-16-54-36.csv",
-        "data/March29_014/4_014_final_run-2019-3-29-17-38-45.csv",
+        #"data/March22_001/7-001-rest25s_left20s_right20s_MI-2019-3-22-16-54-17.csv",
+        #"data/March20/time-test-JingMingImagined_10s-2019-3-20-10-28-35.csv",  # 6
+        #"data/March20/time-test-JingMingImagined_10s-2019-3-20-10-30-26.csv",
+        #"data/March20/time-test-JingMingImagined_10s-2019-3-20-10-35-31.csv",
+        #"data/March24_011/1_011_Rest20LeftRight20_MI-2019-3-24-16-25-41.csv",  # 9 to 13
+        #"data/March24_011/2_011_Rest20LeftRight20_MI-2019-3-24-16-38-10.csv",
+        #"data/March24_011/3_011_Rest20LeftRight10_MI-2019-3-24-16-49-23.csv",
+        #"data/March24_011/4_011_Rest20LeftRight10_MI-2019-3-24-16-57-8.csv",
+        #"data/March24_011/5_011_Rest20LeftRight20_MI-2019-3-24-17-3-17.csv",
+        #"data/March29_014/1_014_rest_left_right_20s-2019-3-29-16-44-32.csv",   # 14
+        #"data/March29_014/2_014_rest_left_right_20s-2019-3-29-16-54-36.csv",
+        #"data/March29_014/3_014_AWESOME_rest_left_right_20s-2019-3-29-16-54-36.csv",
+        #"data/March29_014/4_014_final_run-2019-3-29-17-38-45.csv",
         # "data/March29_014/5_014_eye_blink-2019-3-29-17-44-33.csv",
         # "data/March29_014/6_014_eye_blink-2019-3-29-17-46-14.csv",
         # "data/March29_014/7_014_eye_blink-2019-3-29-17-47-56.csv",
@@ -348,7 +359,7 @@ if load_data:
 def get_features(arr):
     # ch has shape (2, 500)
     channels = [0, 1, 6, 7]
-    # channels=[0,7]
+    channels=[0,7]
 
     psds_per_channel = []
     for ch in arr[channels]:
@@ -362,7 +373,7 @@ def get_features(arr):
     # features = np.amax(psds_per_channel[:,mu_indices], axis=-1).flatten()   # max of 10-12hz as feature
     features = np.mean(psds_per_channel[:, mu_indices], axis=-
                        1).flatten()   # mean of 10-12hz as feature
-    features = np.array([features[:2].mean(), features[2:].mean()])
+    #features = np.array([features[:2].mean(), features[2:].mean()])
     # features = psds_per_channel[:,mu_indices].flatten()                     # all of 10-12hz as feature
     return features, freqs, psds_per_channel[0], psds_per_channel[-1]
 
@@ -370,8 +381,8 @@ def get_features(arr):
 """ end """
 
 # * use this to select which files you want to test/train on
-train_csvs = [-1]          # index of the training files we want to use
-test_csvs = [2]             # index of the test files we want to use
+train_csvs = [1]          # index of the training files we want to use
+test_csvs = [0,1,2]             # index of the test files we want to use
 train_csvs = [csvs[i] for i in train_csvs]
 test_csvs = [csvs[i] for i in test_csvs]
 print("Training sets: \n" + str(train_csvs))
@@ -380,7 +391,7 @@ train_data = merge_all_dols([data_dict[csv] for csv in train_csvs])
 all_results = []
 all_test_results = []
 window_lengths = [1, 2, 4, 6, 8]
-window_lengths = [5]
+window_lengths = [2]
 for window_s in window_lengths:
     train_psds, train_features, freqs = extract(train_data, window_s, shift, plot_psd)
     data = to_feature_vec(train_features, rest=False)
@@ -421,7 +432,7 @@ for window_s in window_lengths:
     print()
 
     print("TEST")
-    #test_dict = data_dict[test_csvs[0]]
+    test_dict = merge_all_dols([data_dict[csv] for csv in test_csvs])
     _, test_features, _ = extract(test_dict, window_s, shift, plot_psd)
     test_data = to_feature_vec(test_features)
     X_test = test_data[:, :-1]
@@ -452,12 +463,13 @@ for window_s in window_lengths:
 
 ####################### PLOTS ########################
 #window_s = 1
-plot_trace = 0
+plot_trace = 1
 if plot_trace:
     test_csvs = [0, 1, 2]
     test_csvs = [csvs[i] for i in test_csvs]
     t_before = 2
     test_dict = get_data(test_csvs, tmin=int(t_before * sampling_freq))
+    test_dict = merge_all_dols([data_dict[csv] for csv in test_csvs])
     _, test_features, _ = extract(test_dict, window_s, shift, plot_psd, keep_trials=True)
     model = models[0][-1]
     fig1 = plt.figure("accuracy over trace")
@@ -466,18 +478,69 @@ if plot_trace:
     for trial in test_features['Left']:
         a = model.predict_proba(trial)
         all_pred.append(a.T[0])
-        #plt.plot([i * shift for i in range(a.shape[0])], a.T[0])
+        plt.scatter([i * shift for i in range(a.shape[0])], a.T[0], s=2)
     tf = np.mean(resize_min(all_pred), axis=0)
-    plt.plot([i * shift - window_s for i in range(tf.shape[0])], tf, label='Left')
+    #plt.plot([i * shift - window_s for i in range(tf.shape[0])], tf, label='Left')
+    #all_pred = []
     for trial in test_features['Right']:
         a = model.predict_proba(trial)
         all_pred.append(a.T[1])
-        #plt.plot([i * shift for i in range(a.shape[0])], a.T[0])
+        plt.scatter([i * shift for i in range(a.shape[0])], a.T[1], s=2)
     tf = np.mean(resize_min(all_pred), axis=0)
-    plt.plot([i * shift - window_s for i in range(tf.shape[0])], tf, label='Right')
+    plt.plot([i * shift for i in range(tf.shape[0])], tf, label='Right')
     plt.ylim([0, 1])
     plt.axvline(x=t_before, linestyle=':', linewidth=0.7)
-
+plot_trace_acc = 1
+def running_mean(x, N):
+   cumsum = np.cumsum(np.insert(x, 0, 0)) 
+   return (cumsum[N:] - cumsum[:-N]) / N
+if plot_trace_acc:
+    test_csvs = [0, 1, 2]
+    test_csvs = [csvs[i] for i in test_csvs]
+    t_before = 2
+    test_dict = get_data(test_csvs, tmin=int(t_before * sampling_freq))
+    test_dict = merge_all_dols([data_dict[csv] for csv in test_csvs])
+    _, test_features, _ = extract(test_dict, window_s, shift, plot_psd, keep_trials=True)
+    model = models[-1][-1]
+    fig1 = plt.figure("accuracy over trace")
+    fig1.clf()
+    all_pred = []
+    for trial in test_features['Left']:
+        a = model.predict(trial)
+        all_pred.append(1 - a)
+        #plt.plot([i * shift for i in range(a.shape[0])], a.T[0])
+    #tf = np.mean(resize_min(all_pred), axis=0)
+    #tf = running_mean(tf,10)
+    #plt.plot([i * shift for i in range(tf.shape[0])], tf, label='Left')
+    #all_pred = []
+    for trial in test_features['Right']:
+        a = model.predict(trial)
+        all_pred.append(a)
+        #plt.plot([i * shift for i in range(a.shape[0])], a.T[0])
+    lateral = 10
+    rm = [running_mean(block,lateral)[::lateral] * 100 for block in all_pred]
+    blocks = resize_min(rm)
+    tf = np.mean(blocks, axis=0)
+   # plt.scatter([i for i in range(tf.shape[0])], tf, label='Right')
+    #plt.plot([i * shift for i in range(tf.shape[0])], tf, label='Right')
+    plt.ylim([0, 100])
+    #plt.axvline(x=t_before, linestyle=':', linewidth=0.7)
+    
+    plt.figure()
+    sn.set()
+    blocks_d = {'timepoint': [i for block in blocks for i in range(tf.shape[0])], 'signal': blocks.flatten(), 'event':['acc' for block in blocks for i in range(tf.shape[0])]}
+    df = pd.DataFrame(data=blocks_d)
+    ax = sn.lineplot(x="timepoint", y="signal", style="event", markers=True, ci=68, data=df)
+    co='white'
+    ax.xaxis.label.set_color(co)
+    ax.yaxis.label.set_color(co)
+    #ax.tick_params(axis='y', colors=co)
+    #ax.tick_params(axis='x', colors=co)
+    ax.get_legend().remove()
+    #df.plot.scatter(x="timepoint",y="signal")
+    plt.ylim([50, 100])
+    plt.savefig('test.png', transparent=True)
+    
 mu_indices = np.where(np.logical_and(freqs >= 10, freqs <= 12))
 fig3 = plt.figure("scatter")
 fig3.clf()
@@ -485,7 +548,6 @@ log = 0
 
 for direction, features in train_features.items():
     f = np.array(features).T
-    print(a.shape)
     # if direction != 'Rest':
     plt.scatter(f[0], f[1], s=2)
 plt.axis('scaled')
@@ -533,6 +595,8 @@ fig1.clf()
 fig2 = plt.figure("separate psds")
 fig2.clf()
 idx = 1
+
+
 for direction, data in train_data.items():
     l = np.hstack([trial[:, 0] for trial in data])
     r = np.hstack([trial[:, -1] for trial in data])
@@ -570,3 +634,35 @@ for direction, data in train_data.items():
     plt.ylim([0, 25])
     plt.xlim([6, 20])
     idx += 2
+
+
+'''
+d = data_dict[csvs[0]]['Right'][0]
+f_n = notch_mains_interference(d)
+f_d = filter_(f_n,250,1,40,2,notch=False)
+
+fig = plt.figure(figsize=(10,4))
+ax = fig.add_subplot(111)
+co = 'white'
+ax.spines['left'].set_color(co)
+ax.spines['right'].set_color(co)
+ax.spines['bottom'].set_color(co)
+ax.spines['top'].set_color(co)
+ax.xaxis.label.set_color(co)
+ax.yaxis.label.set_color(co)
+ax.tick_params(axis='y', colors=co)
+ax.tick_params(axis='x', colors=co)
+#plt.axis('off')
+#plt.subplot(311)
+arr = d.T[0,500:1000]
+x = [i/250 for i in range(len(arr))]
+plt.plot(arr - arr.mean(),linewidth=1.5,color="white",alpha=0)
+arr = f_n.T[0,500:1000]
+#plt.subplot(312)
+#plt.plot(arr - arr.mean(),linewidth=1.5,color="white")
+arr = f_d.T[0,500:1000]
+#plt.plot(arr - arr.mean(),linewidth=1.5,color="white")
+plt.ylabel("μV")
+plt.xlabel("Time ($250^{-1}$s)")
+plt.savefig('axis_only.png', transparent=True)
+'''
