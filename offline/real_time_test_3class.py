@@ -199,7 +199,7 @@ def extract(all_data, window_s, shift, plot_psd=False, keep_trials=False):
         for trial in data:
             if direction == 'Rest':
                 trial = trial[int(len(trial)/2):]
-            epochs = epoch_data(trial, 250 * window_s, int(shift*250))    # shape n x 500 x 2
+            epochs = epoch_data(trial, int(250 * window_s), int(shift*250))    # shape n x 500 x 2
             trial_features = []
             for epoch in epochs:
                 features, freqs, psd1, psd2 = get_features(epoch.T)
@@ -362,9 +362,12 @@ def get_features(arr):
     channels=[0,7]
 
     psds_per_channel = []
+    nfft = 500
+    if arr.shape[-1] < 500:
+        nfft = 250
     for ch in arr[channels]:
         psd, freqs = mlab.psd(np.squeeze(ch),
-                              NFFT=500,
+                              NFFT=nfft,
                               Fs=250)
         psds_per_channel.append(psd)
     psds_per_channel = np.array(psds_per_channel)
@@ -391,7 +394,8 @@ train_data = merge_all_dols([data_dict[csv] for csv in train_csvs])
 all_results = []
 all_test_results = []
 window_lengths = [1, 2, 4, 6, 8]
-window_lengths = [2]
+window_s = 4
+window_lengths = [window_s]
 for window_s in window_lengths:
     train_psds, train_features, freqs = extract(train_data, window_s, shift, plot_psd)
     data = to_feature_vec(train_features, rest=False)
@@ -462,8 +466,7 @@ for window_s in window_lengths:
                                                                                               1, mctr[i], vartr[i], mcte[i], varte[i]))
 
 ####################### PLOTS ########################
-#window_s = 1
-plot_trace = 1
+plot_trace = 0
 if plot_trace:
     test_csvs = [0, 1, 2]
     test_csvs = [csvs[i] for i in test_csvs]
@@ -494,67 +497,121 @@ plot_trace_acc = 1
 def running_mean(x, N):
    cumsum = np.cumsum(np.insert(x, 0, 0)) 
    return (cumsum[N:] - cumsum[:-N]) / N
+
+model = None
+#model = models[0][-1]
+video_mode = True
+# use video mode when you want to save the figure to a transparent bg and white text
 if plot_trace_acc:
     test_csvs = [0, 1, 2]
     test_csvs = [csvs[i] for i in test_csvs]
-    t_before = 2
-    test_dict = get_data(test_csvs, tmin=int(t_before * sampling_freq))
-    test_dict = merge_all_dols([data_dict[csv] for csv in test_csvs])
-    _, test_features, _ = extract(test_dict, window_s, shift, plot_psd, keep_trials=True)
-    model = models[-1][-1]
+    t_before = 4
+    #test_dict_tb = get_data(test_csvs, tmin=int(t_before * sampling_freq))
+    #test_dict = merge_all_dols([data_dict[csv] for csv in test_csvs])
+    _, test_features_tb, _ = extract(test_dict_tb, window_s, shift, plot_psd, keep_trials=True)
+    
     fig1 = plt.figure("accuracy over trace")
-    fig1.clf()
     all_pred = []
-    for trial in test_features['Left']:
-        a = model.predict(trial)
+    for trial in test_features_tb['Left']:
+        if model:
+            a = model.predict(trial)
+        else:
+            a = np.mean(np.array([m[1].predict(trial) for m in models]), axis=0)
         all_pred.append(1 - a)
         #plt.plot([i * shift for i in range(a.shape[0])], a.T[0])
     #tf = np.mean(resize_min(all_pred), axis=0)
     #tf = running_mean(tf,10)
     #plt.plot([i * shift for i in range(tf.shape[0])], tf, label='Left')
     #all_pred = []
-    for trial in test_features['Right']:
-        a = model.predict(trial)
+    for trial in test_features_tb['Right']:
+        if model:
+            a = model.predict(trial)
+        else:
+            a = np.mean(np.array([m[1].predict(trial) for m in models]), axis=0)
         all_pred.append(a)
         #plt.plot([i * shift for i in range(a.shape[0])], a.T[0])
-    lateral = 10
+    lateral = 8
     rm = [running_mean(block,lateral)[::lateral] * 100 for block in all_pred]
     blocks = resize_min(rm)
     tf = np.mean(blocks, axis=0)
-   # plt.scatter([i for i in range(tf.shape[0])], tf, label='Right')
+    #plt.scatter([i for i in range(tf.shape[0])], tf, label='Right')
     #plt.plot([i * shift for i in range(tf.shape[0])], tf, label='Right')
     plt.ylim([0, 100])
-    #plt.axvline(x=t_before, linestyle=':', linewidth=0.7)
     
-    plt.figure()
+    
+    # this is a very important plot, where we show the accuracy over the time of the trace
+    fig = plt.figure('trace')
+    #fig.clf()
     sn.set()
-    blocks_d = {'timepoint': [i for block in blocks for i in range(tf.shape[0])], 'signal': blocks.flatten(), 'event':['acc' for block in blocks for i in range(tf.shape[0])]}
+    xlabel = 'Time after onset (s)'
+    ylabel = 'Accuracy (%)'
+    blocks_d = {xlabel: [i*lateral*shift - t_before + window_s for block in blocks for i in range(tf.shape[0])], ylabel: blocks.flatten(), 'event':['acc' for block in blocks for i in range(tf.shape[0])]}
     df = pd.DataFrame(data=blocks_d)
-    ax = sn.lineplot(x="timepoint", y="signal", style="event", markers=True, ci=68, data=df)
+    ax = sn.lineplot(x=xlabel, y=ylabel, style="event", markers=True, ci=0, data=df,linewidth=5)
+    ax.get_legend().remove()
+    plt.axvline(x=0, linestyle=':')
+    plt.ylim([20, 100])
+    plt.xlim([-3.5,9.5])
+    if video_mode:
+        co='white'
+        ax.xaxis.label.set_color(co)
+        ax.yaxis.label.set_color(co)
+        ax.tick_params(axis='y', colors=co)
+        ax.tick_params(axis='x', colors=co)
+        ax.grid(False)
+        plt.savefig('acc_trace_thick' + str(window_s) + '.png', transparent=True, dpi=300)
+    #df.plot.scatter(x="timepoint",y="signal")
+    # for the video figure, we trained on csv 1 and tested on [0,1,2]
+    
+    '''
+    plt.figure('axes')
+    sn.set()
+    sn.set_style("whitegrid")
+    xlabel = 'Time after onset (s)'
+    ylabel = 'Accuracy (%)'
+    blocks_d = {xlabel: [i*lateral*shift for block in blocks for i in range(tf.shape[0])], ylabel: blocks.flatten(), 'event':['acc' for block in blocks for i in range(tf.shape[0])]}
+    df = pd.DataFrame(data=blocks_d)
+    ax = sn.lineplot(x=xlabel, y=ylabel, err_style="bars", ci=68, data=df, linewidth=2,alpha=0)
     co='white'
     ax.xaxis.label.set_color(co)
     ax.yaxis.label.set_color(co)
-    #ax.tick_params(axis='y', colors=co)
-    #ax.tick_params(axis='x', colors=co)
-    ax.get_legend().remove()
-    #df.plot.scatter(x="timepoint",y="signal")
-    plt.ylim([50, 100])
-    plt.savefig('test.png', transparent=True)
+    ax.tick_params(axis='y', colors=co)
+    ax.tick_params(axis='x', colors=co)
+    plt.axvline(x=0, linestyle=':')
+    plt.ylim([20, 100])
+    plt.xlim([-3.5,9.5])
+    ax.grid(False)
+    plt.savefig('acc_trace_axis_only1.png', transparent=True)'''
     
 mu_indices = np.where(np.logical_and(freqs >= 10, freqs <= 12))
 fig3 = plt.figure("scatter")
 fig3.clf()
 log = 0
-
+ax = plt.subplot(111)
 for direction, features in train_features.items():
     f = np.array(features).T
     # if direction != 'Rest':
     plt.scatter(f[0], f[1], s=2)
 plt.axis('scaled')
+#ax.grid(False)
 plt.show()
 
 
-mean_plt = 1
+from mpl_toolkits.mplot3d import axes3d, Axes3D 
+fig3 = plt.figure("scatter")
+fig3.clf()
+log = 0
+c_dict = {'Left':'r','Right':'b','Rest':'g'}
+ax = plt.subplot(111, projection='3d')
+for direction, features in train_features.items():
+    f = np.array(features).T
+    # if direction != 'Rest':
+    ax.scatter(f[0], f[1],f[0]*f[1], c=c_dict[direction],s=2)
+plt.axis('scaled')
+ax.grid(False)
+plt.show()
+
+mean_plt = 0
 if mean_plt:
     fig4 = plt.figure('mean')
     fig4.clf()
@@ -565,20 +622,30 @@ if mean_plt:
             mu = np.log10(mu)
         plt.scatter(np.mean(mu[0]), np.mean(mu[1]), s=2)
     plt.axis('scaled')
-
+    
+sn.reset_orig()
+#with plt.style.context('seaborn-colorblind'):
+sn.set_style("whitegrid")
+plot_rest = True
 fig = plt.figure("kde")
 fig.clf()
-ax = plt.subplot(121)
+ax = plt.subplot(111)
 plt.title("Mean")
 for direction, features in train_features.items():
     features = np.array(features).T
     if log:
         mu = np.log10(mu)
-    if direction != 'Rest':
-        sn.kdeplot(features[0], features[1], ax=ax, shade_lowest=False, alpha=0.6)
+    if plot_rest or direction != 'Rest':
+        #sn.kdeplot(features[0], features[1], ax=ax, shade=True, shade_lowest=False, alpha=0.3,s=0.5)
+        sn.kdeplot(features[0], features[1], ax=ax, shade_lowest=False, alpha =0.6)
 ax.set(aspect="equal")
+plt.ylim([-2, 20])
+plt.xlim([-2, 20])
+#ax.grid(False)
+plt.savefig('mean_lines.png', transparent=True,dpi=300)
 ymin, ymax = plt.gca().get_ylim()
 
+'''
 #ax = plt.subplot(122, sharex=ax, sharey=ax)
 ax = plt.subplot(122)
 plt.title("Max")
@@ -588,7 +655,7 @@ for direction, features in train_features.items():
         mu = np.log10(mu)
     if direction != 'Rest':
         sn.kdeplot(features[0], features[1], ax=ax, shade_lowest=False, alpha=0.6)
-ax.set(aspect="equal")
+ax.set(aspect="equal")'''
 
 fig1 = plt.figure("psds")
 fig1.clf()
