@@ -378,13 +378,13 @@ def get_features(arr):
                        1).flatten()   # mean of 10-12hz as feature
     #features = np.array([features[:2].mean(), features[2:].mean()])
     # features = psds_per_channel[:,mu_indices].flatten()                     # all of 10-12hz as feature
-    return features, freqs, psds_per_channel[0], psds_per_channel[-1]
+    return np.log(features), freqs, psds_per_channel[0], psds_per_channel[-1]
 
 
 """ end """
 
 # * use this to select which files you want to test/train on
-train_csvs = [1]          # index of the training files we want to use
+train_csvs = [0,1,2]          # index of the training files we want to use
 test_csvs = [0,1,2]             # index of the test files we want to use
 train_csvs = [csvs[i] for i in train_csvs]
 test_csvs = [csvs[i] for i in test_csvs]
@@ -502,12 +502,14 @@ model = None
 #model = models[0][-1]
 video_mode = True
 # use video mode when you want to save the figure to a transparent bg and white text
+plot_trace_acc = 0
 if plot_trace_acc:
     test_csvs = [0, 1, 2]
     test_csvs = [csvs[i] for i in test_csvs]
     t_before = 4
-    #test_dict_tb = get_data(test_csvs, tmin=int(t_before * sampling_freq))
-    #test_dict = merge_all_dols([data_dict[csv] for csv in test_csvs])
+    if load_data:
+        test_dict_tb = get_data(test_csvs, tmin=int(t_before * sampling_freq))
+        test_dict = merge_all_dols([data_dict[csv] for csv in test_csvs])
     _, test_features_tb, _ = extract(test_dict_tb, window_s, shift, plot_psd, keep_trials=True)
     
     fig1 = plt.figure("accuracy over trace")
@@ -547,7 +549,7 @@ if plot_trace_acc:
     ylabel = 'Accuracy (%)'
     blocks_d = {xlabel: [i*lateral*shift - t_before + window_s for block in blocks for i in range(tf.shape[0])], ylabel: blocks.flatten(), 'event':['acc' for block in blocks for i in range(tf.shape[0])]}
     df = pd.DataFrame(data=blocks_d)
-    ax = sn.lineplot(x=xlabel, y=ylabel, style="event", markers=True, ci=0, data=df,linewidth=5)
+    ax = sn.lineplot(x=xlabel, y=ylabel, style="event", markers=False, ci=0, data=df,linewidth=3)
     ax.get_legend().remove()
     plt.axvline(x=0, linestyle=':')
     plt.ylim([20, 100])
@@ -566,7 +568,7 @@ if plot_trace_acc:
     '''
     plt.figure('axes')
     sn.set()
-    sn.set_style("whitegrid")
+    #sn.set_style("whitegrid")
     xlabel = 'Time after onset (s)'
     ylabel = 'Accuracy (%)'
     blocks_d = {xlabel: [i*lateral*shift for block in blocks for i in range(tf.shape[0])], ylabel: blocks.flatten(), 'event':['acc' for block in blocks for i in range(tf.shape[0])]}
@@ -582,21 +584,53 @@ if plot_trace_acc:
     plt.xlim([-3.5,9.5])
     ax.grid(False)
     plt.savefig('acc_trace_axis_only1.png', transparent=True)'''
-    
+
 mu_indices = np.where(np.logical_and(freqs >= 10, freqs <= 12))
-fig3 = plt.figure("scatter")
-fig3.clf()
-log = 0
-ax = plt.subplot(111)
-for direction, features in train_features.items():
-    f = np.array(features).T
-    # if direction != 'Rest':
-    plt.scatter(f[0], f[1], s=2)
-plt.axis('scaled')
-#ax.grid(False)
-plt.show()
 
+figpath = "/Users/marley/Documents/ntxvideofigures/plots_new/"
+color_palette = "husl"
+sn.set()
+log = 1
+with sn.color_palette(color_palette, 3):
+    fig3 = plt.figure("scatter")
+    fig3.clf()
+    log = 0
+    ax = plt.subplot(111)
+    for direction, features in train_features.items():
+        f = np.array(features).T
+        if plot_rest or direction != 'Rest':
+            plt.scatter(f[0], f[1], s=3)
+    #plt.axis('scaled')
+    ax.axes.get_xaxis().set_visible(False)
+    ax.axes.get_yaxis().set_visible(False)
+    ax.grid(False)
+    plt.savefig(figpath + 'scatter' + str(tempcount % 10) + '.png', transparent=True,dpi=300)
+    
+    
+    plot_rest = True
+    fig = plt.figure("kde")
+    fig.clf()
+    ax = plt.subplot(111)
+    for direction, features in train_features.items():
+        features = np.array(features).T
+        if plot_rest or direction != 'Rest': 
+            sn.kdeplot(features[0], features[1], ax=ax, shade_lowest=False,alpha=0.3)
+    for direction, features in train_features.items():
+        features = np.array(features).T
+        if plot_rest or direction != 'Rest':
+            a = sn.kdeplot(features[0], features[1], ax=ax, shade=True, shade_lowest=False, alpha=0.8,linewidth=6)
+    
+    #ax.set(aspect="equal")
+    #plt.ylim([-2, 20])
+    #plt.xlim([-2, 20])
+    ax.grid(False)
+    ax.axes.get_xaxis().set_visible(False)
+    ax.axes.get_yaxis().set_visible(False)
+    plt.savefig(figpath + 'kde' + str(tempcount % 10) + '.png', transparent=True,dpi=300)
+    ymin, ymax = plt.gca().get_ylim()
 
+tempcount += 1
+'''
 from mpl_toolkits.mplot3d import axes3d, Axes3D 
 fig3 = plt.figure("scatter")
 fig3.clf()
@@ -610,6 +644,7 @@ for direction, features in train_features.items():
 plt.axis('scaled')
 ax.grid(False)
 plt.show()
+'''
 
 mean_plt = 0
 if mean_plt:
@@ -625,25 +660,26 @@ if mean_plt:
     
 sn.reset_orig()
 #with plt.style.context('seaborn-colorblind'):
-sn.set_style("whitegrid")
-plot_rest = True
-fig = plt.figure("kde")
-fig.clf()
-ax = plt.subplot(111)
-plt.title("Mean")
-for direction, features in train_features.items():
-    features = np.array(features).T
-    if log:
-        mu = np.log10(mu)
-    if plot_rest or direction != 'Rest':
-        #sn.kdeplot(features[0], features[1], ax=ax, shade=True, shade_lowest=False, alpha=0.3,s=0.5)
-        sn.kdeplot(features[0], features[1], ax=ax, shade_lowest=False, alpha =0.6)
-ax.set(aspect="equal")
-plt.ylim([-2, 20])
-plt.xlim([-2, 20])
-#ax.grid(False)
-plt.savefig('mean_lines.png', transparent=True,dpi=300)
-ymin, ymax = plt.gca().get_ylim()
+plot_kde = 0
+if plot_kde:
+    plot_rest = True
+    fig = plt.figure("kde")
+    fig.clf()
+    ax = plt.subplot(111)
+    plt.title("Mean")
+    for direction, features in train_features.items():
+        features = np.array(features).T
+        if log:
+            mu = np.log10(mu)
+        if plot_rest or direction != 'Rest':
+            #sn.kdeplot(features[0], features[1], ax=ax, shade=True, shade_lowest=False, alpha=0.3,s=0.5)
+            sn.kdeplot(features[0], features[1], ax=ax, shade_lowest=False, alpha =0.6)
+    ax.set(aspect="equal")
+    plt.ylim([-2, 20])
+    plt.xlim([-2, 20])
+    #ax.grid(False)
+    plt.savefig('mean_lines.png', transparent=True,dpi=300)
+    ymin, ymax = plt.gca().get_ylim()
 
 '''
 #ax = plt.subplot(122, sharex=ax, sharey=ax)
