@@ -35,7 +35,7 @@ MIN_DISTANCE_TO_WALL = 0.6 # meters
 MAX_DISTANCE_TO_WALL = 2.5 # meters
 MIN_CHANGE_DISTANCE = 0.3
 MAX_STD_ERR = 0.3
-MIN_CHANGE_RATIO = 1.3
+MIN_CHANGE_RATIO = 1.4
 
 previous_wall = ""
 comparison_time = time.time()
@@ -51,12 +51,12 @@ def collision_detection(left_forw, right_forw, front_forw, front_tilt): # assume
     Returns OK (1) or NOT OK (0) for each direction
     """
     l_out, r_out, f_out = 1,1,1
-    if left_forw <= COLLISION_THRESHOLD or front_forw <= COLLISION_THRESHOLD/4:
+    if left_forw <= COLLISION_THRESHOLD or front_forw <= COLLISION_THRESHOLD/2:
         l_out = 0
-    if right_forw <= COLLISION_THRESHOLD or front_forw <= COLLISION_THRESHOLD/4:
+    if right_forw <= COLLISION_THRESHOLD or front_forw <= COLLISION_THRESHOLD/2:
         r_out = 0
-    if (front_forw <= COLLISION_THRESHOLD or left_forw < SIDE_COLLISION_THRESHOLD
-        or right_forw < SIDE_COLLISION_THRESHOLD):
+    if (front_forw <= COLLISION_THRESHOLD or left_forw <= SIDE_COLLISION_THRESHOLD
+        or right_forw  SIDE_COLLISION_THRESHOLD):
         f_out = 0
     f_out = min(stair_detection(front_tilt), f_out)
     return (l_out, r_out, f_out)
@@ -107,10 +107,45 @@ def is_wall(history):
 
 
     if (std_err < MAX_STD_ERR or deriv < MAX_2ND_ORDER_DERIVATIVE) and history[-1] < MAX_DISTANCE_TO_WALL:
-        desired_distance = max(np.median(history), MIN_DISTANCE_TO_WALL) # not average cuz 1000 m
+        desired_distance = max(np.array2str(np.median(history)), MIN_DISTANCE_TO_WALL) # not average cuz 1000 m
         return desired_distance
 
     return 0
+
+def wall_adjustment(direction, desired_distance, current_distance,
+                     l_out, r_out, f_out):
+    print('desired distance: {}, real distance: {}'.format(desired_distance,
+                                                np.array2str(current_distance)))
+    print("WALL: THERE IS A WALL ON THE {}".format(direction))
+    if direction == "LEFT":
+        if current_distance/desired_distance > MIN_CHANGE_RATIO and l_out:
+            print("WALL: MAKING LEFT ADJUSTMENT")
+            return 'L'
+        elif desired_distance/current_distance > MIN_CHANGE_RATIO and r_out:
+            print("WALL: MAKING RIGHT ADJUSTMENT")
+            return 'R'
+        elif current_distance < MIN_DISTANCE_TO_WALL and r_out:
+            print('WALL: TOO CLOSE TO WALL. MAKING RIGHT ADJUSTMENT')
+            return 'R'
+        # if distances["left"][-1] + MIN_CHANGE_DISTANCE < desired_distance and r_out:
+        #     print("WALL: MAKING RIGHT ADJUSTMENT")
+        #     return 'R'
+        # elif distances["left"][-1] > desired_distance + MIN_CHANGE_DISTANCE  and l_out:
+        #     print("WALL: MAKING LEFT ADJUSTMENT")
+        #     return 'L'
+    elif direction == "RIGHT":
+        if distances["right"][-1]/desired_distance > MIN_CHANGE_RATIO and r_out:
+            print("WALL: MAKING RIGHT ADJUSTMENT")
+            return 'R'
+        elif desired_distance/distances["right"][-1] > MIN_CHANGE_RATIO  and l_out:
+            print("WALL: MAKING LEFT ADJUSTMENT")
+            return 'L'
+        elif distances["right"][-1] < MIN_DISTANCE_TO_WALL and l_out:
+            print('WALL: TOO CLOSE TO WALL. MAKING LEFT ADJUSTMENT')
+            return 'L'
+    return ''
+
+
 
 def wall_follower(l_out, r_out, f_out):
     """
@@ -125,167 +160,32 @@ def wall_follower(l_out, r_out, f_out):
 
     if not f_out:
         return 'S'
+
     if current_time - comparison_time > 1: # check every 1 second
         comparison_time = current_time
-        # if min(distances["left"][-1], distances["right"][-1]) < MIN_DISTANCE_TO_WALL:
-        #     if distances["left"][-1] < distances["right"][-1]:
-        #         # left stuff
-        #         desired_distance = is_wall(distances["left"])
-        #         if desired_distance:
-        #             print('desired distance: ')
-        #             print(desired_distance)
-        #             print('real distance: ')
-        #             print(distances["left"][-1])
-        #             print("WALL: THERE IS A WALL ON THE LEFT")
-        #             # left stuff
-        #             if distances["left"][-1]/desired_distance > MIN_CHANGE_RATIO and l_out:
-        #                 print("WALL: MAKING LEFT ADJUSTMENT")
-        #                 return 'L'
-        #             elif desired_distance/distances["left"][-1] > MIN_CHANGE_RATIO and r_out:
-        #                 print("WALL: MAKING RIGHT ADJUSTMENT")
-        #                 return 'R'
-        #             elif distances["left"][-1] < MIN_DISTANCE_TO_WALL and r_out:
-        #                 print('WALL: TOO CLOSE TO WALL. MAKING RIGHT ADJUSTMENT')
-        #                 return 'R'
-        #             # if distances["left"][-1] + MIN_CHANGE_DISTANCE < desired_distance and r_out:
-        #             #     print("WALL: MAKING RIGHT ADJUSTMENT")
-        #             #     return 'R'
-        #             # elif distances["left"][-1] > desired_distance + MIN_CHANGE_DISTANCE  and l_out:
-        #             #     print("WALL: MAKING LEFT ADJUSTMENT")
-        #             #     return 'L'
-        #             return ''
-        #     else:
-        #         desired_distance = is_wall(distances["right"])
-        #         if desired_distance:
-        #             print('desired distance: ')
-        #             print(desired_distance)
-        #             print('real distance: ')
-        #             print(distances["right"][-1])
-        #             print("WALL: THERE IS A WALL ON THE RIGHT")
-        #             # left stuff
-        #             if distances["right"][-1]/desired_distance > MIN_CHANGE_RATIO and r_out:
-        #                 print("WALL: MAKING RIGHT ADJUSTMENT")
-        #                 return 'R'
-        #             elif desired_distance/distances["right"][-1] > MIN_CHANGE_RATIO  and l_out:
-        #                 print("WALL: MAKING LEFT ADJUSTMENT")
-        #                 return 'L'
-        #             elif distances["right"][-1] < MIN_DISTANCE_TO_WALL and l_out:
-        #                 print('WALL: TOO CLOSE TO WALL. MAKING LEFT ADJUSTMENT')
-        #                 return 'L'
-        #             return ''
-        if previous_wall == "left":
-            desired_distance = is_wall(distances["left"])
-            if desired_distance:
-                print('desired distance: ')
-                print(desired_distance)
-                print('real distance: ')
-                print(distances["left"][-1])
-                print("WALL: THERE IS A WALL ON THE LEFT")
-                # left stuff
-                # if distances["left"][-1]/desired_distance > MIN_CHANGE_RATIO and l_out:
-                #     print("WALL: MAKING LEFT ADJUSTMENT")
-                #     return 'L'
-                # elif desired_distance/distances["left"][-1] > MIN_CHANGE_RATIO and r_out:
-                #     print("WALL: MAKING RIGHT ADJUSTMENT")
-                #     return 'R'
-                if distances["left"][-1] + MIN_CHANGE_DISTANCE < desired_distance and r_out:
-                    print("WALL: MAKING RIGHT ADJUSTMENT")
-                    return 'R'
-                elif distances["left"][-1] > desired_distance + MIN_CHANGE_DISTANCE  and l_out:
-                    print("WALL: MAKING LEFT ADJUSTMENT")
-                    return 'L'
-                elif distances["left"][-1] < MIN_DISTANCE_TO_WALL and r_out:
-                    print('WALL: TOO CLOSE TO WALL. MAKING RIGHT ADJUSTMENT')
-                    return 'R'
 
-                return ''
-        if previous_wall == "right":
-            desired_distance = is_wall(distances["right"])
-            if desired_distance:
-                print('desired distance: ')
-                print(desired_distance)
-                print('real distance: ')
-                print(distances["right"][-1])
-                print("WALL: THERE IS A WALL ON THE RIGHT")
-                # left stuff
-                if distances["right"][-1] + MIN_CHANGE_DISTANCE < desired_distance and l_out:
-                    print("WALL: MAKING LEFT ADJUSTMENT")
-                    return 'L'
-                elif distances["right"][-1] > desired_distance + MIN_CHANGE_DISTANCE  and r_out:
-                    print("WALL: MAKING RIGHT ADJUSTMENT")
-                    return 'R'
-                # if distances["right"][-1]/desired_distance > MIN_CHANGE_RATIO and r_out:
-                #     print("WALL: MAKING RIGHT ADJUSTMENT")
-                #     return 'R'
-                # elif desired_distance/distances["right"][-1] > MIN_CHANGE_RATIO  and l_out:
-                #     print("WALL: MAKING LEFT ADJUSTMENT")
-                #     return 'L'
-                elif distances["right"][-1] < MIN_DISTANCE_TO_WALL and l_out:
-                    print('WALL: TOO CLOSE TO WALL. MAKING LEFT ADJUSTMENT')
-                    return 'L'
-                return ''
+        left_desired_distance = is_wall(distances["left"])
+        right_desired_distance = is_wall(distances["right"])
 
-        if distances["left"][-1] < distances["right"][-1]:
-            desired_distance = is_wall(distances["left"])
-            if desired_distance:
-                previous_wall = "left"
-                print('desired distance: ')
-                print(desired_distance)
-                print('real distance: ')
-                print(distances["left"][-1])
-                print("WALL: THERE IS A WALL ON THE LEFT")
-                # left stuff
-                if distances["left"][-1] + MIN_CHANGE_DISTANCE < desired_distance and r_out:
-                    print("WALL: MAKING RIGHT ADJUSTMENT")
-                    return 'R'
-                elif distances["left"][-1] > desired_distance + MIN_CHANGE_DISTANCE  and l_out:
-                    print("WALL: MAKING LEFT ADJUSTMENT")
-                    return 'L'
-                elif distances["left"][-1] < MIN_DISTANCE_TO_WALL and r_out:
-                    print('WALL: TOO CLOSE TO WALL. MAKING RIGHT ADJUSTMENT')
-                    return 'R'
-                return ''
-
-
-        desired_distance = is_wall(distances["right"])
-        if desired_distance:
-            previous_wall = "right"
-            print('desired distance: ')
-            print(desired_distance)
-            print('real distance: ')
-            print(distances["right"][-1])
-            print("WALL: THERE IS A WALL ON THE RIGHT")
-            # left stuff
-            if distances["right"][-1] + MIN_CHANGE_DISTANCE < desired_distance and l_out:
-                print("WALL: MAKING LEFT ADJUSTMENT")
-                return 'L'
-            elif distances["right"][-1] > desired_distance + MIN_CHANGE_DISTANCE  and r_out:
-                print("WALL: MAKING RIGHT ADJUSTMENT")
-                return 'R'
-            elif distances["right"][-1] < MIN_DISTANCE_TO_WALL and l_out:
-                print('WALL: TOO CLOSE TO WALL. MAKING LEFT ADJUSTMENT')
-                return 'L'
-            return ''
-
-        desired_distance = is_wall(distances["left"])
-        if desired_distance:
-            previous_wall = "left"
-            print('desired distance: ')
-            print(desired_distance)
-            print('real distance: ')
-            print(distances["left"][-1])
-            print("WALL: THERE IS A WALL ON THE LEFT")
-            # left stuff
-            if distances["left"][-1] + MIN_CHANGE_DISTANCE < desired_distance and r_out:
-                print("WALL: MAKING RIGHT ADJUSTMENT")
-                return 'R'
-            elif distances["left"][-1] > desired_distance + MIN_CHANGE_DISTANCE  and l_out:
-                print("WALL: MAKING LEFT ADJUSTMENT")
-                return 'L'
-            elif distances["left"][-1] < MIN_DISTANCE_TO_WALL and r_out:
-                print('WALL: TOO CLOSE TO WALL. MAKING RIGHT ADJUSTMENT')
-                return 'R'
-            return ''
+        if previous_wall == "left" and left_desired_distance:
+            return wall_adjustment("LEFT", left_desired_distance, distances["left"][-1],
+                                   l_out, r_out, f_out)
+        elif previous_wall == "right" and right_desired_distance:
+            return wall_adjustment("RIGHT", right_desired_distance, distances["right"][-1],
+                                   l_out, r_out, f_out)
+        elif distances["left"][-1] < distances["right"][-1] and left_desired_distance:
+            return wall_adjustment("LEFT", left_desired_distance, distances["left"][-1],
+                                   l_out, r_out, f_out)
+        elif distances["right"][-1] >= distances["left"][-1] and right_desired_distance:
+            return wall_adjustment("RIGHT", right_desired_distance, distances["right"][-1],
+                                   l_out, r_out, f_out)
+        elif left_desired_distance:
+            return wall_adjustment("LEFT", left_desired_distance, distances["left"][-1],
+                                   l_out, r_out, f_out)
+        elif right_desired_distance:
+            return wall_adjustment("RIGHT", right_desired_distance, distances["right"][-1],
+                                   l_out, r_out, f_out)
+    return 'F'
 
 def obstacle_avoider():
     return None
@@ -299,19 +199,7 @@ def clear_distances():
 @sio.on('to self-driving (clear)')
 def on_clear(data):
     clear_distances()
-    # l = sensor_data['left']
-    # r = sensor_data['right']
-    # f = sensor_data['front']
-    # f_t = sensor_data['front-tilt']
-    #
-    # l_out, r_out, f_out = collision_detection(l, r, f, f_t)
-    # if f_out:
-    #     command = 'F'
-    # else:
-    #     command = 'S'
-
     command = 'F'
-
     sio.emit('from self-driving (forward)', {'response': command,
                                              'duration': 500,
                                              'state': 'forward'})
@@ -349,8 +237,6 @@ def on_message(sensor_data):
         command = "F"
     else:
         command = "S"
-
-    # if command == "CAN'T GO FORWARD AND NO WALL TO FOLLOW":
 
     sio.emit('from self-driving', {'response': command,
                                    'duration': 500})
