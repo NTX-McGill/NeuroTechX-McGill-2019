@@ -63,7 +63,11 @@ def predict(ch):
                                    window=mlab.window_hanning,
                                    Fs=250,
                                    noverlap=0
-                                   ) 
+                                   )
+    mu_indices = np.where(np.logical_and(freqs>=10, freqs<=12))
+    mu1 = psd1[mu_indices].mean()
+    mu2 = psd2[mu_indices].mean()
+    l, r = list(clf.predict_proba(np.array([mu1,mu2]).reshape(1,-1))[0])
     blink_index = np.where(np.logical_and(freqs>= 5, freqs <= 6))
     blink_psd = psd1[blink_index].mean() + psd2[blink_index].mean()
     indices = np.where(np.logical_and(freqs>=15, freqs<=45))
@@ -73,10 +77,6 @@ def predict(ch):
     psd_ = psd1[x_indices]
     freqs_ = freqs[x_indices]
     peak = freqs_[np.argmax(psd_)]
-    
-    """Testing new thresholds """
-    
-    blink_index2 = np.where(np.logical_and(freqs>= 5, freqs <= 7))
     
     
     
@@ -112,7 +112,7 @@ def predict(ch):
         if prev_states.count('blink') >= blink_threshold:
             prev_predictions = []
             prev_states = []
-            return 'BLINK'
+            return 'BLINK', l, r
         if last_change > decision:              # we've reached decision deadline
             if prev_states.count('clear') > clear_threshold:    # enough samples are clear, we interpret the user's intention as wanting to turn
                 mu_indices = np.where(np.logical_and(freqs>=10, freqs<=12))
@@ -126,11 +126,11 @@ def predict(ch):
                 prev_predictions = []
                 prev_states = []
                 if l > r:
-                    return 'L'
-                return 'R'
+                    return 'L', l, r
+                return 'R', l, r
             prev_predictions = []
             prev_states = []
-            return 'BLINK'
+            return 'BLINK', l, r
         if state == 'clear' and last_change * pred_frequency >= 2:  # we're at least 1 second away from when we stopped
             mu_indices = np.where(np.logical_and(freqs>=10, freqs<=12))
             mu1 = psd1[mu_indices].mean()
@@ -138,7 +138,7 @@ def predict(ch):
             l, r = list(clf.predict_proba(np.array([mu1,mu2]).reshape(1,-1))[0])
             prev_predictions.append(l)  # append prediction for voting
             
-
+    return None, l, r
 
     #print("{:2.1f}, {:2.1f}".format(mean_psd, blink_psd/mean_psd))
 
@@ -155,7 +155,8 @@ def change_state(received_state):
 def on_message(data):
     global buffer_data
     buffer_data += data['data'] # concatenate lists
-
+    l = 0.5
+    r = 0.5
     if len(buffer_data) < 500:
         # lacking data
         response = "F" # go forward otherwise
@@ -163,10 +164,10 @@ def on_message(data):
         # we have enough data to make a prediction
         to_pop = len(buffer_data) - 500
         buffer_data = buffer_data[to_pop:]
-        response = predict(buffer_data)
+        response, l, r = predict(buffer_data)
     sio.emit('data from ML', {'response': response,
-                              'left-prob': random.uniform(0, 1),
-                              'right-prob': random.uniform(0, 1),
+                              'left-prob': l,
+                              'right-prob': r,
                               'blink-prob': -1})
 
 
