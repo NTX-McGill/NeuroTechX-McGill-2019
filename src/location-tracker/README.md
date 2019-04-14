@@ -1,7 +1,4 @@
-# Admin
-
-This is a web interface for administrators to see a quick overview of all the
-assets being tracked.
+# Location Tracker
 
 ## Usage
 
