@@ -3,6 +3,8 @@ MILO is designed to help users navigate without the use of hands or limbs. This 
 
 We also designed a caregiver mobile application, which sends the real-time location of the wheelchair user to their caregivers to ensure safety and facilitate real-time communication. It also notifies the caregiver if the user's heartrate increases abnormally or a crash occurs.
 
+![](/FiguresFolder/Fig6.png)
+
 ## Github Navigation 
 - [`\offline`](https://github.com/NTX-McGill/NeuroTechX-McGill-2019/tree/master/offline/) contains raw EEG data and scripts for offline analysis and visualization 
 	- [`\offline\data`](https://github.com/NTX-McGill/NeuroTechX-McGill-2019/tree/master/offline/data) contains the raw EEG data recorded from consenting and anonymized participants. Each folder contains the recording for a single anonymized and consenting participant. The data collection paradigms are specified in the README.md of each folder
