@@ -14,7 +14,7 @@ We also designed a web application for caregivers, from which they can view the 
 - [`\robotics`](https://github.com/NTX-McGill/NeuroTechX-McGill-2019/tree/master/robotics) contains scripts to interface with the Arduino hardware connected to the wheelchair
 - `\src` contains the software
 	- [`\dashboard`](https://github.com/NTX-McGill/NeuroTechX-McGill-2019/tree/master/src/dashboard) contains the dashboard software as well the instructions to set up and launch it
-	- [`\real-time`](https://github.com/NTX-McGill/NeuroTechX-McGill-2019/tree/master/src/real-time) contains scripts to classify EEG signals acquired in real-time
+	- [`\real-time`](https://github.com/NTX-McGill/NeuroTechX-McGill-2019/tree/master/src/real-time) contains scripts to classify EEG signals acquired in real-time, to send/receive data from the wheelchair, and for assisted driving
 	- [`\caregiver-app`](https://github.com/NTX-McGill/NeuroTechX-McGill-2019/tree/master/src/caregiver-app) contains the web app and text messaging for the caregiver
 
 ## Project Pipeline
@@ -46,11 +46,15 @@ A linear regression is used to classify the motor imagery state of the user in r
 If no motor imagery signals are detected and jaw-clenching or eye-blinking is sustained, the wheelchair will go into a stop. Sustaining these artifacts again will bring the wheelchair to move forward again.
 
 ## Dashboard
-Our user dashboard guides assists with the data collection paradigm and Neurofeedback task. The visual-cued paradigm is displayed to guide the users. The bar graph displays a measure of the machine learning model's confidence in that a signal is the correct motor imagery signal corresponding to the labeling (i.e. correct Left, correct Right, correct Rest, etc). The Neurofeedback task is used to help users generate better motor imagery signal.
+Our dashboard acts as the hub for both data collection and the real time control of the wheelchair.
+
+During data collection, the experimenter can create a queue of thoughts ("left", "right", "rest") for the subject to think about. After each trial, a CSV file is written with the EEG data collected as well as its corresponding though label. Spectrograms are displayed in real time to assist the experimenter. Neurofeedback is also integrated by displaying the mu bands.
+
+During the real time control of the wheelchair, bar graphs and charts display the machine learning confidence. The sensor readings are also shown on the screen.
 
 ![](/figures/Fig4.png)
 
-## Caregiver App
+## Caregiver Web App
 An application capable of sending the wheelchair's location to the caregiver in real-time was designed as a safety measure for wheelchair users. A notification feature is implemented so that the caregiver receives a text via Twilio, a cloud communication platform, when the user of the wheelchair experiences trouble or distress (i.e. obstacles, trauma, high stress, malfunction, etc.). The location information is received through the location services of the user's smartphone. The measure of stress dictating whether to send an alert or not is currently based on heart rate monitoring information. Once the heart rate exceeds a pre-established threshold customized to the user’s resting heart rate, the caregiver is alerted that the user might require assistance.  
 
 ## Hardware
