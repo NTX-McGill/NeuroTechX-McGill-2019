@@ -69,8 +69,8 @@ In order to detect whether the user is following a wall, two ultrasonic sensors 
 
 The second function of the assisted-driving paradigm is obstacle avoidance. The two sensors used in wall following are combined with a frontward facing sensor and a sensor pointing at 45º from the vertical towards the ground. As the wheelchair approaches a small obstacle, using information about the chair’s distance from the obstacle, the algorithm determines if there is room to navigate around it. Once the obstacle has been cleared, the wheelchair continues on the straight path that it had initially set out on. If there isn’t room to navigate around the obstacle, the wheelchair comes to a complete stop and the user decides what subsequent action they wish to execute. The system uses the 45º ultrasonic sensor to detect the presence of stairs or steep hills in its upcoming path and stops if the former are detected.
 
-## Partners and Advisors
-We couldn't do it without you guys <3
+## A Big Thank You to:
+Our partners:
 * [wrnch.ai](https://wrnch.ai/)
 * [DeepMind](https://deepmind.com/)
 * [OpenBCI](https://openbci.com/)
@@ -79,7 +79,10 @@ We couldn't do it without you guys <3
 * [Building 21](https://building21.ca/)
 * [McGill University Faculties of Arts](https://www.mcgill.ca/arts/),[Science](https://www.mcgill.ca/science/) and [Engineering](https://www.mcgill.ca/engineering/)
 * [McGill University School of Physical and Occupational Therapy](https://www.mcgill.ca/spot/)
-* [Dr. Georgios Mitsis](https://www.mcgill.ca/bioengineering/people/faculty/georgios-mitsis), our Faculty Advisor
+
+Our faculty advisor:
+* [Dr. Georgios Mitsis](https://www.mcgill.ca/bioengineering/people/faculty/georgios-mitsis)
+
 * [Dr. Stefanie Blain-Moraes](https://www.mcgill.ca/spot/stefanie-blain-moraes), for lending equipment
 
 ## The Team
