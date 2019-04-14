@@ -1,11 +1,11 @@
-## DATA COLLECTION
+# Data Collection
 
 ## Electrode placement
 1. Have the participant remove any earrings, necklaces, glasses (can replace later if need for seeing screen) and untie hair.
 2. Measure the distance between the two ears (Y). Take note of and mark the following using the head marker while holding the measuring tape in the same position:
-  * Mid-point between both ears
-  * 10% of Y as measured from the midpoint (i.e. 40% and 60% of Y, as measured from one of the ears)
-  * 20% of Y as measured from the midpoint (i.e. 30% and 70% of Y, as measured from one of the ears)
+   * Mid-point between both ears
+   * 10% of Y as measured from the midpoint (i.e. 40% and 60% of Y, as measured from one of the ears)
+   * 20% of Y as measured from the midpoint (i.e. 30% and 70% of Y, as measured from one of the ears)
 3. Measure the distance between the nasion (the dip between the forehead and the nose) and the inion (the bump where the skull dips inwards at the back of the head) (X). Take note of and mark the following as described in #1:
   * Mid-point between the nasion and inion
 4. Find the intersection between the mid-point of X and Y. This is Cz, the center of the head. Place the headmarker over this spot and do a sanity check. Is it between the two eyes? Does it look like the center of the head?
