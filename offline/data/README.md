@@ -3,9 +3,9 @@
 ## Required equipment
 * Measuring tape
 * [Head marker](https://www.uline.ca/Product/Detail/S-17462R/Markers-and-Pens/Sharpie-China-Markers-Red?pricode=YE731&gadtype=pla&id=S-17462R&gclid=Cj0KCQjwtMvlBRDmARIsAEoQ8zTQJZnP6G0zHH-9TAcVlKNOleufHNOmLClhWkHzrrbr6X2QLbNuPxMaAm8jEALw_wcB&gclsrc=aw.ds)
-* [OpenBCI board] (https://shop.openbci.com/products/cyton-biosensing-board-8-channel?variant=38958638542)
-* [Gold cup electrodes] (https://shop.openbci.com/collections/frontpage/products/openbci-gold-cup-electrodes?variant=9056028163)
-* [Electrode gel] (https://bio-medical.com/ten20-eeg-conductive-paste-4oz-jars-3-pack.html)
+* [OpenBCI board](https://shop.openbci.com/products/cyton-biosensing-board-8-channel?variant=38958638542)
+* [Gold cup electrodes](https://shop.openbci.com/collections/frontpage/products/openbci-gold-cup-electrodes?variant=9056028163)
+* [Electrode gel](https://bio-medical.com/ten20-eeg-conductive-paste-4oz-jars-3-pack.html)
 * Laptop
 
 ## Electrode placement
@@ -35,7 +35,7 @@
     * Connect dongle to USB port of laptop
 
 ## Launching the OpenBCI GUI and troubleshooting 
-1. Install [OpenBCI GUI[(https://openbci.com/index.php/downloads) and [FDTI VP driver](https://www.ftdichip.com/Drivers/VCP.htm).
+1. Install [OpenBCI GUI](https://openbci.com/index.php/downloads) and [FDTI VP driver](https://www.ftdichip.com/Drivers/VCP.htm).
 Launch the OpenBCI GUI.
 2. Select Data Source > LIVE (from Cyton) > Serial (from Dongle) > usually the FDTI driver is the first port on the Serial/COM port list > START SYSTEM
 3. Set OSC to the following settings:
