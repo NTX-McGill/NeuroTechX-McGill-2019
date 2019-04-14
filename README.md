@@ -9,6 +9,7 @@ We also designed a caregiver mobile application, which sends the real-time locat
 - [Signal Processing visualization](https://github.com/NTX-McGill/NeuroTechX-McGill-2019/tree/master/offline/visualization)
 - [Machine Learning](https://github.com/NTX-McGill/NeuroTechX-McGill-2019/tree/master/offline/ML)
 - [Software](https://github.com/NTX-McGill/NeuroTechX-McGill-2019/tree/master/offline/training_software)
+- [Robotics code](https://github.com/NTX-McGill/NeuroTechX-McGill-2019/tree/master/robotics)
 
 ## Setup
 - how to run the code
