@@ -74,7 +74,7 @@ Our partners:
 * [wrnch.ai](https://wrnch.ai/)
 * [DeepMind](https://deepmind.com/)
 * [OpenBCI](https://openbci.com/)
-* [twilio](https://www.twilio.com/)
+* [Twilio](https://www.twilio.com/)
 * [Muse](https://choosemuse.com/)
 * [Building 21](https://building21.ca/)
 * [McGill University Faculties of Arts](https://www.mcgill.ca/arts/),[Science](https://www.mcgill.ca/science/) and [Engineering](https://www.mcgill.ca/engineering/)
