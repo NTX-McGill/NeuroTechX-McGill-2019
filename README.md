@@ -3,8 +3,6 @@ MILO is designed to help users navigate without the use of hands or limbs. This 
 
 We also designed a caregiver mobile application, which sends the real-time location of the wheelchair user to their caregivers to ensure safety and facilitate real-time communication. It also notifies the caregiver if the user's heartrate increases abnormally or a crash occurs.
 
-![](/FiguresFolder/Fig6.png)
-
 ## Github Navigation 
 - [`\offline`](https://github.com/NTX-McGill/NeuroTechX-McGill-2019/tree/master/offline/) contains raw EEG data and scripts for offline analysis and visualization 
 	- [`\offline\data`](https://github.com/NTX-McGill/NeuroTechX-McGill-2019/tree/master/offline/data) contains the raw EEG data recorded from consenting and anonymized participants. Each folder contains the recording for a single anonymized and consenting participant. The data collection paradigms are specified in the README.md of each folder
@@ -61,6 +59,8 @@ An application capable of sending the wheelchair's location to the caregiver in 
 
 ## Hardware 
 The commercially available Orthofab Oasis 2008 wheelchair was modified and customized to fit the needs of the project. The motor controller of the wheelchair was replaced with two commercial-grade 40A, 12V PWM controllers connected to an Arduino Uno. Furthermore, the seat of the wheelchair was reupholstered and custom-built footrests were installed. Four motion sensors were installed around the circumference of the footrest for the implementation of the assisted-driving feature.
+
+![](/FiguresFolder/Fig6.png)
 
 ## Assisted Driving
 Relying on MI for finer navigation is challenging if not impossible. We therefore created an assisted-driving model which serves to refine movements involved in straight navigation. The model has two primary functions: wall following and object avoidance.
