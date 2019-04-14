@@ -1,10 +1,12 @@
 # MILO - the MInd-controlled LOcomotive
-MILO is designed to help users navigate without the use of hands or limbs. This brain-computer interface (BCI) makes use of electroencephalography (EEG), an affordable, accessible and non-invasive technique to detect brain activity. Specifically, MILO uses motor imagery (MI) signals to turn, by detecting a suppression of the mu rhythm (7-13 Hz) in the sensorimotor cortex (the brain area associated with movement) when users imagine movements. In addition to MI, eye blinking signals and jaw artefacts were used to initiate starts and stops, and to indicate the desire to turn. With MILO, users can move forward or stop by blinking their eyes or clenching their jaw, and can turn left or right by thinking about left and right hand movements. 
+MILO helps people navigate without the use of hands or limbs. It is especially useful for people with ALS, locked-in syndrome, and other forms of paralysis.
 
-We also designed a caregiver mobile application, which sends the real-time location of the wheelchair user to their caregivers to ensure safety and facilitate real-time communication. It also notifies the caregiver if the user's heartrate increases abnormally or a crash occurs.
+Our brain-computer interface makes use of electroencephalography (EEG), an affordable, accessible, and non-invasive technique to detect brain activity. Specifically, MILO uses motor imagery signals to turn, by detecting a suppression of the mu rhythm (7-13 Hz) in the sensorimotor cortex (the brain area associated with movement) when users imagine movements. In addition to motor imagery, eye blinking signals and jaw artefacts were used to initiate starts and stops, and to indicate the desire to turn. With MILO, users can toggle between moving forward and stoping by blinking their eyes or clenching their jaw. They can turn left or right by simply thinking about left and right hand movements.
 
-## Github Navigation 
-- [`\offline`](https://github.com/NTX-McGill/NeuroTechX-McGill-2019/tree/master/offline/) contains raw EEG data and scripts for offline analysis and visualization 
+We designed a web application for caregivers, from which they can view the location of the wheelchair user in real time to ensure their safety. A text message is also sent to the caregiver if the user's heart rate is abnormal or a crash occurs.
+
+## Github Navigation
+- [`\offline`](https://github.com/NTX-McGill/NeuroTechX-McGill-2019/tree/master/offline/) contains raw EEG data and scripts for offline analysis and visualization
 	- [`\offline\data`](https://github.com/NTX-McGill/NeuroTechX-McGill-2019/tree/master/offline/data) contains the raw EEG data recorded from consenting and anonymized participants. Each folder contains the recording for a single anonymized and consenting participant. The data collection paradigms are specified in the README.md of each folder
 	- [`\offline\signal_processing`](https://github.com/NTX-McGill/NeuroTechX-McGill-2019/tree/master/offline/signal_processing) contains scripts for signal processing
 	- [`\offline\training_software`](https://github.com/NTX-McGill/NeuroTechX-McGill-2019/tree/master/offline/training_software) contains scripts to vizualize the data
@@ -21,7 +23,7 @@ We also designed a caregiver mobile application, which sends the real-time locat
 
 ![](/figures/Fig2.jpg)
 
-Medical grade Ten20 EEG conductive paste was used to secure four passive gold cup electrodes directly onto the scalp of the user. The four electrodes used to collect MI data were placed along the sensorimotor cortex according to the 10/20 System (channels C1, C2, C3 and C4), as well as two reference electrodes placed on the subject's ear lobes. For heart-rate detection, an electrode was placed on the left wrist. References and the heart-rate electrode were secured using electrical tape. To acquire raw EEG data, a laptop configured to OpenBCI's Cyton Biosensing 8-channel, 32-bit board was used. 
+Medical grade Ten20 EEG conductive paste was used to secure four passive gold cup electrodes directly onto the scalp of the user. The four electrodes used to collect motor imagery data were placed along the sensorimotor cortex according to the 10/20 System (channels C1, C2, C3 and C4), as well as two reference electrodes placed on the subject's ear lobes. For heart-rate detection, an electrode was placed on the left wrist. References and the heart-rate electrode were secured using electrical tape. To acquire raw EEG data, a laptop configured to OpenBCI's Cyton Biosensing 8-channel, 32-bit board was used.
 
 To collect training date, users were presented with a cue (right, left or rest) during which they were instructed to imagine moving their right hand or left hand, or to relax. Neurofeedback was provided in the form of bar plots indicating the strength of their motor imagery.
 
@@ -36,27 +38,27 @@ The signal was first notched-filtered at 60 Hz and 120 Hz to remove power-line n
 
 ![](/figures/Fig5.png)
 
-The paradigm used to move, turn, and stop the wheelchair consists of alternating between three states: Rest, Stop and Intermediate. MI classification takes place within the intermediate state, which outputs either a full stop, or a command to turn the wheelchair in the appropriate direction. To switch from one state to another, artifacts, such as jaw-clenches or eye blinks, are used. A sustained artifact signal will command the wheelchair to move to the next state. 
+The paradigm used to move, turn, and stop the wheelchair consists of alternating between three states: Rest, Stop and Intermediate. motor imagery classification takes place within the intermediate state, which outputs either a full stop, or a command to turn the wheelchair in the appropriate direction. To switch from one state to another, artifacts, such as jaw-clenches or eye blinks, are used. A sustained artifact signal will command the wheelchair to move to the next state.
 
-A linear regression is used to classify the MI state of the user in real-time. The feature used in the regression is the average mu band power, given as the average of the frequencies of interest for all time points. The linear regression then gives a MI state for every given time point. The direction with the most occurrence within a 3 second time-window is the final decision output and is fed to the wheelchair. 
+A linear regression is used to classify the motor imagery state of the user in real-time. The feature used in the regression is the average mu band power, given as the average of the frequencies of interest for all time points. The linear regression then gives a motor imagery state for every given time point. The direction with the most occurrence within a 3 second time-window is the final decision output and is fed to the wheelchair.
 
-If no MI signals are detected and jaw-clenching or eye-blinking is sustained, the wheelchair will go into a stop. Sustaining these artifacts again will bring the wheelchair to move forward again. 
+If no motor imagery signals are detected and jaw-clenching or eye-blinking is sustained, the wheelchair will go into a stop. Sustaining these artifacts again will bring the wheelchair to move forward again.
 
 ## Dashboard
-Our user dashboard guides assists with the data collection paradigm and Neurofeedback task. The visual-cued paradigm is displayed to guide the users. The bar graph displays a measure of the machine learning model's confidence in that a signal is the correct motor imagery signal corresponding to the labeling (i.e. correct Left, correct Right, correct Rest, etc). The Neurofeedback task is used to help users generate better MI signal.
+Our user dashboard guides assists with the data collection paradigm and Neurofeedback task. The visual-cued paradigm is displayed to guide the users. The bar graph displays a measure of the machine learning model's confidence in that a signal is the correct motor imagery signal corresponding to the labeling (i.e. correct Left, correct Right, correct Rest, etc). The Neurofeedback task is used to help users generate better motor imagery signal.
 
 ![](/figures/Fig4.png)
 
 ## Caregiver App
 An application capable of sending the wheelchair's location to the caregiver in real-time was designed as a safety measure for wheelchair users. A notification feature is implemented so that the caregiver receives a text via Twilio, a cloud communication platform, when the user of the wheelchair experiences trouble or distress (i.e. obstacles, trauma, high stress, malfunction, etc.). The location information is received through the location services of the user's smartphone. The measure of stress dictating whether to send an alert or not is currently based on heart rate monitoring information. Once the heart rate exceeds a pre-established threshold customized to the user’s resting heart rate, the caregiver is alerted that the user might require assistance.  
 
-## Hardware 
+## Hardware
 The commercially available Orthofab Oasis 2008 wheelchair was modified and customized to fit the needs of the project. The motor controller of the wheelchair was replaced with two commercial-grade 40A, 12V PWM controllers connected to an Arduino Uno. Furthermore, the seat of the wheelchair was reupholstered and custom-built footrests were installed. Four motion sensors were installed around the circumference of the footrest for the implementation of the assisted-driving feature.
 
 ![](/figures/Fig6.png)
 
 ## Assisted Driving
-Relying on MI for finer navigation is challenging if not impossible. We therefore created an assisted-driving model which serves to refine movements involved in straight navigation. The model has two primary functions: wall following and object avoidance.
+Relying on motor imagery for finer navigation is challenging if not impossible. We therefore created an assisted-driving model which serves to refine movements involved in straight navigation. The model has two primary functions: wall following and object avoidance.
 
 In order to detect whether the user is following a wall, two ultrasonic sensors — one on the left and one on the right — are used to continuously monitor the wheelchair’s position relative to a potential wall. In order to determine if a wall is present, a linear regression model is fit to the last 5 seconds of sensor data collected from each side. A threshold on the standard error determines whether the wheelchair is approaching a wall from the side or is parallel to a wall. If a wall is detected, the optimal distance to the wall is calculated as the median of the data 1 to 5 seconds previously. If the difference between the current and optimal distances to the wall is large, a slight turn is executed to correct it.
 
