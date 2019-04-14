@@ -79,7 +79,7 @@ The second function of the assisted-driving paradigm is obstacle avoidance. The 
 * [McGill University Faculties of Arts](https://www.mcgill.ca/arts/),[Science](https://www.mcgill.ca/science/) and [Engineering](https://www.mcgill.ca/engineering/)
 * [McGill University School of Physical and Occupational Therapy](https://www.mcgill.ca/spot/)
 
-A special thank you as well to [Dr. Georgios Mitsis](https://www.mcgill.ca/bioengineering/people/faculty/georgios-mitsis), our faculty advisor, and [Dr. Stefanie Blain-Moraes](https://www.mcgill.ca/spot/stefanie-blain-moraes) for lending equipment
+A special thank you to [Dr. Georgios Mitsis](https://www.mcgill.ca/bioengineering/people/faculty/georgios-mitsis), our faculty advisor, and to [Dr. Stefanie Blain-Moraes](https://www.mcgill.ca/spot/stefanie-blain-moraes) for lending equipment.
 
 ## The Team
 We are an interdisciplinary group of dedicated undergraduate students from McGill University and our mission is to raise awareness and interest in neurotechnology.
