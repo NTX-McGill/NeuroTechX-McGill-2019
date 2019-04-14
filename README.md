@@ -54,6 +54,11 @@ A linear regression is used to classify the MI state of the user in real-time. T
 
 If no MI signals are detected and jaw-clenching or eye-blinking is sustained, the wheelchair will go into a stop. Sustaining these artifacts again will bring the wheelchair to move forward again. 
 
+## Dashboard
+Our user dashboard guides assists with the data collection paradigm and Neurofeedback task. The visual-cued paradigm is displayed to guide the users. The bar graph displays a measure of the machine learning model's confidence in that a signal is the correct motor imagery signal corresponding to the labeling (i.e. correct Left, correct Right, correct Rest, etc). 
+
+![](/FiguresFolder/Fig4.png)
+
 ## Caregiver App
 An application capable of sending the wheelchair's location to the caregiver in real-time was designed as a safety measure for wheelchair users. A notification feature is implemented so that the caregiver receives a text via Twilio, a cloud communication platform, when the user of the wheelchair experiences trouble or distress (i.e. obstacles, trauma, high stress, malfunction, etc.). The location information is received through the location services of the user's smartphone. The measure of stress dictating whether to send an alert or not is currently based on heart rate monitoring information. Once the heart rate exceeds a pre-established threshold customized to the user’s resting heart rate, the caregiver is alerted that the user might require assistance.  
 
