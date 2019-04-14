@@ -1,5 +1,5 @@
 # Milo Wheelchair
-Our Milo wheelchair is designed to help patients with locked-in syndrome. While they lose complete control of the majority of voluntary muscles, their cognitive functions are usually unaffected, and they can only communicate through eye movements and blinking(1). 
+Our Milo wheelchair is designed to help patients with locked-in syndrome. They lose complete control of the majority of voluntary muscles. Their cognitive functions are usually unaffected, and they can only communicate through eye movements and blinking(1). 
 
 In recent years, EEG-based brain-computer interfaces (BCIs) have emerged as a method to enable patients with the locked-in syndrome to interact with the external world. 
 
