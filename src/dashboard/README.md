@@ -7,18 +7,17 @@ This is a user interface that can be used for training patients and testing the 
 The frontend display receives data from a [Node.js](https://nodejs.org/en/) server titled server.js.
 
 Dependencies:
-* "@openbci/cyton": "^2.0.1",
-* "colormap": "^2.3.0",
-* "csv-writer": "^1.2.0",
-* "dgram": "^1.0.1",
-* "events": "^3.0.0",
-* "express": "^4.16.4",
-* "http": "0.0.0",
-* "node-osc": "^3.0.0",
-* "osc": "^2.2.4",
-* "osc-js": "^2.0.3",
-* "socket.io": "^2.2.0"
-
+* `@openbci/cyton` (2.0.1)
+* `colormap` (2.3.0)
+* `csv-writer` (1.2.0)
+* `dgram` (1.0.1)
+* `events` (3.0.0)
+* `express` (4.16.4)
+* `http` (0.0.0)
+* `node-osc` (3.0.0)
+* `osc` (2.2.4)
+* `osc-js` (2.0.3)
+* `socket.io` (2.2.0)
 
 The server gets EEG data from the [OpenBCI_GUI](https://openbci.com/index.php/downloads) using its networking function. To use the OpenBCI's networking, open the GUI and, under networking set stream 1 to FFT with port 12345 and address fft. Set stream 2 to TimeSeries with port 12345 and address /openbci.
 
