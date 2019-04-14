@@ -78,8 +78,14 @@ For more information, see our [facebook page](https://www.facebook.com/McGillNeu
 
 ## Partners
 We couldn't do it without you guys <3
-* DeepMind
-* OpenBCI
-* Building 21
-* McGill University
-* Muse
+* [wrnch.ai](https://wrnch.ai/)
+* [DeepMind](https://deepmind.com/)
+* [OpenBCI](https://openbci.com/)
+* [twilio](https://www.twilio.com/)
+* [Muse](https://choosemuse.com/)
+* [Building 21](https://building21.ca/)
+* [McGill University Faculties of Arts](https://www.mcgill.ca/arts/),[Science](https://www.mcgill.ca/science/) and [Engineering](https://www.mcgill.ca/engineering/)
+* [McGill University School of Physical and Occupational Therapy](https://www.mcgill.ca/spot/)
+* Dr. Georgios Mitsis, our Faculty Advisor
+* Dr. Stefanie Blain-Moraes, for lending equipment
+
