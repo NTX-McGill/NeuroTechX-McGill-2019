@@ -22,7 +22,7 @@ To ensure the safety, the wheelchair has a heart-rate-dependent break system. Th
 
 ![](/FiguresFolder/Fig2.jpg)
 
-Medical grade Ten20 EEG conductive paste was used to secure four OpenBCI passive gold cup electrodes directly onto the scalp of the participant. The four electrodes used to collect MI data were placed along the sensorimotor cortex of the subject, rear to the frontal lobe and just before the central sulcus that separates the frontal lobe from the parietal lobe (8). Two reference electrodes were placed on the subject's two ears. C1, C2, C3, and C4 channels were used, as recommend for the detection of the optimal $\mu$-rhythm (4). For eye blinking and heart-rate data, two gold cup electrodes were placed beside the left eye and left wrist of the participants respectively. To acquire raw EEG data, a computer device configured to OpenBCI's Cyton Biosensing 32-bit board would be used. 
+Medical grade Ten20 EEG conductive paste was used to secure four OpenBCI passive gold cup electrodes directly onto the scalp of the participant. The four electrodes used to collect MI data were placed along the sensorimotor cortex of the subject, rear to the frontal lobe and just before the central sulcus that separates the frontal lobe from the parietal lobe. Two reference electrodes were placed on the subject's two ears. C1, C2, C3, and C4 channels were used, as recommend for the detection of the optimal mu rhythm. For eye blinking and heart-rate data, two gold cup electrodes were placed beside the left eye and left wrist of the participants respectively. To acquire raw EEG data, a computer device configured to OpenBCI's Cyton Biosensing 32-bit board would be used. 
 
 To simulate an indoor environment, the experiment would be conducted in a room with ambient noise level. The participants would be seated comfortably on a chair or wheelchair facing a laptop screen. Before they are connected to the electrodes, the participants would be asked to remove any earrings, necklaces, glasses and/or to untie their hair to reduce noise during EEG data collection. 
 
@@ -33,7 +33,7 @@ To obtain optimal data, we designed a visual cue-based experimental paradigm wit
 ## Signal Processing
 Our targeted frequency range is the mu rhythm (8-12Hz) when the subjects are at rest and beta rhythm (13-36Hz) when the subjects blink their eyes. To process real-time data, we sampled at 250 Hz with a time window of two seconds, which is a standardized protocol on EEG data (ref needed).
 
-The signal was first notched-filtered at 60 Hz and 120 Hz to remove the power-line noise across all eight electrodes (9). In order to determine the optimal filter method for the targeted frequency range (mu band (8Hz-12Hz) and beta band (13-36Hz)), five filter designs were compared. Among \textit{Butterworth}, elliptic, \textit{Chebyshev Type I, Chebyshev Type II, }and the Window Method of the FIR filter, the frequency spectra showed that \textit{Chebyshev Type I} filter performed the best. In particular, the performance of the filter improves marginally for mu and beta rhythm detection when \textit{Chebyshev Type I} filter was used. 
+The signal was first notched-filtered at 60 Hz and 120 Hz to remove the power-line noise across all eight electrodes. In order to determine the optimal filter method for the targeted frequency range (mu band (8Hz-12Hz) and beta band (13-36Hz)), five filter designs were compared. Among Butterworth, elliptic, Chebyshev Type I, Chebyshev Type II, and the Window Method of the FIR filter, the frequency spectra showed that Chebyshev Type I filter performed the best. In particular, the performance of the filter improves marginally for mu and beta rhythm detection when Chebyshev Type I filter was used. 
 
 After the data pre-processing, we used Power Spectral Density (PSD) to extract the power of the mu band (8-12Hz) and the beta band (13-36 Hz) with respect to frequency. We compared the periodogram method and Welch’s averaging method, and found that Welch’s method gave us a cleaner signal. 
 
@@ -50,7 +50,7 @@ If no motor imagery signals are detected and jaw-clenches are sustained, the whe
 
 ![](/FiguresFolder/Fig4.png)
 
-Generation of robust motor imagery can be a difficult task for most individuals without prior training, as people tend to imagine visual images of related movements intead of kinesthetic feelings of actions (4). Thus, various MI neurofeedback training methods have been proposed (4). 
+Generation of robust motor imagery can be a difficult task for most individuals without prior training, as people tend to imagine visual images of related movements intead of kinesthetic feelings of actions. Thus, various MI neurofeedback training methods have been proposed. 
 
 The MI neurofeedback training is performed on the production tab of our user dashboard. In the production tab of the dashboard, the user is given an idea of how their motor imagery signals are being processed. The production dashboard displays a measure of the machine learning model's confidence in that a signal is the correct motor imagery signal corresponding to the labeling (i.e. correct Left, correct Right, correct Rest, etc). The dashboard displays a bar graph with the percentage accuracy of the model. 
 
@@ -71,8 +71,8 @@ In order to detect whether the user is following a wall, two ultrasonic sensors 
 The second function of the assisted-driving paradigm is obstacle avoidance. The two sensors used in wall following are combined with a frontward facing sensor and a sensor pointing at 45º from the vertical towards the ground. As the wheelchair approaches a small obstacle, using information about the chair’s distance from the obstacle, the algorithm determines if there is room to navigate around it. Once the obstacle has been cleared, the wheelchair continues on the straight path that it had initially set out on. If there isn’t room to navigate around the obstacle, the wheelchair comes to a complete stop and the user decides what subsequent action they wish to execute. The system uses the 45º ultrasonic sensor to detect the presence of stairs or steep hills in its upcoming path and stops if the former are detected.
 
 
-
-For more information, see our [facebook page](https://www.facebook.com/McGillNeurotech/) or [our website](https://www.mcgillneurotech.com/).
+## For more information
+See our [facebook page](https://www.facebook.com/McGillNeurotech/) or [our website](https://www.mcgillneurotech.com/).
 
 
 ## Partners
