@@ -4,12 +4,23 @@ MILO is designed to help users navigate without the use of hands or limbs. This 
 We also designed a caregiver mobile application, which sends the real-time location of the wheelchair user to their caregivers to ensure safety and facilitate real-time communication. It also notifies the caregiver if the user's heartrate increases abnormally or a crash occurs.
 
 ## Github Navigation 
-- [Data collection raw data](https://github.com/NTX-McGill/NeuroTechX-McGill-2019/tree/master/offline/data)
-- [Signal processing code](https://github.com/NTX-McGill/NeuroTechX-McGill-2019/tree/master/offline/signal_processing)
-- [Signal processing data visualization](https://github.com/NTX-McGill/NeuroTechX-McGill-2019/tree/master/offline/visualization)
-- [Machine learning](https://github.com/NTX-McGill/NeuroTechX-McGill-2019/tree/master/offline/ML)
-- [Software](https://github.com/NTX-McGill/NeuroTechX-McGill-2019/tree/master/offline/training_software)
-- [Robotics code](https://github.com/NTX-McGill/NeuroTechX-McGill-2019/tree/master/robotics)
+- [`\offline`](https://github.com/NTX-McGill/NeuroTechX-McGill-2019/tree/master/offline/) contains raw EEG data and scripts for offline analysis and visualization 
+	- [`\offline\data`](https://github.com/NTX-McGill/NeuroTechX-McGill-2019/tree/master/offline/data) contains the raw EEG data recorded from consenting and anonymized participants. Each folder contains the recording for a single anonymized and consenting participant. The data collection paradigms are specified in the README.md of each folder
+	- [`\offline\signal_processing`](https://github.com/NTX-McGill/NeuroTechX-McGill-2019/tree/master/offline/signal_processing) contains scripts for signal processing
+	- [`\offline\training_software`](https://github.com/NTX-McGill/NeuroTechX-McGill-2019/tree/master/offline/training_software) contains scripts to vizualize the data
+	- `real_time_test_3class.py` contains the optimized script for feature extraction and classification
+- [`\robotics`](https://github.com/NTX-McGill/NeuroTechX-McGill-2019/tree/master/robotics) contains scripts to interface with the Arduino hardware connected to the wheelchair
+- `\src` contains the software
+	- [`\dashboard`](https://github.com/NTX-McGill/NeuroTechX-McGill-2019/tree/master/src/dashboard) contains the dashboard software as well the instructions to set up and launch it
+	- [`\real-time`](https://github.com/NTX-McGill/NeuroTechX-McGill-2019/tree/master/src/real-time) contains scripts to classify EEG signals acquired in real-time
+
+## Setup
+**1. Hardware**
+   - [Open BCI Cyton Board](https://shop.openbci.com/products/cyton-biosensing-board-8-channel?variant=38958638542)
+   - [Arduino](https://www.arduino.cc) 
+
+**2. Computer & Software**
+   - [Dashboard](https://github.com/NTX-McGill/NeuroTechX-McGill-2019/tree/master/src/dashboard)
 
 ## Setup
 - how to run the code
