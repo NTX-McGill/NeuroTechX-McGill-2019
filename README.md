@@ -72,8 +72,9 @@ We couldn't do it without you guys <3
 * [Building 21](https://building21.ca/)
 * [McGill University Faculties of Arts](https://www.mcgill.ca/arts/),[Science](https://www.mcgill.ca/science/) and [Engineering](https://www.mcgill.ca/engineering/)
 * [McGill University School of Physical and Occupational Therapy](https://www.mcgill.ca/spot/)
-* Dr. Georgios Mitsis, our Faculty Advisor
-* Dr. Stefanie Blain-Moraes, for lending equipment
+* [Dr. Georgios Mitsis](https://www.mcgill.ca/bioengineering/people/faculty/georgios-mitsis), our Faculty Advisor
+* [Dr. Stefanie Blain-Moraes](https://www.mcgill.ca/spot/stefanie-blain-moraes), for lending equipment
 
 ## The Team
+We are an interdisciplinary group of dedicated undergraduate students from McGill University and our mission is to raise awareness and interest in neurotechnology.
 For more information, see our [facebook page](https://www.facebook.com/McGillNeurotech/) or [our website](https://www.mcgillneurotech.com/).
