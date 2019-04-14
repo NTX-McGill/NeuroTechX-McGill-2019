@@ -36,7 +36,7 @@ The signal was first notched-filtered at 60 Hz and 120 Hz to remove power-line n
 
 ![](/FiguresFolder/Fig5.png)
 
-The paradigm used to move, turn, and stop the wheelchair consists of alternating between three states: Rest, Stop and Intermediate. MI classification takes place within the intermediate state, which outputs either a full stop, or a command to turn the wheelchair in the appropriate direction. To switch from one state to another, artifacts, such as jaw-clenches or eye blinks, are used. A sustained artifact signal of X sec will command the wheelchair to move to the next state. 
+The paradigm used to move, turn, and stop the wheelchair consists of alternating between three states: Rest, Stop and Intermediate. MI classification takes place within the intermediate state, which outputs either a full stop, or a command to turn the wheelchair in the appropriate direction. To switch from one state to another, artifacts, such as jaw-clenches or eye blinks, are used. A sustained artifact signal will command the wheelchair to move to the next state. 
 
 A linear regression is used to classify the MI state of the user in real-time. The feature used in the regression is the average mu band power, given as the average of the frequencies of interest for all time points. The linear regression then gives a MI state for every given time point. The direction with the most occurrence within a 3 second time-window is the final decision output and is fed to the wheelchair. 
 
