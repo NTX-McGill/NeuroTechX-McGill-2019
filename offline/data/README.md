@@ -9,6 +9,7 @@
 * Laptop
 
 ## Electrode placement
+![](/figures/electrode%20positions.png)
 1. Have the participant remove any earrings, necklaces, glasses (can replace later if need for seeing screen) and untie hair.
 2. Measure the distance between the two ears (Y). Take note of and mark the following using the head marker while holding the measuring tape in the same position:
     * Mid-point between both ears
@@ -38,7 +39,9 @@
 1. Install [OpenBCI GUI](https://openbci.com/index.php/downloads) and [FDTI VP driver](https://www.ftdichip.com/Drivers/VCP.htm).
 Launch the OpenBCI GUI.
 2. Select Data Source > LIVE (from Cyton) > Serial (from Dongle) > usually the FDTI driver is the first port on the Serial/COM port list > START SYSTEM
+![](/figures/gui.png)
 3. Set OSC to the following settings:
+![](/figures/osc.png)
 4. Start both the OSC and Data Stream.
 5. Troubleshooting if electrodes are RAILED OR if amplitudes are higher than 5-6 uV\*rms
     * Make sure all electrodes are sticking well, with no hair under the electrode. If they aren’t sticking well, try using abrasive and more paste.
