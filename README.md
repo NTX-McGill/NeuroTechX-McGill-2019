@@ -12,7 +12,7 @@ We also designed a web application for caregivers, from which they can view the 
 	- [`\offline\training_software`](https://github.com/NTX-McGill/NeuroTechX-McGill-2019/tree/master/offline/training_software) contains scripts to vizualize the data
 	- `real_time_test_3class.py` contains the optimized script for feature extraction and classification
 - [`\robotics`](https://github.com/NTX-McGill/NeuroTechX-McGill-2019/tree/master/robotics) contains scripts to interface with the Arduino hardware connected to the wheelchair
-- `\src` contains the software
+- `\src`
 	- [`\dashboard`](https://github.com/NTX-McGill/NeuroTechX-McGill-2019/tree/master/src/dashboard) contains the dashboard software as well the instructions to set up and launch it
 	- [`\real-time`](https://github.com/NTX-McGill/NeuroTechX-McGill-2019/tree/master/src/real-time) contains scripts to classify EEG signals acquired in real-time, to send/receive data from the wheelchair, and for assisted driving
 	- [`\caregiver-app`](https://github.com/NTX-McGill/NeuroTechX-McGill-2019/tree/master/src/caregiver-app) contains the web app and text messaging for the caregiver
