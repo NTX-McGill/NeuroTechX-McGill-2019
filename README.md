@@ -9,7 +9,7 @@ We also designed a web application for caregivers, from which they can view the 
 - [`\offline`](https://github.com/NTX-McGill/NeuroTechX-McGill-2019/tree/master/offline/) contains raw EEG data and scripts for offline analysis and visualization
 	- [`\offline\data`](https://github.com/NTX-McGill/NeuroTechX-McGill-2019/tree/master/offline/data) contains the raw EEG data recorded from consenting and anonymized participants. Each folder contains the recording for a single anonymized and consenting participant. The data collection paradigms are specified in the README.md of each folder
 	- [`\offline\signal_processing`](https://github.com/NTX-McGill/NeuroTechX-McGill-2019/tree/master/offline/signal_processing) contains scripts for signal processing
-	- [`\offline\training_software`](https://github.com/NTX-McGill/NeuroTechX-McGill-2019/tree/master/offline/training_software) contains scripts to vizualize the data
+	- [`\offline\visualization`](https://github.com/NTX-McGill/NeuroTechX-McGill-2019/tree/master/offline/visualization) contains scripts to vizualize the data
 	- `real_time_test_3class.py` contains the optimized script for feature extraction and classification
 - [`\robotics`](https://github.com/NTX-McGill/NeuroTechX-McGill-2019/tree/master/robotics) contains scripts to interface with the Arduino hardware connected to the wheelchair
 - `\src`
