@@ -22,10 +22,6 @@ We also designed a caregiver mobile application, which sends the real-time locat
 **2. Computer & Software**
    - [Dashboard](https://github.com/NTX-McGill/NeuroTechX-McGill-2019/tree/master/src/dashboard)
 
-## Setup
-- how to run the code
-- dependencies and materials
-
 ## Pipeline
 ![Project pipeline](/FiguresFolder/Fig1%20(1).png)
 
