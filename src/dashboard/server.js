@@ -323,12 +323,12 @@ io.on('connection', function(socket){
 
   collectionTimer = setInterval(function(){
     currentTime = getTimeValue();
-    if (currentTime - roboticsTime > 500) {
+    if (currentTime - roboticsTime > 400) {
       roboticsTime = currentTime;
       io.sockets.emit('to robotics', {response: 'D'}) // request data
       // console.log('hi')
     }
-  }, 500); // 5 times/sec
+  }, 400); // 5 times/sec
 
   socket.on("from sensors", function(data){
     // if (state == "forward") {
