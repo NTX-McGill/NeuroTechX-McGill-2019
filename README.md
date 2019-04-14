@@ -15,17 +15,17 @@ We also designed a caregiver mobile application, which sends the real-time locat
 	- [`\real-time`](https://github.com/NTX-McGill/NeuroTechX-McGill-2019/tree/master/src/real-time) contains scripts to classify EEG signals acquired in real-time
 
 ## Project Pipeline
-![Project pipeline](/FiguresFolder/Fig1%20(1).png)
+![Project pipeline](/figures/Fig1%20(1).png)
 
 ## Data Collection
 
-![](/FiguresFolder/Fig2.jpg)
+![](/figures/Fig2.jpg)
 
 Medical grade Ten20 EEG conductive paste was used to secure four passive gold cup electrodes directly onto the scalp of the user. The four electrodes used to collect MI data were placed along the sensorimotor cortex according to the 10/20 System (channels C1, C2, C3 and C4), as well as two reference electrodes placed on the subject's ear lobes. For heart-rate detection, an electrode was placed on the left wrist. References and the heart-rate electrode were secured using electrical tape. To acquire raw EEG data, a laptop configured to OpenBCI's Cyton Biosensing 8-channel, 32-bit board was used. 
 
 To collect training date, users were presented with a cue (right, left or rest) during which they were instructed to imagine moving their right hand or left hand, or to relax. Neurofeedback was provided in the form of bar plots indicating the strength of their motor imagery.
 
-![](/FiguresFolder/Fig3%20(1).png)
+![](/figures/Fig3%20(1).png)
 
 ## Signal Processing
 Our targeted frequency range is the mu rhythm (7-13 Hz) when the subjects are at rest and beta rhythm (13-36 Hz) when the subjects blink their eyes. To process real-time data, we sampled at 250 Hz with a time window of two seconds.
@@ -34,7 +34,7 @@ The signal was first notched-filtered at 60 Hz and 120 Hz to remove power-line n
 
 ## Machine Learning
 
-![](/FiguresFolder/Fig5.png)
+![](/figures/Fig5.png)
 
 The paradigm used to move, turn, and stop the wheelchair consists of alternating between three states: Rest, Stop and Intermediate. MI classification takes place within the intermediate state, which outputs either a full stop, or a command to turn the wheelchair in the appropriate direction. To switch from one state to another, artifacts, such as jaw-clenches or eye blinks, are used. A sustained artifact signal will command the wheelchair to move to the next state. 
 
@@ -45,7 +45,7 @@ If no MI signals are detected and jaw-clenching or eye-blinking is sustained, th
 ## Dashboard
 Our user dashboard guides assists with the data collection paradigm and Neurofeedback task. The visual-cued paradigm is displayed to guide the users. The bar graph displays a measure of the machine learning model's confidence in that a signal is the correct motor imagery signal corresponding to the labeling (i.e. correct Left, correct Right, correct Rest, etc). The Neurofeedback task is used to help users generate better MI signal.
 
-![](/FiguresFolder/Fig4.png)
+![](/figures/Fig4.png)
 
 ## Caregiver App
 An application capable of sending the wheelchair's location to the caregiver in real-time was designed as a safety measure for wheelchair users. A notification feature is implemented so that the caregiver receives a text via Twilio, a cloud communication platform, when the user of the wheelchair experiences trouble or distress (i.e. obstacles, trauma, high stress, malfunction, etc.). The location information is received through the location services of the user's smartphone. The measure of stress dictating whether to send an alert or not is currently based on heart rate monitoring information. Once the heart rate exceeds a pre-established threshold customized to the user’s resting heart rate, the caregiver is alerted that the user might require assistance.  
@@ -53,7 +53,7 @@ An application capable of sending the wheelchair's location to the caregiver in 
 ## Hardware 
 The commercially available Orthofab Oasis 2008 wheelchair was modified and customized to fit the needs of the project. The motor controller of the wheelchair was replaced with two commercial-grade 40A, 12V PWM controllers connected to an Arduino Uno. Furthermore, the seat of the wheelchair was reupholstered and custom-built footrests were installed. Four motion sensors were installed around the circumference of the footrest for the implementation of the assisted-driving feature.
 
-![](/FiguresFolder/Fig6.png)
+![](/figures/Fig6.png)
 
 ## Assisted Driving
 Relying on MI for finer navigation is challenging if not impossible. We therefore created an assisted-driving model which serves to refine movements involved in straight navigation. The model has two primary functions: wall following and object avoidance.
