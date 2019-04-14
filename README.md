@@ -1,4 +1,4 @@
-# MILO - the mind-controlled locomotive
+# MILO - the MInd-controlled LOcomotive
 MILO is designed to help users navigate without the use of hands or limbs. This brain-computer interface (BCI) makes use of electroencephalography (EEG), an affordable, accessible and non-invasive technique to detect brain activity. Specifically, MILO uses motor imagery (MI) signals to turn, by detecting a suppression of the mu rhythm (7-13 Hz) in the sensorimotor cortex (the brain area associated with movement) when users imagine movements. In addition to MI, eye blinking signals and jaw artefacts were used to initiate starts and stops, and to indicate the desire to turn. With MILO, users can move forward or stop by blinking their eyes or clenching their jaw, and can turn left or right by thinking about left and right hand movements. 
 
 We also designed a caregiver mobile application, which sends the real-time location of the wheelchair user to their caregivers to ensure safety and facilitate real-time communication. It also notifies the caregiver if the user's heartrate increases abnormally or a crash occurs.
