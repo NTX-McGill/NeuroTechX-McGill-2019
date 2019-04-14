@@ -11,13 +11,10 @@ We also designed a caregiver mobile application, which should be used along with
 To ensure the safety, the wheelchair has a heart-rate-dependent break system. The wheelchair will stop when individuals are in danger (i.e. collision) and their heart rate increases 
 
 ## Contents
-- 
+- what does each folder do
 ## Setup
-**1. Hardware**
-   - 
+- why do we buy the product
 
-**2. Computer & Software**
-   - 
    
 
 ## Pipeline
@@ -42,7 +39,9 @@ A linear regression is used to classify, in real-time, the motor imagery state o
 If no motor imagery signals are detected and jaw-clenches are sustained, the wheelchair will go into a stop. Sustaining jaw clenches again will bring the wheelchair to move forward. 
 
 ## Neurofeedback Training
-ddddd
+Generation of robust motor imagery can be a difficult task for most individuals without prior training, as people tend to imagine visual images of related movements intead of kinesthetic feelings of actions (4). Thus, various MI neurofeedback training methods have been proposed (4). 
+
+The MI neurofeedback training is performed on the production tab of our user dashboard. In the production tab of the dashboard, the user is given an idea of how their motor imagery signals are being processed. The production dashboard displays a measure of the machine learning model's confidence in that a signal is the correct motor imagery signal corresponding to the labeling (i.e. correct Left, correct Right, correct Rest, etc). The dashboard displays a bar graph with the percentage accuracy of the model. 
 
 ## Hardware 
 The commercially available \textit{Orthofab Oasis 2008} wheelchair was modified and customized to fit the needs of the project. The motor controller of the wheelchair was replaced with two commercial-grade 40A, 12V PWM controller connected to an Arduino Uno. Furthermore, the seat of the wheelchair was reupholstered and custom-built footrests were installed. Four motion sensors were installed around the circumference of the footrest for the implementation of the self-driving feature.
