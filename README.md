@@ -55,7 +55,7 @@ A linear regression is used to classify the MI state of the user in real-time. T
 If no MI signals are detected and jaw-clenching or eye-blinking is sustained, the wheelchair will go into a stop. Sustaining these artifacts again will bring the wheelchair to move forward again. 
 
 ## Dashboard
-Our user dashboard guides assists with the data collection paradigm and Neurofeedback task. The visual-cued paradigm is displayed to guide the users. The bar graph displays a measure of the machine learning model's confidence in that a signal is the correct motor imagery signal corresponding to the labeling (i.e. correct Left, correct Right, correct Rest, etc). 
+Our user dashboard guides assists with the data collection paradigm and Neurofeedback task. The visual-cued paradigm is displayed to guide the users. The bar graph displays a measure of the machine learning model's confidence in that a signal is the correct motor imagery signal corresponding to the labeling (i.e. correct Left, correct Right, correct Rest, etc). The Neurofeedback task is used to help users generate better MI signal.
 
 ![](/FiguresFolder/Fig4.png)
 
