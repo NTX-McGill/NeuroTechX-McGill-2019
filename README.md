@@ -14,15 +14,7 @@ We also designed a caregiver mobile application, which sends the real-time locat
 	- [`\dashboard`](https://github.com/NTX-McGill/NeuroTechX-McGill-2019/tree/master/src/dashboard) contains the dashboard software as well the instructions to set up and launch it
 	- [`\real-time`](https://github.com/NTX-McGill/NeuroTechX-McGill-2019/tree/master/src/real-time) contains scripts to classify EEG signals acquired in real-time
 
-## Setup
-**1. Hardware**
-   - [Open BCI Cyton Board](https://shop.openbci.com/products/cyton-biosensing-board-8-channel?variant=38958638542)
-   - [Arduino](https://www.arduino.cc) 
-
-**2. Computer & Software**
-   - [Dashboard](https://github.com/NTX-McGill/NeuroTechX-McGill-2019/tree/master/src/dashboard)
-
-## Pipeline
+## Project Pipeline
 ![Project pipeline](/FiguresFolder/Fig1%20(1).png)
 
 ## Data Collection
