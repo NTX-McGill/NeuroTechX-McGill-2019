@@ -9,7 +9,7 @@
 * Laptop
 
 ## Electrode placement
-![](/figures/electrode%20positions.png)
+![](./figures/electrode%20positions.png)
 1. Have the participant remove any earrings, necklaces, glasses (can replace later if need for seeing screen) and untie hair.
 2. Measure the distance between the two ears (Y). Take note of and mark the following using the head marker while holding the measuring tape in the same position:
     * Mid-point between both ears
