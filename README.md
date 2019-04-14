@@ -1,5 +1,5 @@
 # MILO: The Mind-Controlled Locomotive
-MILO helps people navigate without the use of hands or limbs. It is especially useful for people with ALS, locked-in syndrome, and other forms of paralysis.
+MILO helps people navigate without the use of hands or limbs. We think it could be especially useful for people with ALS, locked-in syndrome, and other forms of paralysis.
 
 Our brain-computer interface makes use of electroencephalography (EEG), an affordable, accessible, and non-invasive technique to detect brain activity. Specifically, MILO uses motor imagery signals to turn, by detecting a suppression of the mu rhythm (7-13 Hz) in the sensorimotor cortex (the brain area associated with movement) when users imagine movements. In addition to motor imagery, eye blinking signals and jaw artefacts were used to initiate starts and stops, and to indicate the desire to turn. With MILO, users can toggle between moving forward and stoping by blinking their eyes or clenching their jaw. They can turn left or right by simply thinking about left and right hand movements.
 
