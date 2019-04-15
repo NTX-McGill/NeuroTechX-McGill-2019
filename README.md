@@ -8,9 +8,9 @@ Our brain-computer interface makes use of electroencephalography (EEG), an affor
 	- [`\offline\data`](https://github.com/NTX-McGill/NeuroTechX-McGill-2019/tree/master/offline/data) contains the raw EEG data recorded from consenting and anonymized participants. Each folder contains the recording for a single anonymized and consenting participant. The data collection paradigms are specified in the README.md of each folder
 	- [`\offline\signal_processing`](https://github.com/NTX-McGill/NeuroTechX-McGill-2019/tree/master/offline/signal_processing) contains scripts for signal processing
 	- [`\offline\visualization`](https://github.com/NTX-McGill/NeuroTechX-McGill-2019/tree/master/offline/visualization) contains scripts to vizualize the data
-	- `\offline\ML\real_time_test_3class.py` is the optimized script for feature extraction and classification
+	- [`\offline\ML`](https://github.com/NTX-McGill/NeuroTechX-McGill-2019/tree/master/offline/ML) contains scripts for feature classification
 - [`\robotics`](https://github.com/NTX-McGill/NeuroTechX-McGill-2019/tree/master/robotics) contains scripts to interface with the Arduino hardware connected to the wheelchair
-- [`\src`](https://github.com/NTX-McGill/NeuroTechX-McGill-2019/tree/master/src/) contains software for the dashboard, the self-driving features, the caregiver app and the real-time rendering
+- [`\src`](https://github.com/NTX-McGill/NeuroTechX-McGill-2019/tree/master/src/) contains software for the dashboard, the assisted driving features, the caregiver app and the real-time rendering
 	- [`\src\dashboard`](https://github.com/NTX-McGill/NeuroTechX-McGill-2019/tree/master/src/dashboard) contains the dashboard software as well the instructions to set up and launch it
 	- [`\src\real-time`](https://github.com/NTX-McGill/NeuroTechX-McGill-2019/tree/master/src/real-time) contains scripts to classify EEG signals acquired in real-time, to send/receive data from the wheelchair, and for assisted driving
 	- [`\src\caregiver-app`](https://github.com/NTX-McGill/NeuroTechX-McGill-2019/tree/master/src/caregiver-app) contains the web app and text messaging for the caregiver
@@ -29,7 +29,7 @@ To collect training date, users were presented with a cue (right, left or rest) 
 ![](/figures/Fig3%20(1).png)
 
 ## Signal Processing
-Our targeted frequency range is the mu rhythm (8-13 Hz) when the subjects are at rest and beta rhythm (13-36 Hz) when the subjects blink their eyes. To process real-time data, we sampled at 250 Hz with a time window of two seconds.The signal was first notched-filtered at 60 Hz and 120 Hz to remove power-line noise using a Butterworth filter. After data pre-processing, we used Power Spectral Density (PSD) to extract the power of the mu band and the beta band with respect to frequency using Welch’s method.
+Our targeted frequency range is the mu rhythm (7-13 Hz) when the subjects are at rest and beta rhythm (13-36 Hz) when the subjects blink their eyes. To process real-time data, we sampled at 250 Hz with a time window of two seconds.The signal was first notched-filtered at 60 Hz and 120 Hz to remove power-line noise using a Butterworth filter. After data pre-processing, we used Power Spectral Density (PSD) to extract the power of the mu band and the beta band with respect to frequency using Welch’s method.
 
 ## Machine Learning
 
