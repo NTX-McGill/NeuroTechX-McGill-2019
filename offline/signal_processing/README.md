@@ -25,7 +25,7 @@ are isolated at electrodes localized over the motor cortex areas of the brain ( 
 for right and  left hand movements respectively). To obtain spectral features, as demonstrated in `/real-time/RT.py`, we computed the signal power through the power spectral density (PSD).  To do so, we explored two different methods, including the periodogram and Welch's method. While the Welch PSD leads to smoother plots, the peridogram described the data more accurately.
 
 The spectral features therefore consisted of obtaining mean PSD values at frequencies of interest 
-(μ band from about 8 − 13 Hz ).
+(μ band from about 7 − 13 Hz ).<br/>
 ![Periodogram vs Welch](./figures/welchVp.png)
 
 ### Wavelet
