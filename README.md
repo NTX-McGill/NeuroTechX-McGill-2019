@@ -11,7 +11,7 @@ Our brain-computer interface makes use of electroencephalography (EEG), an affor
 	- [`\offline\ML`](https://github.com/NTX-McGill/NeuroTechX-McGill-2019/tree/master/offline/ML) contains scripts for feature classification
 - [`\robotics`](https://github.com/NTX-McGill/NeuroTechX-McGill-2019/tree/master/robotics) contains scripts to interface with the Arduino hardware connected to the wheelchair
 - [`\src`](https://github.com/NTX-McGill/NeuroTechX-McGill-2019/tree/master/src/) contains software for the dashboard, the assisted driving features, the caregiver app and the real-time rendering
-	- [`\src\dashboard`](https://github.com/NTX-McGill/NeuroTechX-McGill-2019/tree/master/src/dashboard) contains the **dashboard software as well the instructions to set up and launch it**
+	- [`\src\dashboard`](https://github.com/NTX-McGill/NeuroTechX-McGill-2019/tree/master/src/dashboard) contains the **dashboard software as well the instructions to set up and launch it**. This is a **user interface for testing the wheelchair**
 	- [`\src\real-time`](https://github.com/NTX-McGill/NeuroTechX-McGill-2019/tree/master/src/real-time) contains scripts to classify EEG signals acquired in real-time, to send/receive data from the wheelchair, and for assisted driving
 	- [`\src\caregiver-app`](https://github.com/NTX-McGill/NeuroTechX-McGill-2019/tree/master/src/caregiver-app) contains the web app and text messaging for the caregiver
 
