@@ -21,6 +21,8 @@ import matplotlib.mlab as mlab
 from scipy import signal
 import numpy.fft as fft
 import numpy as np
+from matplotlib.colors import ListedColormap
+
 """
 Created on Sun Mar 17 09:03:30 2019
 
@@ -290,18 +292,18 @@ csvs = ["data/March22_008/10_008-2019-3-22-15-8-55.csv",
         #"data/March22_001/5-001-rest25s_left10s_right10s_MI-2019-3-22-16-35-57.csv",
         # "data/March22_001/6-001-rest25s_left15s_right15s_MI-2019-3-22-16-46-17.csv",    #actual
         #"data/March22_001/7-001-rest25s_left20s_right20s_MI-2019-3-22-16-54-17.csv",
-        #"data/March20/time-test-JingMingImagined_10s-2019-3-20-10-28-35.csv",  # 6
-        #"data/March20/time-test-JingMingImagined_10s-2019-3-20-10-30-26.csv",
-        #"data/March20/time-test-JingMingImagined_10s-2019-3-20-10-35-31.csv",
-        #"data/March24_011/1_011_Rest20LeftRight20_MI-2019-3-24-16-25-41.csv",  # 9 to 13
-        #"data/March24_011/2_011_Rest20LeftRight20_MI-2019-3-24-16-38-10.csv",
-        #"data/March24_011/3_011_Rest20LeftRight10_MI-2019-3-24-16-49-23.csv",
-        #"data/March24_011/4_011_Rest20LeftRight10_MI-2019-3-24-16-57-8.csv",
-        #"data/March24_011/5_011_Rest20LeftRight20_MI-2019-3-24-17-3-17.csv",
-        #"data/March29_014/1_014_rest_left_right_20s-2019-3-29-16-44-32.csv",   # 14
-        #"data/March29_014/2_014_rest_left_right_20s-2019-3-29-16-54-36.csv",
-        #"data/March29_014/3_014_AWESOME_rest_left_right_20s-2019-3-29-16-54-36.csv",
-        #"data/March29_014/4_014_final_run-2019-3-29-17-38-45.csv",
+        "data/March20/time-test-JingMingImagined_10s-2019-3-20-10-28-35.csv",  # 6
+        "data/March20/time-test-JingMingImagined_10s-2019-3-20-10-30-26.csv",
+        "data/March20/time-test-JingMingImagined_10s-2019-3-20-10-35-31.csv",
+        "data/March24_011/1_011_Rest20LeftRight20_MI-2019-3-24-16-25-41.csv",  # 9 to 13
+        "data/March24_011/2_011_Rest20LeftRight20_MI-2019-3-24-16-38-10.csv",
+        "data/March24_011/3_011_Rest20LeftRight10_MI-2019-3-24-16-49-23.csv",
+        "data/March24_011/4_011_Rest20LeftRight10_MI-2019-3-24-16-57-8.csv",
+        "data/March24_011/5_011_Rest20LeftRight20_MI-2019-3-24-17-3-17.csv",
+        "data/March29_014/1_014_rest_left_right_20s-2019-3-29-16-44-32.csv",   # 14
+        "data/March29_014/2_014_rest_left_right_20s-2019-3-29-16-54-36.csv",
+        "data/March29_014/3_014_AWESOME_rest_left_right_20s-2019-3-29-16-54-36.csv",
+        "data/March29_014/4_014_final_run-2019-3-29-17-38-45.csv",
         # "data/March29_014/5_014_eye_blink-2019-3-29-17-44-33.csv",
         # "data/March29_014/6_014_eye_blink-2019-3-29-17-46-14.csv",
         # "data/March29_014/7_014_eye_blink-2019-3-29-17-47-56.csv",
@@ -323,7 +325,7 @@ csv_map = {"10_008-2019-3-22-15-8-55.csv": "10_008_OpenBCI-RAW-2019-03-22_15-07-
            "time-test-JingMingImagined_10s-2019-3-20-10-35-31.csv": 'OpenBCI-RAW-2019-03-20_10-04-29.txt',
            "1_011_Rest20LeftRight20_MI-2019-3-24-16-25-41.csv": '011_1to3_OpenBCI-RAW-2019-03-24_16-21-59.txt',
            "2_011_Rest20LeftRight20_MI-2019-3-24-16-38-10.csv": '011_1to3_OpenBCI-RAW-2019-03-24_16-21-59.txt',
-           "3_011_Rest20LeftRight10_MI-2019-3-24-16-49-23.csv": '011_1to3_OpenBCI-RAW-2019-03-24_16-21-59.txt',
+           "3_011_Rest20LeftRight10_MI-2019-3-24-16-49-23.csv": '011_1to3_OpenBCI-RAW-2019-03-24_16-21-59.txt', # decent
            "4_011_Rest20LeftRight10_MI-2019-3-24-16-57-8.csv": '011_4to6_OpenBCI-RAW-2019-03-24_16-54-15.txt',
            "5_011_Rest20LeftRight20_MI-2019-3-24-17-3-17.csv": '011_4to6_OpenBCI-RAW-2019-03-24_16-54-15.txt',
            "1_014_rest_left_right_20s-2019-3-29-16-44-32.csv": "1_014_OpenBCI-RAW-2019-03-29_16-40-55.txt",
@@ -373,12 +375,11 @@ def get_features(arr):
     psds_per_channel = np.array(psds_per_channel)
     mu_indices = np.where(np.logical_and(freqs >= 10, freqs <= 12))
 
-    # features = np.amax(psds_per_channel[:,mu_indices], axis=-1).flatten()   # max of 10-12hz as feature
-    features = np.mean(psds_per_channel[:, mu_indices], axis=-
-                       1).flatten()   # mean of 10-12hz as feature
+    #features = np.amax(psds_per_channel[:,mu_indices], axis=-1).flatten()   # max of 10-12hz as feature
+    features = np.mean(psds_per_channel[:, mu_indices], axis=-1).flatten()   # mean of 10-12hz as feature
     #features = np.array([features[:2].mean(), features[2:].mean()])
     # features = psds_per_channel[:,mu_indices].flatten()                     # all of 10-12hz as feature
-    return np.log(features), freqs, psds_per_channel[0], psds_per_channel[-1]
+    return features, freqs, psds_per_channel[0], psds_per_channel[-1]
 
 
 """ end """
@@ -396,6 +397,7 @@ all_test_results = []
 window_lengths = [1, 2, 4, 6, 8]
 window_s = 4
 window_lengths = [window_s]
+#tempcount += 1
 for window_s in window_lengths:
     train_psds, train_features, freqs = extract(train_data, window_s, shift, plot_psd)
     data = to_feature_vec(train_features, rest=False)
@@ -590,11 +592,9 @@ mu_indices = np.where(np.logical_and(freqs >= 10, freqs <= 12))
 figpath = "/Users/marley/Documents/ntxvideofigures/plots_new/"
 color_palette = "husl"
 sn.set()
-log = 1
 with sn.color_palette(color_palette, 3):
     fig3 = plt.figure("scatter")
     fig3.clf()
-    log = 0
     ax = plt.subplot(111)
     for direction, features in train_features.items():
         f = np.array(features).T
@@ -604,32 +604,37 @@ with sn.color_palette(color_palette, 3):
     ax.axes.get_xaxis().set_visible(False)
     ax.axes.get_yaxis().set_visible(False)
     ax.grid(False)
-    plt.savefig(figpath + 'scatter' + str(tempcount % 10) + '.png', transparent=True,dpi=300)
+    plt.savefig(figpath + 'featurescatter' + str(tempcount % 10) + '.png', transparent=True,dpi=300)
     
     
     plot_rest = True
     fig = plt.figure("kde")
     fig.clf()
     ax = plt.subplot(111)
+    idx = 0
     for direction, features in train_features.items():
+        
         features = np.array(features).T
         if plot_rest or direction != 'Rest': 
-            sn.kdeplot(features[0], features[1], ax=ax, shade_lowest=False,alpha=0.3)
+            hue = sn.color_palette(color_palette, 3)[idx]
+            cmap = ListedColormap(sn.dark_palette(hue, n_colors=20)[10:])
+            sn.kdeplot(features[0], features[1], ax=ax, shade_lowest=False, cmap=cmap)
+            idx += 1
+            '''
     for direction, features in train_features.items():
         features = np.array(features).T
         if plot_rest or direction != 'Rest':
             a = sn.kdeplot(features[0], features[1], ax=ax, shade=True, shade_lowest=False, alpha=0.8,linewidth=6)
-    
+    '''
     #ax.set(aspect="equal")
     #plt.ylim([-2, 20])
     #plt.xlim([-2, 20])
     ax.grid(False)
     ax.axes.get_xaxis().set_visible(False)
     ax.axes.get_yaxis().set_visible(False)
-    plt.savefig(figpath + 'kde' + str(tempcount % 10) + '.png', transparent=True,dpi=300)
+    plt.savefig(figpath + 'featurekde' + str(tempcount % 10) + '.png', transparent=True,dpi=300)
     ymin, ymax = plt.gca().get_ylim()
 
-tempcount += 1
 '''
 from mpl_toolkits.mplot3d import axes3d, Axes3D 
 fig3 = plt.figure("scatter")
