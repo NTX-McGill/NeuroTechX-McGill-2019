@@ -248,6 +248,17 @@ def merge_dols(dol1, dol2):
     no = []
     return dict((k, dol1.get(k, no) + dol2.get(k, no)) for k in keys)
 
+def normalize(features_dict):
+    all_features = to_feature_vec(features_dict, rest=True)
+    av1,av2,_ = list(np.mean(all_features, axis=0))
+    mean_coeff = np.array([av1/(av1+av2),av2/(av1+av2)])
+    for direction, features in features_dict.items():
+        features = [np.divide(example, mean_coeff) for example in features]
+        features_dict[direction] = features
+    
+def running_mean(x, N):
+   cumsum = np.cumsum(np.insert(x, 0, 0)) 
+   return (cumsum[N:] - cumsum[:-N]) / N
 
 def get_data(csvs, tmin=0):
     all_data = {'Right': [], 'Left': [], 'Rest': []}
@@ -282,33 +293,41 @@ def get_data(csvs, tmin=0):
     return all_data
 
 
-csvs = ["data/March22_008/10_008-2019-3-22-15-8-55.csv",
+csvs = [["data/March22_008/10_008-2019-3-22-15-8-55.csv",
         "data/March22_008/9_008-2019-3-22-14-59-0.csv",
         "data/March22_008/8_008-2019-3-22-14-45-53.csv",    #
         # "data/March22_008/7_008-2019-3-22-14-27-46.csv",    #actual
         # "data/March22_008/6_008-2019-3-22-14-19-52.csv",    #actual
         # "data/March22_008/5_008-2019-3-22-14-10-26.csv",    #actual
-        #"data/March22_001/4-001-rest25s_left15s_right15s_MI-2019-3-22-16-27-44.csv",
-        #"data/March22_001/5-001-rest25s_left10s_right10s_MI-2019-3-22-16-35-57.csv",
+        ],
+        ["data/March22_001/4-001-rest25s_left15s_right15s_MI-2019-3-22-16-27-44.csv",
+        "data/March22_001/5-001-rest25s_left10s_right10s_MI-2019-3-22-16-35-57.csv",
         # "data/March22_001/6-001-rest25s_left15s_right15s_MI-2019-3-22-16-46-17.csv",    #actual
-        #"data/March22_001/7-001-rest25s_left20s_right20s_MI-2019-3-22-16-54-17.csv",
-        "data/March20/time-test-JingMingImagined_10s-2019-3-20-10-28-35.csv",  # 6
+        "data/March22_001/7-001-rest25s_left20s_right20s_MI-2019-3-22-16-54-17.csv",
+        ],
+        ["data/March20/time-test-JingMingImagined_10s-2019-3-20-10-28-35.csv",  # 6
         "data/March20/time-test-JingMingImagined_10s-2019-3-20-10-30-26.csv",
         "data/March20/time-test-JingMingImagined_10s-2019-3-20-10-35-31.csv",
+        ],
+        [
         "data/March24_011/1_011_Rest20LeftRight20_MI-2019-3-24-16-25-41.csv",  # 9 to 13
         "data/March24_011/2_011_Rest20LeftRight20_MI-2019-3-24-16-38-10.csv",
         "data/March24_011/3_011_Rest20LeftRight10_MI-2019-3-24-16-49-23.csv",
         "data/March24_011/4_011_Rest20LeftRight10_MI-2019-3-24-16-57-8.csv",
         "data/March24_011/5_011_Rest20LeftRight20_MI-2019-3-24-17-3-17.csv",
+        ],
+        [
         "data/March29_014/1_014_rest_left_right_20s-2019-3-29-16-44-32.csv",   # 14
         "data/March29_014/2_014_rest_left_right_20s-2019-3-29-16-54-36.csv",
         "data/March29_014/3_014_AWESOME_rest_left_right_20s-2019-3-29-16-54-36.csv",
         "data/March29_014/4_014_final_run-2019-3-29-17-38-45.csv",
+        ],
         # "data/March29_014/5_014_eye_blink-2019-3-29-17-44-33.csv",
         # "data/March29_014/6_014_eye_blink-2019-3-29-17-46-14.csv",
         # "data/March29_014/7_014_eye_blink-2019-3-29-17-47-56.csv",
         ]
 
+all_csvs = [name for sublist in csvs for name in sublist]
 
 csv_map = {"10_008-2019-3-22-15-8-55.csv": "10_008_OpenBCI-RAW-2019-03-22_15-07-58.txt",
            "9_008-2019-3-22-14-59-0.csv": "8to9_008_OpenBCI-RAW-2019-03-22_13-49-24.txt",
@@ -338,22 +357,23 @@ csv_map = {"10_008-2019-3-22-15-8-55.csv": "10_008_OpenBCI-RAW-2019-03-22_15-07-
            }
 fs_Hz = 250
 sampling_freq = 250
-window_s = 2
+window_s = 8
 shift = 0.1
 channel_name = 'C4'
 Viet = 0
 Marley = 0
 Andy = 0
 cm = 0
-plot_psd = 0            # set this to 1 if you want to plot the psds per window
+plot_psd = 0            # set t  his to 1 if you want to plot the psds per window
 colormap = sn.cubehelix_palette(as_cmap=True)
 tmin, tmax = 0, 0
+normalize_ = 1
 
 # * set load_data to true the first time you run the script
 load_data = 0
 if load_data:
     data_dict = {}
-    for csv in csvs:
+    for csv in all_csvs:
         data_dict[csv] = get_data([csv])
 """ * modify this to test filtering and new features """
 
@@ -385,10 +405,13 @@ def get_features(arr):
 """ end """
 
 # * use this to select which files you want to test/train on
-train_csvs = [0,1,2]          # index of the training files we want to use
-test_csvs = [0,1,2]             # index of the test files we want to use
-train_csvs = [csvs[i] for i in train_csvs]
+train_csvs = [1]          # index of the training files we want to use
+test_csvs = [4]             # index of the test files we want to use
+#train_csvs = [csvs[i] for i in train_csvs]
 test_csvs = [csvs[i] for i in test_csvs]
+test_csvs = [name for sublist in test_csvs for name in sublist]
+
+train_csvs = [i for i in all_csvs if i not in test_csvs]
 print("Training sets: \n" + str(train_csvs))
 print("Test sets: \n" + str(test_csvs))
 train_data = merge_all_dols([data_dict[csv] for csv in train_csvs])
@@ -400,6 +423,8 @@ window_lengths = [window_s]
 #tempcount += 1
 for window_s in window_lengths:
     train_psds, train_features, freqs = extract(train_data, window_s, shift, plot_psd)
+    all_features = to_feature_vec(train_features, rest=True)
+    mean = np.mean(all_features, axis=0)
     data = to_feature_vec(train_features, rest=False)
 
     X = data[:, :-1]
@@ -415,9 +440,9 @@ for window_s in window_lengths:
     models = []
     models.append(('LR', LogisticRegression(solver='lbfgs')))
     models.append(('LDA', LinearDiscriminantAnalysis()))
-    models.append(('KNN', KNeighborsClassifier()))
-    models.append(('CART', DecisionTreeClassifier()))
-    models.append(('NB', GaussianNB(var_smoothing=0.001)))
+    #models.append(('KNN', KNeighborsClassifier()))
+    #models.append(('CART', DecisionTreeClassifier()))
+    #models.append(('NB', GaussianNB(var_smoothing=0.001)))
     models.append(('SVM', SVC(gamma='scale')))
     # evaluate each model in turn
     results = []
@@ -436,11 +461,15 @@ for window_s in window_lengths:
     print("average accuracy: " + "{:2.1f}".format(np.array(results).mean() * 100))
     all_results.append(np.array(results).mean() * 100)
     print()
-
+    
     print("TEST")
     test_dict = merge_all_dols([data_dict[csv] for csv in test_csvs])
     _, test_features, _ = extract(test_dict, window_s, shift, plot_psd)
+    normalize_ = True
+    if normalize_:
+        normalize(test_features)
     test_data = to_feature_vec(test_features)
+    print(np.mean(test_data, axis=0))
     X_test = test_data[:, :-1]
     Y_test = test_data[:, -1]
     test_results = []
@@ -495,14 +524,10 @@ if plot_trace:
     plt.plot([i * shift for i in range(tf.shape[0])], tf, label='Right')
     plt.ylim([0, 1])
     plt.axvline(x=t_before, linestyle=':', linewidth=0.7)
-plot_trace_acc = 1
-def running_mean(x, N):
-   cumsum = np.cumsum(np.insert(x, 0, 0)) 
-   return (cumsum[N:] - cumsum[:-N]) / N
 
 model = None
 #model = models[0][-1]
-video_mode = True
+video_mode = False
 # use video mode when you want to save the figure to a transparent bg and white text
 plot_trace_acc = 0
 if plot_trace_acc:
@@ -592,19 +617,21 @@ mu_indices = np.where(np.logical_and(freqs >= 10, freqs <= 12))
 figpath = "/Users/marley/Documents/ntxvideofigures/plots_new/"
 color_palette = "husl"
 sn.set()
+plot_rest = False
 with sn.color_palette(color_palette, 3):
     fig3 = plt.figure("scatter")
     fig3.clf()
     ax = plt.subplot(111)
-    for direction, features in train_features.items():
+    for direction, features in test_features.items():
         f = np.array(features).T
         if plot_rest or direction != 'Rest':
             plt.scatter(f[0], f[1], s=3)
     #plt.axis('scaled')
-    ax.axes.get_xaxis().set_visible(False)
-    ax.axes.get_yaxis().set_visible(False)
-    ax.grid(False)
-    plt.savefig(figpath + 'featurescatter' + str(tempcount % 10) + '.png', transparent=True,dpi=300)
+    if video_mode:
+        ax.axes.get_xaxis().set_visible(False)
+        ax.axes.get_yaxis().set_visible(False)
+        ax.grid(False)
+        plt.savefig(figpath + 'featurescatter' + str(tempcount % 10) + '.png', transparent=True,dpi=300)
     
     
     plot_rest = True
@@ -629,10 +656,11 @@ with sn.color_palette(color_palette, 3):
     #ax.set(aspect="equal")
     #plt.ylim([-2, 20])
     #plt.xlim([-2, 20])
-    ax.grid(False)
-    ax.axes.get_xaxis().set_visible(False)
-    ax.axes.get_yaxis().set_visible(False)
-    plt.savefig(figpath + 'featurekde' + str(tempcount % 10) + '.png', transparent=True,dpi=300)
+    if video_mode:
+        ax.grid(False)
+        ax.axes.get_xaxis().set_visible(False)
+        ax.axes.get_yaxis().set_visible(False)
+        plt.savefig(figpath + 'featurekde' + str(tempcount % 10) + '.png', transparent=True,dpi=300)
     ymin, ymax = plt.gca().get_ylim()
 
 '''
