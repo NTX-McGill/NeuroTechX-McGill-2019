@@ -66,9 +66,9 @@ csvs = [
         "data/March22_008/9_008-2019-3-22-14-59-0.csv",
         "data/March22_008/8_008-2019-3-22-14-45-53.csv",
         ],
-        ["data/March17/4_RestLeftRight_MI_5s.csv", #005
-        "data/March17/5_RestLeftRight_MI_10s.csv",
-        ],
+        #["data/March17/4_RestLeftRight_MI_5s.csv", #005
+        #"data/March17/5_RestLeftRight_MI_10s.csv",
+        #],
         ["data/March22_001/1-001-rest20s_left10s_right10s_MI-2019-3-22-16-0-32.csv", #001
         "data/March22_001/2-001-rest20s_left10s_right10s_MI-2019-3-22-16-12-17.csv",
         "data/March22_001/3-001-rest20s_left15s_right15s_MI-2019-3-22-16-19-25.csv",

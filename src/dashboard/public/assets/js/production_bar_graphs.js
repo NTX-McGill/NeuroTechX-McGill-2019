@@ -59,7 +59,11 @@ var config = {
                     yAxes: [{
                         scaleLabel: {
                             display: true,
-                            labelString: 'value'
+                            labelString: 'value',
+                        },
+                        ticks: {
+                          beginAtZero: true,
+                          max: 1,
                         }
                     }]
                 },

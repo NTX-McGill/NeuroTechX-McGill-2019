@@ -80,38 +80,16 @@ def get_data(fname, csv):
 sampling_freq = 250
 shift = 0.1
 fs_Hz = 250
-folder = "March22_008/"
-#folder = "March20/"
-#fname = 'time-test-JingMingImagined10s-2019-3-20-10-12-1.csv'
-csv = "time-test-JingMingImaginedREALLYGOOD-2019-3-20-10-21-44.csv"
-csv = "time-test-JingMingActual_10s-2019-3-20-10-51-28.csv"
-csv = "time-test-JingMingActual-2019-3-20-9-54-59.csv"
-csv = "time-test-JingMingActual-2019-3-20-10-5-15.csv"
-csv = "time-test-JingMingImagined_10s-2019-3-20-10-28-35.csv"
-#csv = "time-test-JingMingImagined_10s-2019-3-20-10-30-26.csv"
-#csv = "time-test-JingMingImagined_10s-2019-3-20-10-35-31.csv"
-#csv = "time-test-JingMingImagined_10s-2019-3-20-10-57-45.csv"
-
-fname = 'OpenBCI-RAW-2019-03-20_10-04-29.txt'
-
-if folder == "March22_008/":
-    csv = "10_008-2019-3-22-15-8-55.csv"
-    csv = "9_008-2019-3-22-14-59-0.csv"
-    csv = "8_008-2019-3-22-14-45-53.csv"
-    #csv = "7_008-2019-3-22-14-27-46.csv"
-    #csv = "6_008-2019-3-22-14-19-52.csv"
-    #csv = "5_008-2019-3-22-14-10-26.csv"
-    
-    fname = "10_008_OpenBCI-RAW-2019-03-22_15-07-58.txt"
-    fname = "8to9_008_OpenBCI-RAW-2019-03-22_13-49-24.txt"
-    #fname = "4to7_008_OpenBCI-RAW-2019-03-22_13-49-24.txt"
-
-all_data = get_data(folder + fname, folder + csv)
-
-set_1 = [0,1]
-set_2 = [6,7]
+set_1 = [0]
+set_2 = [7]
 num = 1
-for direction, data in all_data.items():
+
+subj = -1
+test_csvs = csvs[subj]
+test_dict = merge_all_dols([data_dict[csv] for csv in test_csvs])
+test_dict = data_dict[test_csvs[0]]
+csv = test_csvs[0].split('/')[-1]
+for direction, data in test_dict.items():
     figname = direction + '_spec_' + csv.split('.')[0]
     fig = plt.figure(figname)
     left = []

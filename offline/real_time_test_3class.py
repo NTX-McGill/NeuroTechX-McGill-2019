@@ -12,6 +12,8 @@ from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import accuracy_score
 from sklearn.metrics import classification_report
 from sklearn import model_selection
+from sklearn.preprocessing import scale
+from sklearn.decomposition import PCA
 import seaborn as sn
 from sklearn.utils.multiclass import unique_labels
 from sklearn.metrics import confusion_matrix
@@ -20,7 +22,6 @@ import matplotlib.mlab as mlab
 from scipy import signal
 import numpy.fft as fft
 import numpy as np
-from matplotlib.colors import ListedColormap
 
 """
 Created on Sun Mar 17 09:03:30 2019
@@ -202,6 +203,7 @@ def extract(all_data, window_s, shift, plot_psd=False, keep_trials=False,scale_b
     fig1.clf()
     for direction, data in all_data.items():
         for trial in data:
+            #trial = scale(trial)
             epochs = epoch_data(trial, int(250 * window_s), int(shift*250))    # shape n x 500 x 2
             trial_features = []
             for epoch in epochs:
@@ -252,7 +254,7 @@ def running_mean(x, N):
 
 fs_Hz = 250
 sampling_freq = 250
-shift = 0.1
+shift = 0.25
 channel_name = 'C4'
 cm = 0
 plot_psd = 0            # set t  his to 1 if you want to plot the psds per window
@@ -271,16 +273,15 @@ if load_data:
 def get_features(arr, scale_by=None):
     # ch has shape (2, 500)
     channels = [0, 1, 6, 7]
-    #channels=[0,7]
+    channels=[0,7]
 
     psds_per_channel = []
     nfft = 500
     if arr.shape[-1] < 500:
         nfft = 250
     for ch in arr[channels]:
-        psd, freqs = mlab.psd(np.squeeze(ch),
-                              NFFT=nfft,
-                              Fs=250)
+        #freqs,psd = signal.periodogram(np.squeeze(ch),fs=250, nfft=500, detrend='constant')
+        psd, freqs = mlab.psd(np.squeeze(ch),NFFT=nfft,Fs=250)
         psds_per_channel.append(psd)
     psds_per_channel = np.array(psds_per_channel)
     mu_indices = np.where(np.logical_and(freqs >= 10, freqs <= 12))
@@ -301,11 +302,13 @@ def get_features(arr, scale_by=None):
 
 # * use this to select which files you want to test/train on
 subjects = [i for i in range (len(csvs))]             # index of the test files we want to use
-#subjects = [0]
+subjects = [0]
 
 all_results = []
 all_test_results = []
-validation = False
+validation = 0
+test = 1
+pca_ = False
 for subj in subjects:
     #train_csvs = [csvs[i] for i in train_csvs]
     #test_csvs = [csvs[i] for i in subjects]
@@ -316,12 +319,13 @@ for subj in subjects:
     print(test_csvs[0].split('/')[1])
     train_data = merge_all_dols([data_dict[csv] for csv in train_csvs])
     window_lengths = [1, 2, 4, 6, 8]
-    window_s = 4
+    window_s = 2
     window_lengths = [window_s]
     #tempcount += 1
     temp = []
     scale_by = [18,20]
     scale_by = None
+    all_wtest_results = []
     for window_s in window_lengths:
         #train_psds, train_features, freqs = extract(train_data, window_s, shift, plot_psd)
         train_psds, train_features, freqs = extract(train_data, window_s, shift, plot_psd,scale_by=scale_by)
@@ -349,48 +353,62 @@ for subj in subjects:
         names = []
     
         X, Y = shuffle(X, Y, random_state=seed)
+        if pca_:
+            pca = PCA(n_components=2, svd_solver='full')
+            pca.fit(X)
+            X = pca.transform(X)
         
-        if validation:
-            print("VALIDATION")
         
-            for name, model in models:
-                kfold = model_selection.KFold(n_splits=10, shuffle=True, random_state=seed)
-                cv_results = model_selection.cross_val_score(model, X, Y, cv=kfold, scoring=scoring)
-                results.append(cv_results)
-                names.append(name)
-                msg = "%s: %f (%f)" % (name, cv_results.mean(), cv_results.std())
-                print(msg)
-            print("average accuracy: " + "{:2.1f}".format(np.array(results).mean() * 100))
-            all_results.append(np.array(results).mean() * 100)
-            print()
-        
-        print("TEST")
         test_dict = merge_all_dols([data_dict[csv] for csv in test_csvs])
-        _, test_features, _ = extract(test_dict, window_s, shift, plot_psd, scale_by=scale_by)
-        normalize_ = True
-        if normalize_:
-            normalize(test_features)
-        test_data = to_feature_vec(test_features)
-        print(np.mean(test_data, axis=0))
-        X_test = test_data[:, :-1]
-        Y_test = test_data[:, -1]
-        test_results = []
-        for name, model in models:
-            model.fit(X, Y)
-            score = model.score(X_test, Y_test)
-            msg = "%s: %f" % (name, score)
-            print(msg)
-            test_results.append(score)
-        print("test accuracy:")
-        print("{:2.1f}".format(np.array(test_results).mean() * 100))
-        all_test_results.append(np.array(test_results).mean() * 100)
-    
-        # Stuff are: X, Y for training
-        # For testing: X_test, Y_test
-        ''' EDA '''
-        print(X.shape, X_test.shape)
-        mctr, mcte = np.mean(X, axis=0), np.mean(X_test, axis=0)
-        vartr, varte = np.var(X, axis=0), np.var(X_test, axis=0)
-        print()
+        #for csv in test_csvs:
+        if True:
+            print(csv)
+            #test_dict = data_dict[csv]
+            _, test_features, _ = extract(test_dict, window_s, shift, plot_psd, scale_by=scale_by)
+            normalize_ = True
+            if normalize_:
+                normalize(test_features)
+            test_data = to_feature_vec(test_features)
+            print(np.mean(test_data, axis=0))
+            X_test = test_data[:, :-1]
+            Y_test = test_data[:, -1]
+            if pca_:
+                X_test = pca.transform(X_test)
+            print(np.mean(X_test, axis=0))
+            
+            if validation:
+                print("VALIDATION")
+                for name, model in models:
+                    kfold = model_selection.KFold(n_splits=10, shuffle=True, random_state=seed)
+                    cv_results = model_selection.cross_val_score(model, X_test, Y_test, cv=kfold, scoring=scoring)
+                    results.append(cv_results)
+                    names.append(name)
+                    msg = "%s: %f (%f)" % (name, cv_results.mean(), cv_results.std())
+                    print(msg)
+                print("average accuracy: " + "{:2.1f}".format(np.array(results).mean() * 100))
+                all_results.append(np.array(results).mean() * 100)
+                print()
+                
+            if test:
+                print("TEST")
+                test_results = []
+                for name, model in models:
+                    model.fit(X, Y)
+                    score = model.score(X_test, Y_test)
+                    msg = "%s: %f" % (name, score)
+                    print(msg)
+                    test_results.append(score)
+                print("test accuracy:")
+                print("{:2.1f}".format(np.array(test_results).mean() * 100))
+                all_wtest_results.append(np.array(test_results).mean() * 100)
+            
+                # Stuff are: X, Y for training
+                # For testing: X_test, Y_test
+                ''' EDA '''
+                print(X.shape, X_test.shape)
+                mctr, mcte = np.mean(X, axis=0), np.mean(X_test, axis=0)
+                vartr, varte = np.var(X, axis=0), np.var(X_test, axis=0)
+                print()
+    all_test_results.append(all_wtest_results)
     
 print(np.array(all_test_results).mean())

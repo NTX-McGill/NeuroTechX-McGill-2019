@@ -5,6 +5,9 @@ import pickle
 from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
 from scipy.signal import butter, lfilter, find_peaks, peak_widths,iirfilter, detrend,correlate,periodogram,welch
 import random
+import warnings
+
+warnings.filterwarnings("ignore")
 
 sio = socketio.Client()
 
@@ -105,7 +108,7 @@ def predict(ch):
             if num_blinks >= blink_threshold:
                 print('BLINK')
                 num_blinks = 0
-                return 'BLINK'
+                return 'BLINK', l, r
     
     if wheelchair_state == "intermediate":
         prev_states.append(state)
