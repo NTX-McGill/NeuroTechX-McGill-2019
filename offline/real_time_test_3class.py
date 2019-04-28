@@ -22,6 +22,7 @@ import matplotlib.mlab as mlab
 from scipy import signal
 import numpy.fft as fft
 import numpy as np
+from scipy import stats
 
 """
 Created on Sun Mar 17 09:03:30 2019
@@ -302,7 +303,7 @@ def get_features(arr, scale_by=None):
 
 # * use this to select which files you want to test/train on
 subjects = [i for i in range (len(csvs))]             # index of the test files we want to use
-subjects = [0]
+#subjects = [0]
 
 all_results = []
 all_test_results = []
@@ -315,12 +316,15 @@ for subj in subjects:
     #test_csvs = [name for sublist in test_csvs for name in sublist]
     test_csvs = csvs[subj]
     train_csvs = [i for i in all_csvs if i not in test_csvs]
+    
+    # use this if you want to train on only subject 1
+    #train_csvs = csvs[0]
     #print("Training sets: \n" + str(train_csvs))
     print(test_csvs[0].split('/')[1])
     train_data = merge_all_dols([data_dict[csv] for csv in train_csvs])
-    window_lengths = [1, 2, 4, 6, 8]
+    window_lengths = [1, 2, 4]
     window_s = 2
-    window_lengths = [window_s]
+    #window_lengths = [window_s]
     #tempcount += 1
     temp = []
     scale_by = [18,20]
@@ -359,11 +363,13 @@ for subj in subjects:
             X = pca.transform(X)
         
         
-        test_dict = merge_all_dols([data_dict[csv] for csv in test_csvs])
-        #for csv in test_csvs:
-        if True:
+        #test_dict = merge_all_dols([data_dict[csv] for csv in test_csvs])
+        
+        #if True:
+        subj_results = []
+        for csv in test_csvs:
             print(csv)
-            #test_dict = data_dict[csv]
+            test_dict = data_dict[csv]
             _, test_features, _ = extract(test_dict, window_s, shift, plot_psd, scale_by=scale_by)
             normalize_ = True
             if normalize_:
@@ -400,7 +406,7 @@ for subj in subjects:
                     test_results.append(score)
                 print("test accuracy:")
                 print("{:2.1f}".format(np.array(test_results).mean() * 100))
-                all_wtest_results.append(np.array(test_results).mean() * 100)
+                subj_results.append(np.array(test_results).mean() * 100)
             
                 # Stuff are: X, Y for training
                 # For testing: X_test, Y_test
@@ -409,6 +415,8 @@ for subj in subjects:
                 mctr, mcte = np.mean(X, axis=0), np.mean(X_test, axis=0)
                 vartr, varte = np.var(X, axis=0), np.var(X_test, axis=0)
                 print()
+        #all_wtest_results.append([np.array(subj_results).mean(),np.array(subj_results).std()])
+        all_wtest_results.append([np.array(subj_results).mean(),stats.sem(np.array(subj_results))])
     all_test_results.append(all_wtest_results)
     
 print(np.array(all_test_results).mean())
