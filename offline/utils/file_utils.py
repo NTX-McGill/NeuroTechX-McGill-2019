@@ -8,7 +8,7 @@ Created on Mon Aug  5 18:30:48 2019
 import pandas as pd
 import numpy as np
 
-from metadata import MARKER_DATA, DATA_COLUMNS, LABELS
+from metadata import MARKER_DATA, DATA_COLUMNS, LABELS, ALL_FILES
 
 def merge_dols(dol1, dol2):
     keys = set(dol1).union(dol2)
@@ -28,10 +28,10 @@ def load_openbci_raw(path):
 def load_data(csv):
     print("loading " + csv)
     data = {label: [] for label in LABELS} 
-    df = pd.read_csv(csv)
+    df = pd.read_csv('../' + csv)
     path_arr = csv.split('/')
     folder, fname = path_arr[:-1], path_arr[-1]
-    data_path = "/".join(folder + [MARKER_DATA[fname]])
+    data_path = "/".join(['..'] + folder + [MARKER_DATA[fname]])
     eeg, timestamps = load_openbci_raw(data_path)
     prev = 0
     prev_direction = df['Direction'][prev]
@@ -49,9 +49,12 @@ def load_data(csv):
             prev_direction = el
     return data
 
-def load_dataset(csv_set, tmin=0):
-    all_data = {label: [] for label in LABELS} 
+def load_dataset(csv_set):
+    dataset = {label: [] for label in LABELS} 
     for csv in csv_set:
         data = load_data(csv)
-        all_data = merge_dols(all_data, data)
-    return all_data
+        dataset = merge_dols(dataset, data)
+    return dataset
+
+def load_all():
+    return {fname: load_data(fname) for fname in ALL_FILES}

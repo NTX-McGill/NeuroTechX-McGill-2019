@@ -61,7 +61,7 @@ MARKER_DATA = {"4_RestLeftRight_MI_5s.csv": "4_RestLeftRight_5s_MI_OpenBCI-RAW-2
                "4_045_25rest_20left_20right_fourtimes_ML-2019-3-28-21-14-4.csv": "2to4_045_OpenBCI-RAW-2019-03-28_20-55-19.txt",
                }
 
-ALL_FILES = [["data/March22_008/10_008-2019-3-22-15-8-55.csv",  # 008
+FILES_BY_SUBJECT = [["data/March22_008/10_008-2019-3-22-15-8-55.csv",  # 008
               "data/March22_008/9_008-2019-3-22-14-59-0.csv",
               "data/March22_008/8_008-2019-3-22-14-45-53.csv",
               ],
@@ -108,3 +108,4 @@ ALL_FILES = [["data/March22_008/10_008-2019-3-22-15-8-55.csv",  # 008
               "data/March28_045/4_045_25rest_20left_20right_fourtimes_ML-2019-3-28-21-14-4.csv",
               ],
              ]
+ALL_FILES = [name for sublist in FILES_BY_SUBJECT for name in sublist]
