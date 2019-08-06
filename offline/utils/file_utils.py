@@ -10,10 +10,12 @@ import numpy as np
 
 from metadata import MARKER_DATA, DATA_COLUMNS, LABELS, ALL_FILES
 
+
 def merge_dols(dol1, dol2):
     keys = set(dol1).union(dol2)
     no = []
     return dict((k, dol1.get(k, no) + dol2.get(k, no)) for k in keys)
+
 
 def load_openbci_raw(path):
     data = np.loadtxt(path,
@@ -27,7 +29,7 @@ def load_openbci_raw(path):
 
 def load_data(csv):
     print("loading " + csv)
-    data = {label: [] for label in LABELS} 
+    data = {label: [] for label in LABELS}
     df = pd.read_csv('../' + csv)
     path_arr = csv.split('/')
     folder, fname = path_arr[:-1], path_arr[-1]
@@ -49,12 +51,14 @@ def load_data(csv):
             prev_direction = el
     return data
 
+
 def load_dataset(csv_set):
-    dataset = {label: [] for label in LABELS} 
+    dataset = {label: [] for label in LABELS}
     for csv in csv_set:
         data = load_data(csv)
         dataset = merge_dols(dataset, data)
     return dataset
+
 
 def load_all():
     return {fname: load_data(fname) for fname in ALL_FILES}
