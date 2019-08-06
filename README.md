@@ -16,7 +16,7 @@ Our brain-computer interface makes use of electroencephalography (EEG), an affor
 	- [`\src\caregiver-app`](https://github.com/NTX-McGill/NeuroTechX-McGill-2019/tree/master/src/caregiver-app) contains the web app and text messaging for the caregiver
 
 ## Project Pipeline
-![Project pipeline](/figures/Fig1%20(1).png)
+![Project pipeline](/figures/fig1-pipeline.png)
 
 ## Data Collection
 
