@@ -6,7 +6,7 @@ Our brain-computer interface makes use of electroencephalography (EEG), an affor
 ## Github Navigation
 - [`\offline`](https://github.com/NTX-McGill/NeuroTechX-McGill-2019/tree/master/offline/) contains raw EEG data and scripts for offline analysis and visualization
 	- [`\offline\data`](https://github.com/NTX-McGill/NeuroTechX-McGill-2019/tree/master/offline/data) contains the raw EEG data recorded from consenting and anonymized participants. Each folder contains the recording for a single anonymized and consenting participant. The data collection paradigms are specified in the README.md of each folder
-	- [`\offline\signal_processing`](https://github.com/NTX-McGill/NeuroTechX-McGill-2019/tree/master/offline/signal_processing) contains scripts for signal processing
+	- [`\offline\signal-processing`](https://github.com/NTX-McGill/NeuroTechX-McGill-2019/tree/master/offline/signal_processing) contains scripts for signal processing
 	- [`\offline\visualization`](https://github.com/NTX-McGill/NeuroTechX-McGill-2019/tree/master/offline/visualization) contains scripts to vizualize the data
 	- [`\offline\ML`](https://github.com/NTX-McGill/NeuroTechX-McGill-2019/tree/master/offline/ML) contains scripts for feature classification
 - [`\robotics`](https://github.com/NTX-McGill/NeuroTechX-McGill-2019/tree/master/robotics) contains scripts to interface with the Arduino hardware connected to the wheelchair

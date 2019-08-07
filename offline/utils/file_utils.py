@@ -55,8 +55,10 @@ def load_data(csv):
 def load_dataset(csv_set):
     dataset = {label: [] for label in LABELS}
     for csv in csv_set:
-        data = load_data(csv)
-        dataset = merge_dols(dataset, data)
+        try:
+            data = load_data(csv)
+            dataset = merge_dols(dataset, data)
+        except Exception as e: print(e)
     return dataset
 
 
