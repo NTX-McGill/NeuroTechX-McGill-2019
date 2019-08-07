@@ -42,13 +42,12 @@ let lastRequestSensorDataTime = getTimeValue();
 /*
 Express
 */
-// Sets static directory as public
-expressApp.use(express.static(__dirname + '/public'));
+expressApp.use(express.static(__dirname + '/app'));
 expressApp.get('/', (req, res) => {
-	res.sendFile(path.join(__dirname + '/public/index.html'));
+	res.sendFile(path.join(__dirname + '/app/index.html'));
 });
 expressApp.get('/production', (req, res) => {
-	res.sendFile(path.join(__dirname + '/public/production.html'));
+	res.sendFile(path.join(__dirname + '/app/production.html'));
 });
 
 console.log('Listening on Port 3000!');
