@@ -16,6 +16,11 @@ def merge_dols(dol1, dol2):
     no = []
     return dict((k, dol1.get(k, no) + dol2.get(k, no)) for k in keys)
 
+def merge_all_dols(arr):
+    all_data = {'Right': [], 'Left': [], 'Rest': []}
+    for dol in arr:
+        all_data = merge_dols(all_data, dol)
+    return all_data
 
 def load_openbci_raw(path):
     data = np.loadtxt(path,
