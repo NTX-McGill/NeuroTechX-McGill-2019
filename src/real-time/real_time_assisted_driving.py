@@ -72,11 +72,9 @@ def stair_detection(front_tilt):
     """
     Returns 0 if there are stairs
     """
+    if front_tilt >= STOP_THRESHOLD:
+        return 0 #
     return 1
-    # if front_tilt >= STOP_THRESHOLD:
-    #     print(66)
-    #     return 0 #
-    # return 1
 
 def append_distances(left, right, front):
     global distances
@@ -113,7 +111,6 @@ def is_wall(history):
     slope, _, r_value, p_value, std_err = stats.linregress(x, relevant_history)
 
     deriv = deriv_2(relevant_history) # average 2nd order derivative
-
 
     if (std_err < MAX_STD_ERR or deriv < MAX_2ND_ORDER_DERIVATIVE):
         desired_distance = min(np.array([1.7]),max(np.median(history), np.array([MIN_DISTANCE_TO_WALL]))) # not average cuz 1000 m
@@ -181,30 +178,27 @@ def wall_follower(l_out, r_out, f_out):
     if current_time - comparison_time > 0: # check every 1 second
         comparison_time = current_time
 
-        # left_desired_distance = is_wall(distances["left"])
-        # right_desired_distance = is_wall(distances["right"])
+        left_desired_distance = is_wall(distances["left"])
+        right_desired_distance = is_wall(distances["right"])
 
-        return wall_adjustment("RIGHT", np.array([0.9]), distances["right"][-1],
+        if previous_wall == "left" and left_desired_distance:
+            return wall_adjustment("LEFT", left_desired_distance, distances["left"][-1],
                                    l_out, r_out, f_out)
-
-        # if previous_wall == "left" and left_desired_distance:
-        #     return wall_adjustment("LEFT", left_desired_distance, distances["left"][-1],
-        #                            l_out, r_out, f_out)
-        # elif previous_wall == "right" and right_desired_distance:
-        #     return wall_adjustment("RIGHT", right_desired_distance, distances["right"][-1],
-        #                            l_out, r_out, f_out)
-        # elif distances["left"][-1] < distances["right"][-1] and left_desired_distance:
-        #     return wall_adjustment("LEFT", left_desired_distance, distances["left"][-1],
-        #                            l_out, r_out, f_out)
-        # elif distances["right"][-1] >= distances["left"][-1] and right_desired_distance:
-        #     return wall_adjustment("RIGHT", right_desired_distance, distances["right"][-1],
-        #                            l_out, r_out, f_out)
-        # elif left_desired_distance:
-        #     return wall_adjustment("LEFT", left_desired_distance, distances["left"][-1],
-        #                            l_out, r_out, f_out)
-        # elif right_desired_distance:
-        #     return wall_adjustment("RIGHT", right_desired_distance, distances["right"][-1],
-        #                            l_out, r_out, f_out)
+        elif previous_wall == "right" and right_desired_distance:
+            return wall_adjustment("RIGHT", right_desired_distance, distances["right"][-1],
+                                   l_out, r_out, f_out)
+        elif distances["left"][-1] < distances["right"][-1] and left_desired_distance:
+            return wall_adjustment("LEFT", left_desired_distance, distances["left"][-1],
+                                   l_out, r_out, f_out)
+        elif distances["right"][-1] >= distances["left"][-1] and right_desired_distance:
+            return wall_adjustment("RIGHT", right_desired_distance, distances["right"][-1],
+                                   l_out, r_out, f_out)
+        elif left_desired_distance:
+            return wall_adjustment("LEFT", left_desired_distance, distances["left"][-1],
+                                   l_out, r_out, f_out)
+        elif right_desired_distance:
+            return wall_adjustment("RIGHT", right_desired_distance, distances["right"][-1],
+                                   l_out, r_out, f_out)
     return 'F'
 
 def obstacle_avoider():
@@ -286,13 +280,13 @@ def on_message(sensor_data):
         append_distances(l, r, f)
         command = obstacle_avoider()
         if not command:
-            # command = wall_follower(l_out, r_out, f_out)
+            command = wall_follower(l_out, r_out, f_out)
             print(command)
             # if command == '':
-            if f_out:
-                command = 'F'
-            else:
-                command = 'S'
+            # if f_out:
+            #     command = 'F'
+            # else:
+            #     command = 'S'
         sio.emit('from self-driving (forward)', {'response': command,
                                                  'duration': 1000,
                                                  'state': 'forward'})
