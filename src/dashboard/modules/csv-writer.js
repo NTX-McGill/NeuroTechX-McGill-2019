@@ -45,10 +45,10 @@ module.exports = class CSVWriter {
                        date.getMinutes() + '-' + date.getSeconds();
     
 		this.csvTimeWriter = this.createCSVWriter({
-			path: __dirname + '/data/' + trialName + '-'
+			path: __dirname + '/../data/' + trialName + '-'
                               + day + '.csv',
 			//File name of CSV for time test
-			header: [this.timeHeader],
+			header: this.timeHeader,
 			append: true
 		});
 	}
@@ -98,7 +98,7 @@ module.exports = class CSVWriter {
 
 	endTest(save) {
 		/*
-        This function runs when a trial is finishing.If data is meant to be saved,
+        This function runs when a trial is finishing. If data is meant to be saved,
         test number increments by one and testNumber is reset. timeSamples and
         fftSamples are reset as well, to just the headers.Takes boolean argument.
         */
