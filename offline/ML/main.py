@@ -31,7 +31,7 @@ from scipy import signal
 
 warnings.filterwarnings("ignore")
 
-from metadata import MARKER_DATA, LABELS, FILES_BY_SUBJECT, ALL_FILES
+from metadata import MARKER_DATA, LABELS, FILES_BY_SUBJECT, ALL_FILES, ELECTRODE_C3, ELECTRODE_C4
 import file_utils
 
 def plot_confusion_matrix(y_true, y_pred, classes,
@@ -57,8 +57,6 @@ def plot_confusion_matrix(y_true, y_pred, classes,
         print("Normalized confusion matrix")
     else:
         print('Confusion matrix, without normalization')
-
-    # print(cm)
 
     fig, ax = plt.subplots()
     im = ax.imshow(cm, interpolation='nearest', cmap=cmap)
@@ -91,7 +89,6 @@ def plot_confusion_matrix(y_true, y_pred, classes,
 
 def plot_specgram(spec_freqs, spec_PSDperBin, title, shift, i=1):
     f_lim_Hz = [0, 20]   # frequency limits for plotting
-    # plt.figure(figsize=(10,5))
     spec_t = [idx*.1 for idx in range(len(spec_PSDperBin[0]))]
     plt.subplot(3, 1, i)
     plt.title(title)
@@ -107,8 +104,6 @@ def plot_specgram(spec_freqs, spec_PSDperBin, title, shift, i=1):
 def epoch_data(data, window_length, shift, maxlen=2500):
     arr = []
     start = 0
-    #if maxlen > len(data):
-        #start = int((maxlen - len(data))/2)
     i = start
     maxlen = min(len(data), maxlen)
     while i + window_length < start + maxlen:
@@ -117,32 +112,34 @@ def epoch_data(data, window_length, shift, maxlen=2500):
     return np.array(arr)
 
 
-def extract_features(all_data, window_s, shift, plot_psd=False, keep_trials=False,scale_by=None):
-    all_psds = {'Right': [], 'Left': [], 'Rest': []}
-    all_features = {'Right': [], 'Left': [], 'Rest': []}
+def extract_features(all_data, window_s, shift, plot_psd=False, separate_trials=False, scale_by=None):
+    all_psds = {label: [] for label in LABELS}
+    all_features = {label: [] for label in LABELS}
 
     idx = 1
-    fig1 = plt.figure("psd")
-    fig1.clf()
     for direction, data in all_data.items():
         for trial in data:
             epochs = epoch_data(trial, int(250 * window_s), int(shift*250))    # shape n x 500 x 2
             trial_features = []
             for epoch in epochs:
-                features, freqs, psd1, psd2 = get_features(epoch.T, scale_by=scale_by)
-                all_psds[direction].append([psd1, psd2])
+                features, freqs, psds_per_channel = get_features(epoch.T, scale_by=scale_by)
+                psd_c3, psd_c4 = psds_per_channel[0] , psds_per_channel[-1]
+                all_psds[direction].append([psd_c3, psd_c4])
                 trial_features.append(features)
+                
+                # Sanity check: plot the psd
                 if plot_psd:
+                    plt.figure("psd")
                     plt.subplot(3, 2, idx)
-                    plt.plot(freqs, psd1)
+                    plt.plot(freqs, psd_c3)
                     plt.ylim([0, 25])
                     plt.xlim([6, 20])
                     plt.subplot(3, 2, idx+1)
-                    plt.plot(freqs, psd2)
+                    plt.plot(freqs, psd_c4)
                     plt.ylim([0, 25])
                     plt.xlim([6, 20])
             if trial_features:
-                if keep_trials:
+                if separate_trials:
                     all_features[direction].append(np.array(trial_features))
                 else:
                     all_features[direction].extend(trial_features)
@@ -151,11 +148,10 @@ def extract_features(all_data, window_s, shift, plot_psd=False, keep_trials=Fals
 
 
 def to_feature_vec(all_features, rest=False):
-    classes = ['Left', 'Right', 'Rest']
     feature_arr = []
     for direction, features in all_features.items():
         features = np.array(features)
-        arr = np.hstack((features, np.full([features.shape[0], 1], classes.index(direction))))
+        arr = np.hstack((features, np.full([features.shape[0], 1], LABELS.index(direction))))
         feature_arr.append(arr)
     if not rest or not len(features):
         feature_arr = feature_arr[:-1]
@@ -175,10 +171,64 @@ def running_mean(x, N):
    return (cumsum[N:] - cumsum[:-N]) / N
 
 
-def get_features(arr, scale_by=None):
-    # ch has shape (2, 500)
-    channels = [0, 1, 6, 7]
-    channels=[0,7]
+def evaluate_models(X, Y, X_test, Y_test, models):
+    """ Evaluate test accuracy of all models in a list of models
+    
+    Args:
+        X : array of features (train)
+        Y : array of labels (train)
+        X_test : array of features (test)
+        Y_test : array of labels (test)
+        models : list of (name, model) tuples
+    
+    Returns:
+        val_results : array of accuracies, shape num_models
+    """
+    test_results = []
+    for name, model in models:
+        model.fit(X, Y)
+        score = model.score(X_test, Y_test)
+        test_results.append(score)
+        msg = "%s: %f" % (name, score)
+        print(msg)
+    return np.array(test_results)
+
+
+def evaluate_models_crossval(X, Y, models, scoring, random_state, n_splits=10):
+    """ Evaluate cross-validation accuracy of all models in a list of models
+    
+    Args:
+        X : array of features
+        Y : array of labels
+        models : list of (name, model) tuples
+        scoring : string, scoring metric
+        random_state : seed to use for shuffling
+        n_splits : number of folds
+    
+    Returns:
+        val_results : array of accuracies, shape num_models x n_splits
+    """
+    val_results = []
+    for name, model in models:
+        kfold = model_selection.KFold(n_splits=n_splits, shuffle=True, random_state=random_state)
+        cv_results = model_selection.cross_val_score(model, X_test, Y_test, cv=kfold, scoring=scoring)
+        val_results.append(cv_results)
+        msg = "%s: %f (%f)" % (name, cv_results.mean(), cv_results.std())
+        print(msg)
+    return np.array(val_results)
+
+
+def get_features(arr, channels=[ELECTRODE_C3, ELECTRODE_C4], scale_by=None):
+    """ Get features from single window of EEG data
+    
+    Args:
+        arr : data of shape num_channels x timepoints
+    
+    Returns:
+        features : array with feature values
+        freqs : array of frequencies in Hz
+        psds_per_channel : array with full psd spectrum, shape num_channels x num_freqs
+    """
 
     psds_per_channel = []
     nfft = 500
@@ -200,118 +250,91 @@ def get_features(arr, scale_by=None):
         features = np.divide(features, scales)
     #features = np.array([features[:2].mean(), features[2:].mean()])
     # features = psds_per_channel[:,mu_indices].flatten()                     # all of 10-12hz as feature
-    return features, freqs, psds_per_channel[0], psds_per_channel[-1]
+    return features, freqs, psds_per_channel
 
 
-fs_Hz = 250
-sampling_freq = 250
-shift = 0.25
-channel_name = 'C4'
-plot_psd = False
-colormap = sn.cubehelix_palette(as_cmap=True)
-tmin, tmax = 0, 0
-normalize_ = 1
-
-dataset = file_utils.load_all()
-subjects = [i for i in range(len(FILES_BY_SUBJECT))]             # index of the test files we want to use
-
-window_lengths = [1, 2, 4]
-all_results = []
-all_test_results = []
-validation = False
-test = True
-seed = 7
-normalize_ = True
-run_pca = False
-
-# Perform leave-one-subject-out cross-validation for each subject
-for subj in subjects:
-    test_csvs = FILES_BY_SUBJECT[subj]
-    train_csvs = [el for el in ALL_FILES if el not in test_csvs]
-    train_data = prepro.merge_all_dols([dataset[csv] for csv in train_csvs])
-    
-    # print subject name
-    print(test_csvs[0].split('/')[1])
-    
+if __name__ == "__main__":
+    shift = 0.25
+    plot_psd = False
+    tmin, tmax = 0, 0
+    window_lengths = [1, 2, 4]  # window lengths in seconds
+    normalize_spectra = True
+    run_pca = False
     scale_by = None
-    all_wtest_results = []
-    for window_s in window_lengths:
-        train_psds, train_features, freqs = extract_features(train_data, window_s, shift, plot_psd, scale_by=scale_by)
-        data = to_feature_vec(train_features, rest=False)
-        
-        X = data[:, :-1]
-        Y = data[:, -1]
-        # Test options and evaluation metric
-        scoring = 'accuracy'
     
-        # Spot Check Algorithms
-        models = []
-        models.append(('LR', LogisticRegression(solver='lbfgs')))
-        models.append(('LDA', LinearDiscriminantAnalysis()))
-        models.append(('KNN', KNeighborsClassifier()))
-        models.append(('CART', DecisionTreeClassifier()))
-        models.append(('NB', GaussianNB(var_smoothing=0.001)))
-        models.append(('SVM', SVC(gamma='scale')))
-        # evaluate each model in turn
-        results = []
-        names = []
+    # Load data
+    #dataset = file_utils.load_all()
+    subjects = [i for i in range(len(FILES_BY_SUBJECT))]             # index of the test files we want to use
     
-        X, Y = shuffle(X, Y, random_state=seed)
-        if run_pca:
-            pca = PCA(n_components=2, svd_solver='full')
-            pca.fit(X)
-            X = pca.transform(X)
+    all_val_results = []
+    all_test_results = []
+
+    # Test options and evaluation metric
+    scoring = 'accuracy'
+    validation = True
+    test = False
+    seed = 7
+    models = []
+    models.append(('LR', LogisticRegression(solver='lbfgs')))
+    models.append(('LDA', LinearDiscriminantAnalysis()))
+    models.append(('KNN', KNeighborsClassifier()))
+    models.append(('CART', DecisionTreeClassifier()))
+    models.append(('NB', GaussianNB(var_smoothing=0.001)))
+    models.append(('SVM', SVC(gamma='scale')))
+    
+    # Perform leave-one-subject-out cross-validation for each subject
+    # Delivers accuracy by subject, then by window size, then by session, then by model
+    for subj in subjects:
+        test_csvs = FILES_BY_SUBJECT[subj]
+        train_csvs = [el for el in ALL_FILES if el not in test_csvs]
+        train_data = file_utils.merge_all_dols([dataset[csv] for csv in train_csvs])
         
+        # Print subject name
+        print(test_csvs[0].split('/')[1])
         
-        subj_results = []
-        for csv in test_csvs:
-            print(csv)
-            test_dict = data_dict[csv]
-            _, test_features, _ = extract_features(test_dict, window_s, shift, plot_psd, scale_by=scale_by)
-            if normalize_:
-                normalize(test_features)
-            test_data = to_feature_vec(test_features)
-            print(np.mean(test_data, axis=0))
-            X_test = test_data[:, :-1]
-            Y_test = test_data[:, -1]
+        window_val_results = []
+        window_test_results = []
+        for window_s in window_lengths:
+            train_psds, train_features, freqs = extract_features(train_data, window_s, shift, plot_psd, scale_by=scale_by)
+            data = to_feature_vec(train_features, rest=False)
+            
+            # X, Y for training
+            # For testing: X_test, Y_test
+            X = data[:, :-1]
+            Y = data[:, -1]
+            X, Y = shuffle(X, Y, random_state=seed)
             if run_pca:
-                X_test = pca.transform(X_test)
-            print(np.mean(X_test, axis=0))
+                pca = PCA(n_components=2, svd_solver='full')
+                pca.fit(X)
+                X = pca.transform(X)
             
-            if validation:
-                print("VALIDATION")
-                for name, model in models:
-                    kfold = model_selection.KFold(n_splits=10, shuffle=True, random_state=seed)
-                    cv_results = model_selection.cross_val_score(model, X_test, Y_test, cv=kfold, scoring=scoring)
-                    results.append(cv_results)
-                    names.append(name)
-                    msg = "%s: %f (%f)" % (name, cv_results.mean(), cv_results.std())
-                    print(msg)
-                print("average accuracy: " + "{:2.1f}".format(np.array(results).mean() * 100))
-                all_results.append(np.array(results).mean() * 100)
-                print()
+            subj_val_results = []
+            subj_test_results = []
+            for csv in test_csvs:
+                test_data = dataset[csv]
+                _, test_features, _ = extract_features(test_data, window_s, shift, plot_psd, scale_by=scale_by)
+                if normalize_spectra:
+                    normalize(test_features)
+                test_data = to_feature_vec(test_features)
+                X_test = test_data[:, :-1]
+                Y_test = test_data[:, -1]
+                if run_pca:
+                    X_test = pca.transform(X_test)
                 
-            if test:
-                print("TEST")
-                test_results = []
-                for name, model in models:
-                    model.fit(X, Y)
-                    score = model.score(X_test, Y_test)
-                    msg = "%s: %f" % (name, score)
-                    print(msg)
-                    test_results.append(score)
-                print("test accuracy:")
-                print("{:2.1f}".format(np.array(test_results).mean() * 100))
-                subj_results.append(np.array(test_results).mean() * 100)
-            
-                # X, Y for training
-                # For testing: X_test, Y_test
-                ''' EDA '''
-                print(X.shape, X_test.shape)
-                mctr, mcte = np.mean(X, axis=0), np.mean(X_test, axis=0)
-                vartr, varte = np.var(X, axis=0), np.var(X_test, axis=0)
-                print()
-        all_wtest_results.append([np.array(subj_results).mean(),stats.sem(np.array(subj_results))])
-    all_test_results.append(all_wtest_results)
-    
-print(np.array(all_test_results).mean())
+                if validation:
+                    print("VALIDATION")
+                    val_results = evaluate_models_crossval(X_test, Y_test, models, scoring, seed, n_splits=10)
+                    print("average accuracy: " + "{:2.1f}".format(val_results.mean() * 100))
+                    subj_val_results.append(val_results.mean() * 100)
+                    
+                if test:
+                    print("TEST")
+                    test_results = evaluate_models(X, Y, X_test, Y_test, models)
+                    print("average accuracy: {:2.1f}".format(test_results.mean() * 100))
+                    subj_test_results.append(test_results.mean() * 100)
+            window_val_results.append([np.array(subj_val_results).mean(), stats.sem(np.array(subj_val_results))])
+            window_test_results.append([np.array(subj_test_results).mean(),stats.sem(np.array(subj_test_results))])
+        all_val_results.append(window_val_results)
+        all_test_results.append(window_test_results)
+        
+    print(np.array(all_test_results).mean())
