@@ -29,10 +29,12 @@ import numpy as np
 from scipy import stats
 from scipy import signal
 
-warnings.filterwarnings("ignore")
-
+import sys
+sys.path.append('../utils')
 from metadata import MARKER_DATA, LABELS, FILES_BY_SUBJECT, ALL_FILES, ELECTRODE_C3, ELECTRODE_C4
 import file_utils
+
+warnings.filterwarnings("ignore")
 
 def plot_confusion_matrix(y_true, y_pred, classes,
                           normalize=False,
@@ -263,7 +265,7 @@ if __name__ == "__main__":
     scale_by = None
     
     # Load data
-    #dataset = file_utils.load_all()
+    dataset = file_utils.load_all()
     subjects = [i for i in range(len(FILES_BY_SUBJECT))]             # index of the test files we want to use
     
     all_val_results = []
