@@ -9,10 +9,11 @@ import random
 sio = socketio.Client()
 
 buffer_data = []
-with open('../offline/model.pkl', 'rb') as fid:
+with open('model.pkl', 'rb') as fid:
     clf = pickle.load(fid)
 print("STARTING")
 
+# starting state of wheelchair
 wheelchair_state = "stop"
 
 # configs
@@ -27,7 +28,7 @@ distance_from_artifact = int(distance_from_artifact_s/pred_frequency)
 blink_threshold = int(blink_threshold_s/pred_frequency)
 change_threshold = int(change_threshold_s/pred_frequency)
 decision = int(decision_s/pred_frequency)
-clear_threshold = int(1/pred_frequency)                                 # the minimum number of windows within the decision span that must be clear to be considered a 'turn' signal
+clear_threshold = int(1/pred_frequency)     # the minimum number of windows within the decision span that must be clear to be considered a 'turn' signal
 
 # counters
 last_artifact = 0

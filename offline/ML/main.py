@@ -161,6 +161,7 @@ def to_feature_vec(all_features, rest=False):
 
 
 def normalize(features_dict):
+    """ Divide features by mean per channel """
     all_features = to_feature_vec(features_dict, rest=True)
     av = list(np.mean(all_features, axis=0))
     mean_coeff = np.array([el/sum(av[:-1]) for el in av[:-1]])

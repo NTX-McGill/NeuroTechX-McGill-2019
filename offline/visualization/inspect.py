@@ -70,25 +70,17 @@ for direction, data in all_data.items():
     idx = 0
     for spec in right:
         idx += 1
-        plt.subplot(num_rows, 2, idx * 2 - 1)
+        plt.subplot(num_rows, 2, idx * 2)
         draw_spectral_content(f, spec, fig)
     plt.savefig(figname)
 
     fig = plt.figure('av_spec_' + csv.split('.')[0])
     plt.subplot(3, 2, num)
-    draw_spectral_content(
-        f,
-        np.mean(
-            prepro.resize_max(left),
-            axis=0),
-        title=direction + ", channel 1-4")
+    draw_spectral_content(f, np.mean(prepro.resize_max(left), axis=0),
+                          title=direction + ", channel 1-4")
     plt.subplot(3, 2, num + 1)
-    draw_spectral_content(
-        f,
-        np.mean(
-            prepro.resize_max(right),
-            axis=0),
-        title=direction + ", channel 5-8")
+    draw_spectral_content(f, np.mean(prepro.resize_max(right), axis=0),
+                          title=direction + ", channel 5-8")
     num += 2
 
     figname = direction + '_mu_' + csv.split('.')[0]
