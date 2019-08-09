@@ -102,7 +102,7 @@ $(document).ready(function() {
         let time = 1;
 
         //Controlling the timer.
-        collectionTimer = setInterval(function(){
+        collectionTimer = setInterval( () => {
             if (time < totalTime) {
 
               if (time >= times[j]){

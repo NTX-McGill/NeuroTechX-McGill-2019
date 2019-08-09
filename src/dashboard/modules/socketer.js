@@ -1,6 +1,7 @@
 module.exports = class Socketer {
-	constructor(io) {
-		this.io = io;
+	constructor(top) {
+		this.top = top;
+		this.io = this.top.getSocketIO()
 	}
 	sendFFTChannel1(data) {
 		this.io.sockets.emit('fft-test', {'data': data.slice(1)});
@@ -8,7 +9,7 @@ module.exports = class Socketer {
 	sendFFTChannel2(data) {
 		this.io.sockets.emit('fft-test2', {'data': data.slice(1)});
 	}
-	sendTimeSeries(data) {
+	sendTimeSeriesToClient(data) {
 		this.io.sockets.emit('timeseries', {'time': new Date().getTime(), 'eeg': data.slice(1)});
 	}
 	sendSampleRate(numSamples) {
@@ -20,8 +21,8 @@ module.exports = class Socketer {
 	sendStateToML(state) {
 		this.io.sockets.emit('to ML (state)', {'state': state});
 	}
-	initializeAssistedDriving() {
-		this.io.sockets.emit('to self-driving (clear)', {}); // request data
+	initializeSelfDriving() {
+		this.io.sockets.emit('to self-driving (clear)', {});
 	}
 	requestSensorData() {
 		this.io.sockets.emit('to robotics', {response: 'D'}); // request data
