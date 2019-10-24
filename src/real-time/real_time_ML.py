@@ -9,7 +9,7 @@ import random
 sio = socketio.Client()
 
 buffer_data = []
-with open('../offline/model.pkl', 'rb') as fid:
+with open('model.pkl', 'rb') as fid:
     clf = pickle.load(fid)
 print("STARTING")
 
