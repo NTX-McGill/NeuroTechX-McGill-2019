@@ -14,7 +14,7 @@ pylint==2.1.1
 pylsl==1.13.1
 pyserial==3.4
 python-osc==1.7.0
-PyYAML==3.13
+PyYAML==5.4
 requests==2.21.0
 serial==0.0.97
 six==1.11.0
