@@ -18,7 +18,7 @@ PyYAML==3.13
 requests==2.21.0
 serial==0.0.97
 six==1.11.0
-urllib3==1.24.1
+urllib3==1.26.5
 wincertstore==0.2
 wrapt==1.10.11
 xmltodict==0.12.0
